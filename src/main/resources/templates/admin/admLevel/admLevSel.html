@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/admlayout.html}" layout:fragment="content">
+<head>
+
+<link href="/css/admhome.css" rel='stylesheet'>
+
+<meta charset="UTF-8">
+<title>관리자 페이지</title>
+</head>
+<body>
+
+	<div id="wrapper">
+		<div id="container">
+			<h1 id="container_title">회원 레벨 테이블</h1>
+			<div id="container_main" class="content">
+				<form action="/admin/admLevel/admLevSel/update" method="post">
+					<section>
+						<h2 id="main_h2">회원 레벨 테이블 수정 페이지</h2>
+						<div class="tbl_main">
+							<table>
+								<colgroup>
+									<col class="grid_4">
+									<col>
+									<col class="grid_4">
+									<col>
+								</colgroup>
+								<tbody>
+									<tr>
+										<th><label>등급</label></th>
+										<td><input type="text" name="lv_name"
+											th:value="${admlevSel.lv_name}" required class="menu_input"
+											size="40"></td>
+									</tr>
+									<tr>
+								    <th><label>레벨</label></th>
+									    <td>
+									        <span th:text="${admlevSel.lv_num}"></span>
+									        <input type="hidden" name="lv_num" th:value="${admlevSel.lv_num}">
+									    </td>
+									</tr>
+									<tr>
+										<th><label>등급혜택</label></th>
+										<td><input type="text" name="lv_alpha"
+											th:value="${admlevSel.lv_alpha}"  class="menu_input"
+											size="40"></td>
+									</tr>
+									<tr>
+									    <th><label for="lv_auto_use">승급심사여부</label></th>
+									    <td>
+									        <select name="lv_auto_use" id="lv_auto_use" required class="menu_input">
+									            <option value="N" th:selected="${admlevSel.lv_auto_use == 'N'}">자동승급</option>
+									            <option value="Y" th:selected="${admlevSel.lv_auto_use == 'Y'}">관리자 승인필요</option>
+									        </select>
+									    </td>
+									</tr>
+									<tr>
+										<th><label>레벨업 조건</label></th>
+										<td><input type="text" name="lv_up_limit"
+											th:value="${admlevSel.lv_up_limit}" required class="menu_input"
+											size="40"></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</section>
+					<div class="btn_fixed_top btn_confirm">
+						<input type="submit" value="확인" class="btn_submit btn"
+							accesskey="5">
+					</div>
+				</form>
+			</div>
+			<footer id="ft">
+				<p>Copyright © demo.sir.kr. All rights reserved.</p>
+				<br>
+			</footer>
+		</div>
+	</div>
+
+</body>
+</html>

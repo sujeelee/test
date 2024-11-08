@@ -1,0 +1,59 @@
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+	<!--/* colist 반복 할 구간 + replaced 할 공간 */-->
+	<div th:each="comment : ${colist}" >
+	<div class="commentdivider"></div>	
+			<div class="comment-header ml-4" >
+				<blockquote th:text="${comment.mb_nick}">ID</blockquote>
+				<blockquote th:class="'member-sticker type-sticker'+${comment.mb_level}" th:text="${comment.lv_txt}?:_"></blockquote>
+				<div>
+				<button th:unless="${comment.co_blind.equals('Y')}" class="btn-retouch"
+					th:if="${userInfo != null and comment.mb_id == userInfo}"
+					th:onclick="'enableEditMode(' + ${comment.co_id} + ', \'comment\',this)'">
+					<i class='bx bx-edit-alt'></i>
+				</button>
+				<button th:unless="${comment.co_blind.equals('Y')}" class="btn-delete"
+					th:if="${userInfo != null and comment.mb_id == userInfo}"
+					th:attr="data-wr-no=${comment.wr_no}, data-co-id=${comment.co_id}"					
+					onclick="comment_action(this, 'deleteComment')">
+					<i class='bx bx-message-rounded-x'></i>
+				</button>				
+				</div>	
+			</div>
+		<div th:class="${comment.co_blind.equals('Y')} ? 'blur':''">
+           <span class="blind-content" th:if="${comment.co_blind.equals('Y')}">
+           	⚠신고로 인하여 댓글이 블라인드처리 되었습니다⚠
+           </span>
+			<div class="comment-body ml-4" th:data-coid="${comment.co_id}">
+				<blockquote class="comment-text" th:text="${comment.co_content}">content</blockquote>
+				   <button class="btn-save" style="display:none;"
+	                    th:attr="data-co-id=${comment.co_id}, data-wr-no=${comment.wr_no}" 
+	            		onclick="comment_action(this, 'updateComment')">
+	                    <i class='bx bx-edit-alt'></i>
+	               </button>
+			</div>
+			<div class="comment-footer">
+				<button class="btn-like"
+					th:attr="data-no=${comment.co_id} ,data-action='like', data-type='comment'"
+					th:onclick = "action(this)">
+					<i class='bx bxs-heart' th:classappend="${#strings.equals(comment.cg_like, 'like')} ? 'active' : '' "
+					th:id="'comment-like' + ${comment.co_id}"></i>
+			    	<span class="action-count" th:text="${comment.co_good}"></span>
+				</button>		
+				<button class="btn-report"
+					th:attr="data-no=${comment.co_id}, data-action='report', data-type='comment'"
+					th:onclick = "action(this)">
+					<i class='bx bx-x-circle' th:classappend="${#strings.equals(comment.cg_report, 'report')} ? 'active' : '' "
+					th:id="'comment-report' + ${comment.co_id}"></i>				
+			    	<span class="action-count" th:text="${comment.co_bad}"></span>
+				</button>
+		 	</div>	
+		</div>
+	</div>
+	<!--/* colist == 0 이면 없다고 이야기할 공간 */-->
+	<div th:if="${colist == null or #lists.isEmpty(colist)}" class="comment-item" style="text-align: center;">
+		<span>아직 댓글이 없습니다. 첫 댓글의 영광을 누리세요!</span>
+	</div>
+</html>
+<!--/* colist 반복 할 구간 종료 */-->

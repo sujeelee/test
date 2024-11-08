@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/admlayout.html}" layout:fragment="content">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" th:href="@{/css/stock.css}">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<style type="text/css">
+.btn_bt {
+	padding: 3px;
+	padding-left: 0px;
+	margin-left: -2px;
+	width: 132px;
+	height: 25px;
+	margin-bottom: -15px;
+}
+
+.btn_bta {
+	display: inline-block;
+	margin-top: 15px;
+	width: 100px;
+	height: 40px;
+	padding-top: 7px;
+}
+
+</style>
+</head>
+<body>
+	<main id="wrapper">
+		<div id="container">
+			<h1 id="container_title">
+				[<span th:text="${stock.st_status}"></span>]<span
+					th:text="${stock.st_name}"></span>주식가격 리스트
+			</h1>
+			<div id="container_main" class="content">
+				<div class="btn-list">
+					<div class="btn-group">
+						<button th:if="${today == null}" type="button"
+							class="btn btn-info btn_submit btn btn_bt" th:value="${code}"
+							th:onclick="get_new_data(this.value, [[${date}]]);">최신
+							정보 업데이트</button>
+						&nbsp;
+						<button th:if="${list == null or #lists.isEmpty(list)}"
+							type="button" class="btn btn-info btn_submit btn btn_bt"
+							th:value="${code}" th:onclick="get_new_data(this.value, '');">주식정보
+							가져오기</button>
+					</div>
+				</div>
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th>주식코드</th>
+							<th>일자</th>
+							<th>가격</th>
+							<th>대비</th>
+							<th>등락율</th>
+							<th>시가총액</th>
+							<th>하루 최고가</th>
+							<th>하루 최저가</th>
+							<th>체결수량누적</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="list:${list}">
+							<td th:text="${list.st_code}"></td>
+							<td
+								th:text="${list.si_date.substring(0, 4)} + '-' + ${list.si_date.substring(4, 6)} + '-' + ${list.si_date.substring(6, 8)}"></td>
+							<td th:text="${#numbers.formatInteger(list.si_price,3,'COMMA')}"></td>
+							<td th:text="${#numbers.formatInteger(list.si_vs,3,'COMMA')}"></td>
+							<td><span
+								th:text="${#numbers.formatDecimal(list.si_fltRt,2,2)}"></span>%</td>
+							<td
+								th:text="${#numbers.formatInteger(list.si_mrkTotAmt,3,'COMMA')}"></td>
+							<td th:text="${#numbers.formatInteger(list.si_hipr,3,'COMMA')}"></td>
+							<td th:text="${#numbers.formatInteger(list.si_lopr,3,'COMMA')}"></td>
+							<td th:text="${#numbers.formatInteger(list.si_trqu,3,'COMMA')}"></td>
+						</tr>
+						<tr th:if="${list == null or #lists.isEmpty(list)}">
+							<td colspan="9">주식가격 리스트가 존재하지 않습니다.</td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="center">
+					<a class="btn btn-info btn_submit btn btn_bta"
+						th:href="@{/admin/stock}">목록으로</a>
+				</div>
+				<!-- Modal (숨긴 상태로 시작) -->
+				<div id="loadingModal" class="modal" tabindex="-1" role="dialog"
+					style="display: none; position: fixed; top: 35%; z-index: 1050;">
+					<div class="modal-dialog" role="document">
+						<div class="modal-content">
+							<div class="modal-body text-center">
+								<div class="spinner-border text-info"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script th:inline="javascript">
+			function get_new_data(val, date_val) {
+				$('body')
+						.append(
+								'<div class="modal-backdrop fade show" style="background-color: rgba(211, 211, 211, 0.7);"></div>'); // 새로운 backdrop 추가
+				$('#loadingModal').show();
+				var url = '/admin/stock/getAllStockInfo';
+				var param = {
+					st_code : val
+				};
+
+				if (date_val) {
+					url = '/admin/stock/getNewStockInfo';
+					param = {
+						st_code : val,
+						si_date : date_val
+					};
+				}
+
+				setTimeout(
+						function() {
+							$
+									.ajax({
+										url : url,
+										type : 'post',
+										data : param,
+										dataType : 'json',
+										async : false,
+										success : function(data) {
+											if (data.res == "fail") {
+												$('#loadingModal').hide();
+												$('.modal-backdrop').remove(); // 백드롭 제거
+												if (date_val) {
+													alert("최신정보가 없거나 잘못된 요청입니다.");
+												} else {
+													alert("KRX에 상장된 주식이 아니거나 잘못된 요청입니다.");
+												}
+											} else {
+												alert("["
+														+ data.name
+														+ "] 주식 정보 가져오기를 성공했습니다.");
+												location.reload();
+											}
+										}
+									});
+						}, 1000); // 1초 딜레이
+			}
+		</script>
+	</main>
+</body>
+</html>

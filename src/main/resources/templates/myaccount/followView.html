@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout/layout.html}">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/myFollow.css}">
+</head>
+ <body>
+	<main layout:fragment="content">
+		<div class="my-container mt-5">
+			<div th:replace="~{layout/mySide.html}"></div>
+			<div>
+				<div class="fo-info-div">
+					<div class="fo-nick" th:text="${foInfo.mb_nick}"></div>
+					<div class="fo-info">
+						<div class="fo-total" th:text="${#numbers.formatInteger(pm.totalCount, 0, 'COMMA')} + ' 의견'"></div>
+						<div class="fo-follower" th:text="${#numbers.formatInteger(foInfo.follower, 0, 'COMMA')}+' 팔로워'"></div>
+						<div class="fo-following" th:text="${#numbers.formatInteger(foInfo.following, 0, 'COMMA')}+' 팔로잉'"></div>
+						<div class="fo-unfollow">
+							<button class="btn btn-outline-danger" th:if="${foInfo.fo_no > 0}" th:onclick="follow_action([[${foInfo.fo_no}]], 'unfollow');">
+								언팔로우
+							</button>
+							<button class="btn btn-outline-info" th:if="${foInfo.fo_no <= 0}" th:onclick="follow_action([[${fo_mb_id}]], 'follow');">
+								팔로우
+							</button>
+						</div>
+					</div>
+				</div>
+				<div class="follow-view-table">
+					<div class="fo-view-row" th:each="vi : ${views}" th:onclick="follow_action([[${vi.st_code}]], 'stock');">
+						<div class="fo-div">
+							<div class="fo-stock" th:text="${vi.st_name}+'에 쓴 글'"></div>
+							<div class="fo-date" th:text="'· ' + ${#dates.format(vi.wr_datetime, 'MM월 dd일')}"></div>
+						</div>
+						<div th:class="${vi.wr_blind.equals('Y')} ? 'blur':''">
+			                <span class="blind-content" th:if="${vi.wr_blind.equals('Y')}">
+			                	⚠신고로 인하여 게시글이 블라인드처리 되었습니다⚠
+			                </span>
+							<div class="fo-content" th:text="${vi.wr_content}"></div>
+						</div>
+					</div>
+					<div class="fo-view-row" th:if="${views == null or #lists.isEmpty(views)}">
+						팔로우한 회원이 작성한 게시글이 없습니다.
+					</div>
+				</div>
+				<div class="page_div">
+					<ul class="pagination justify-content-center center" 
+						th:object="${pm}" 
+						th:if="${pm.endPage != 0}">
+					    <li class="page-item" th:if="*{prev}">
+					    	<a class="page-link" th:href="@{/myaccount/follow/views/{fo_id}(fo_id=${fo_mb_id}, page=*{startPage-1})}">이전</a>
+					    </li>
+					    <li class="page-item" 
+					    	th:each="i : *{#numbers.sequence(startPage, endPage)}"
+					    	th:classappend="*{cri.page} == ${i} ? 'active' : ''">
+					    	<a class="page-link" th:href="@{/myaccount/follow/views/{fo_id}(fo_id=${fo_mb_id}, page=${i})}" th:text="${i}"></a>
+					    </li>
+					    <li class="page-item" th:if="*{next}">
+					    	<a class="page-link" th:href="@{/myaccount/follow/views/{fo_id}(fo_id=${fo_mb_id}, page=*{endPage+1})}">다음</a>
+					    </li>
+					</ul>
+				</div>
+			</div>	
+		</div>
+		<script th:inline="javascript">
+			function follow_action(fo_id, action){
+				if(action == "stock"){
+					window.open('/stock/' + fo_id + '/community', '_blank');
+				} else {
+					var text = "언팔로우";
+					if(action == "follow"){
+						text = "팔로우";
+					}
+					if(!confirm(text + " 하시겠습니까?")){
+						alert(text + "를 취소하였습니다.");
+						return;
+					}
+					$.ajax({
+						url : '/myaccount/follow/' + action,
+						method : "post", //원하는 방식 선택
+						data : { //보낸 데이터를 객체로
+							fo_no : fo_id
+						},
+						success : function(data){
+							alert(data.msg);
+							if(data.res == "success"){
+								location.reload();
+							}
+						}
+					});
+				}
+			}
+		</script>
+	</main>
+</body>
+</html>

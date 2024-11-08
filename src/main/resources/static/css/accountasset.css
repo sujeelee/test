@@ -1,0 +1,229 @@
+/* Container */
+.my-container {
+    display: grid;
+    grid-template-columns: 184px minmax(10px, 1fr);
+    grid-column-gap: 40px;
+    column-gap: 40px;
+    padding: 0 40px 40px 24px;
+    min-width: 940px;
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+/* Sidebar */
+	.my-sidebar {
+          position: sticky;
+          top: 60px;
+          padding-top: 30px;
+          border-radius: 50px;
+          background-color: #fff;
+      }
+
+      .my-list {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+      }
+
+      .my-list li {
+          margin-bottom: 10px;
+      }
+      
+      .my-item {
+      	list-style: none;
+      }
+
+      .my-btn {
+          background-color: transparent;
+          border: none;
+          text-align: left;
+          cursor: pointer;
+          padding: 10px 15px;
+          border-radius: 50px;
+          transition: background-color 0.2s;
+          width: 100%;
+      }
+
+      .my-list li:hover {
+    border-radius: 20px;
+    background-color: #f9fafb;
+      }
+      .my-text {
+      	font-weight: 500;
+          font-size: 17px;
+          color: #888;
+      }
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+/* 자산 섹션 */
+.account-text {
+	font-size: 19px; 
+	color: #888;
+}
+
+.balance-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* 기간 선택 섹션 */
+
+.graph-container {
+    height: 350px;
+    width: 100%; 		/* 컨테이너의 너비를 100%로 고정 */
+ overflow: hidden; 	/* 불필요한 크기 변화를 방지 */
+}
+
+.period-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.period-button {
+    padding: 4px 16px;
+    border: 1px solid white;
+    border-radius: 20px;
+    background-color: white;
+    color: #888;
+}
+
+.period-button.active { 
+    padding: 4px 16px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    background-color: #f9fafb;
+	color: black;
+} /* 버튼 선택시 */
+
+.period-button:hover{
+	padding: 4px 16px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    background-color: #f9fafb;
+	color: black;
+}
+
+.order-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: end;
+}
+
+.action-button {
+    padding: 4px 16px;
+    border: 1px solid #ebeded;
+    border-radius: 10px;
+    background-color: #ebeded;
+    color: #535454;
+}
+
+.action-button:hover{
+    background-color: #d7d9d9;
+}
+
+/* 클래스이름 맞추는 중 */
+.my-section-wrapper {
+    display: flex;
+    gap: 30px;
+}
+
+.my-section {
+	display: flex;
+    flex-direction: column;
+}
+
+.my-header-text {
+	font-size: 15px;
+	color: #888;
+}
+
+.my-balance-text1 {
+	font-size: 24px;
+    font-weight: bold;
+    color: #333d4b;
+}
+
+.my-balance-text2 {
+	font-size: 17px;
+    color: #888;
+}
+
+.my-item-box {
+	display: flex;
+    flex-direction: column;
+    padding: 20px 24px;
+    border-radius: 15px;
+    gap: 12px;
+    border: 1px solid #ccc;
+    width: 500px;
+    height: 130px;
+}
+
+.my-item-text1 {
+	font-size: 15px; 
+	color: #333d4b; 
+	font-weight: bold;
+}
+
+.my-item-text2 {
+	font-size: 19px; 
+	color: #333d4b;
+}
+
+.my-item-text3 {
+	font-size: 15px; 
+	color: #333d4b;
+}
+
+.my-details {
+	display: flex;
+    flex-direction: column;
+}
+
+.final-details {
+	flex-grow: 1;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 8px;
+}
+
+.my-info-left {
+	display: flex;
+          flex-direction: column;
+}
+
+.my-info-right {
+	display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+}
+
+.my-text-left {
+          color: #4e5968;
+          font-size: 17px;
+}
+
+.my-text-right {
+	font-weight: bold;
+	color: #4e5968;
+          font-size: 18px;
+}
+
+.final-button {
+	width: 100%;
+	border: 0;
+	background-color: transparent;
+}
+
+.final-button :hover {
+	background-color: #f9fafb;
+}
+.my-info-title-div{display: flex;justify-content: space-between;align-items: flex-start;}
+.margin-header-text{margin-bottom: 2%}

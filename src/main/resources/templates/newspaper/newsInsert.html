@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html 
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+	layout:decorate="~{layout/layout.html}">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+	<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
+</head>
+<body>
+	<main layout:fragment="content">
+		<h1 class="text-center mt-4 mb-4">뉴스 등록</h1>
+		<div class="container mt-5">
+			<form th:action="@{/newspaper/newsInsert/{np_no}(np_no=${np_no})}" method="post" enctype="multipart/form-data">
+				<div class="form-group">
+					<label for="ne_title">제목:</label>
+					<input type="text" class="form-control" id="ne_title" name="ne_title">
+				</div>
+				<div class="form-group">
+					<label>썸네일 이미지:</label>
+					<br>
+					<input type="file" name="file">
+				</div>
+				<div class="form-group">
+					<label for="ne_content">내용:</label>
+					<textarea class="form-control" id="ne_content" name="ne_content" style="min-height: 400px; height: auto;"></textarea>
+				</div>
+				<button type="submit" class="btn btn-outline-dark col-12 mb-2">등록</button>
+			</form>
+		</div>
+		<script type="text/javascript">
+		 	$('#ne_content').summernote({
+				placeholder: '내용을 작성하세요',
+				tabsize: 2,
+				height: 400
+			})
+		</script>
+	</main>
+</body>
+</html>

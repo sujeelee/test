@@ -1,0 +1,154 @@
+<sidebar th:fragment="sidebar">
+<link rel="stylesheet" type="text/css" th:href="@{/css/sidebar.css}">
+	<div class="sidebar">
+		<div class="sidebar-rows">
+			<ul class="nav-list">
+				<li class="side_icon" data-tag="mystock" onclick="showDash(this);">
+					<a href="#">
+						<i class="fa-solid fa-arrow-trend-up"></i>
+						<span class="links_name">내 투자</span>
+					</a>
+					<span class="tooltip">내투자</span>
+				</li>
+				<li class="side_icon" data-tag="mywish" onclick="showDash(this);">
+					<a href="#">
+						<i class="fa-solid fa-heart"></i>
+						<span class="links_name">관심주식</span>
+					</a>
+					<span class="tooltip">관심주식</span>
+				</li>
+				<li class="side_icon" data-tag="hot" onclick="showDash(this);">
+					<a href="#">
+						<i class="fa-solid fa-fire"></i>
+						<span class="links_name">&nbsp;실시간</span>
+					</a>
+					<span class="tooltip">실시간</span>
+				</li>
+			</ul>
+		</div>
+		<div class="sidebar-line"></div>
+		<div class="sidebar-rows">
+			<ul>
+				<li class="side_icon" sec:authorize="isAnonymous()">
+					<a th:href="@{/member/login}">
+						<i class="fa-solid fa-right-to-bracket"></i>
+						<span class="links_name">&nbsp;로그인</span>
+					</a>
+					<span class="tooltip">로그인</span>
+				</li>
+				
+				<!-- 회원가입 -->
+				<li class="side_icon" sec:authorize="isAnonymous()">
+					<a th:href="@{/member/join}">
+						<i class="fa-solid fa-user-plus"></i>
+						<span class="links_name">회원가입</span>
+					</a>
+					<span class="tooltip">회원가입</span>
+				</li>
+				<!-- 관리자 -->
+				<li class="side_icon" sec:authorize="isAuthenticated()">
+					<a sec:authorize="isAuthenticated()" th:if="${#authentication.Principal.member.mb_level >= 9}" 
+						th:href="@{/admin/adminHome}">
+						<i class="fa-solid fa-user-tie"></i>
+						<span class="links_name">&nbsp;관리자</span>
+					</a>
+					<span class="tooltip">관리자</span>
+					
+				</li>
+				<!-- 로그아웃 -->
+				<li class="side_icon" sec:authorize="isAuthenticated()">
+					<a th:href="@{/member/logout}">
+						<i class="fa-solid fa-right-from-bracket"></i>
+						<span class="links_name">로그아웃</span>
+					</a>
+					<span class="tooltip">로그아웃</span>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div class="dash-info" style="display: none">
+		<div class="guest-dash-info" sec:authorize="isAnonymous()">
+			<div class="dash-guest">
+				회원전용 기능이에요:)
+			</div>
+			<div class="dash-guest">
+				로그인 후 이용해주세요!
+			</div>
+			<div class="dash-guest">
+				<a th:href="@{/member/login}">
+					<button type="button" class="btn btn-info">로그인 하러 가기</button>
+				</a>
+				<a th:href="@{/member/join}">
+					<button type="button" class="btn btn-info">회원가입 하러 가기</button>
+				</a>
+			</div>
+		</div>
+		<div class="member-dash-info" sec:authorize="isAuthenticated()">
+			<h4 class="dash-title member-dash-title"></h4>
+			<div class="dash-table-line"></div>       
+			<div class="dash-table" id="dash-ajax" th:fragment="dash-ajax">
+				<div class="dash-row" th:each="dashs : ${dashList}">
+					<div class="dash-middle">
+						<div class="dash-table-rigth">
+							<a th:href="'/stock/'+${dashs.code}">
+								<span th:text="${dashs.stockName}"></span>
+							</a>
+							<div class="dash-qty dash-grey" th:if="${dashs.stocksQty > 0}" th:text="${#numbers.formatInteger(dashs.stocksQty, 0, 'COMMA')} + '주'"></div>
+						</div>
+						<div class="dash-table-left">
+							<div th:text="${#numbers.formatInteger(dashs.price, 0, 'COMMA')} + '원'"></div>
+							<div th:class="${dashs.flt == '0' ? 'dash-grey' : dashs.flt.contains('-') ? 'dash-blue' :'dash-red' } + ' dash-font'" th:text="${#numbers.formatInteger(dashs.vs, 0, 'COMMA')}+'원 ('+ ${#numbers.formatDecimal(dashs.flt, 1, 2)}+'%)'"></div>
+						</div>
+					</div>
+				</div><!-- end dash-row -->
+				<div class="dash-row dash-none-list" th:if="${dashList == null or #lists.isEmpty(dashList)}">
+			    	<div class="dash-none-content">
+						<i class="fa-solid fa-note-sticky fa-5x dash-fa-color"></i>
+			    		<p class="dash-no-title">내역이 없어요</p>
+				    </div>
+				</div>
+			</div>	
+		</div>
+		<div class="dash-hot-stocks" style="display: none">
+			<h4 class="dash-title">실시간 차트</h4>
+			<div class="dash-table-line"></div>       
+			<div class="dash-table">
+				<div class="dash-row" th:each="hots : ${hotlist}">
+					<div class="dash-middle">
+						<div class="dash-table-rigth">
+							<span th:text="${hots.ranks}"></span>
+							<a th:href="'/stock/'+${hots.code}">
+								<span th:text="${hots.st_name}"></span>
+							</a>
+						</div>
+						<div class="dash-table-left">
+							<div th:text="${#numbers.formatInteger(hots.price, 0, 'COMMA')} + '원'"></div>
+							<div th:class="${hots.flt == '0' ? 'dash-grey' : hots.flt.contains('-') ? 'dash-blue' :'dash-red' } + ' dash-font'" th:text="${#numbers.formatInteger(hots.vs, 0, 'COMMA')}+'원 ('+ ${#numbers.formatDecimal(hots.flt, 1, 2)}+'%)'"></div>
+						</div>
+					</div>
+				</div><!-- end dash-row -->
+			</div>	
+		</div>
+	</div>
+	<script th:inline="javascript">
+		function get_list_dash(tag){
+			var mb_id = null;
+			if([[${member.mb_id}]]){
+				mb_id = [[${member.mb_id}]];
+			}
+			if(mb_id != null){
+				$.ajax({
+					url : '/dashlist',
+					method : "post", //원하는 방식 선택
+					data : { //보낸 데이터를 객체로
+						tag : tag,
+						mb_id : mb_id
+					},
+					success : function(data){
+						$("#dash-ajax").replaceWith(data);
+					}
+				});
+			}
+		}
+	</script>
+</sidebar>

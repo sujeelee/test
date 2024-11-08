@@ -1,0 +1,448 @@
+@charset "UTF-8";
+.cmcontainer {
+  display: flex;
+  justify-content: space-between; /* 왼쪽과 오른쪽 섹션을 나눔 */
+  align-items: flex-start; /* 상단 정렬 */
+  margin-top: 30px;
+}
+
+.stock-info {
+  flex-basis: 50%; /* 왼쪽 섹션이 차지할 비율 */
+}
+
+.details-right {
+  display: flex;
+  flex-direction: row; /* 세로 방향으로 배치 */
+  gap: 10px; /* 세부 항목과 버튼 사이의 간격 */
+  color: gray; /* 텍스트 색상을 회색으로 설정 */
+}
+
+.details {
+  display: flex;
+  flex-direction: row; /* 세부 항목을 세로로 나열 */
+  color: gray; /* 텍스트 색상을 회색으로 설정 */
+}
+
+.detail {
+  display: flex;
+  flex-direction: column; /* 라벨과 값을 가로로 배치 */
+  justify-content: space-between; /* 라벨과 값을 양쪽 끝으로 배치 */
+  padding: 5px; /* 패딩으로 요소 간격 조정 */
+  border-left: 1px solid #e0e0e0;
+  align-items: center; /* 수직 정렬 */
+  width: 100px; /* 원하는 너비로 설정 (예: 200px) */
+  color: gray; /* 텍스트 색상을 회색으로 설정 */
+}
+
+.label {
+  font-weight: 400; /* 라벨 굵게 설정 */
+  color: #555; /* 라벨 색상 설정 */
+  font-size: 12px; /* 텍스트 크기 조정 (예: 12px) */
+  color: gray; /* 텍스트 색상을 회색으로 설정 */
+}
+
+.value {
+  font-weight: bold; /* 값 굵게 설정 */
+  color: #333; /* 값 색상 설정 */
+  font-size: 14px; /* 텍스트 크기 조정 (예: 14px) */
+  color: gray; /* 텍스트 색상을 회색으로 설정 */
+}
+
+.buttons {
+  display: flex;
+  gap: 5px; /* 버튼 간의 간격 */
+  margin-right: 20px;
+}
+
+.button-icon {
+  padding: 10px 10px; /* 상하 5px, 좌우 10px로 줄이기 */
+  font-size: 20px; /* 버튼 텍스트 크기 조정 (예: 12px) */
+  border: none; /* 필요에 따라 테두리 제거 */
+  border-radius: 3px; /* 모서리 둥글게 */
+  background-color: #f0f0f0; /* 버튼 배경색 */
+  cursor: pointer; /* 포인터 커서로 변경 */
+  transition: background-color 0.3s; /* 배경색 전환 효과 */
+}
+
+.button-icon:hover {
+  background-color: #e0e0e0; /* 호버 시 배경색 변경 */
+}
+
+.icon-alarm {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background-size: cover;
+}
+
+.icon-watch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background-size: cover;
+}
+
+.board-popular-container {
+  display: grid; /* 그리드 레이아웃 사용 */
+  grid-template-columns: 1fr 1fr; /* 두 개의 열로 나누기 */
+  gap: 30px; /* 열 간의 간격 */
+  margin-top: 30px; /* 상단 여백 */
+}
+
+.board-section {
+  flex: 1; /* 가용 공간을 모두 차지하도록 설정 */
+  min-width: 300px; /* 최소 너비 설정 (원하는 값으로 조정 가능) */
+}
+h2 {
+  font-weight: bold;
+  color: #333;
+  font-size: 20px;
+  line-height: 1.6;
+}
+
+.board-editor {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.profile-button {
+  display: flex;
+  align-items: center;
+}
+
+.profile-button img {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+}
+
+.profile-button span {
+  margin-left: 8px;
+  font-weight: 600;
+  color: #666;
+  font-size: 11px;
+}
+
+.textarea-container {
+  flex-grow: 1;
+}
+
+.textarea-container label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.textarea-container textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: none;
+}
+
+.textarea-container textarea::placeholder {
+  color: #aaa;
+}
+
+.board-footer {
+  display: flex; /* Flexbox 사용 */
+  align-items: center; /* 수직 중앙 정렬 */
+  justify-content: flex-end; /* 기본은 왼쪽 정렬 */
+}
+.comment-footer {
+  display: flex; /* Flexbox 사용 */
+  align-items: center; /* 수직 중앙 정렬 */
+  justify-content: flex-end; /* 기본은 왼쪽 정렬 */
+}
+.board-button {
+  background-color: transparent; /* 배경색 투명으로 설정 */
+  border: none; /* 테두리 제거 */
+  cursor: pointer; /* 포인터 커서로 변경 */
+  padding: 10px; /* 패딩 추가 */
+}
+.comment-footer{
+  display: flex; /* Flexbox 사용 */
+  align-items: center; /* 수직 중앙 정렬 */
+  justify-content: flex-end; /* 기본은 왼쪽 정렬 */
+}
+.board-button i {
+  font-size: 24px; /* 아이콘 크기 조정 */
+  color: #333; /* 기본 아이콘 색상 설정 */
+}
+
+.board-button:hover i {
+  color: #096c8a; /* 호버 시 아이콘 색상 변경 (예: teal) */
+}
+
+.board-form button + button {
+  margin-left: 10px; /* 두 버튼 사이에 10px의 간격 추가 */
+}
+
+.board-button-right {
+  margin-left: auto; /* 오른쪽으로 밀기 */
+}
+
+/* 인기 급상승 주식 목록 스타일 */
+.popular-stocks {
+  margin-top: 30px; /* 상단 여백 */
+  max-height: 500px;
+}
+
+.stock-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+  color: #333;
+}
+
+/* 댓글 및 인기 주식 섹션을 감싸는 스타일 */
+.board-popular-wrapper {
+  display: flex; /* Flexbox로 수평 정렬 */
+  flex-direction: row; /* 수평 방향으로 설정 (기본값이므로 생략 가능) */
+  border: 1px solid #e0e0e0; /* 외부 테두리 추가 */
+  border-radius: 8px;
+  gap: 30px; /* 두 요소 간의 간격 설정 */
+  padding: 20px; /* 패딩 추가 */
+  margin-top: 30px; /* 상단 여백 */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+.popular-stocks {
+  padding: 20px; /* 상하좌우 여백 */
+  border-radius: 8px; /* 모서리 둥글게 */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+  margin: 20px 0; /* 상하 여백 */
+}
+
+.popular-stocks h2 {
+  text-align: center; /* 제목 중앙 정렬 */
+  color: #333; /* 제목 색상 */
+  margin-bottom: 20px; /* 제목 아래 여백 */
+}
+
+.stock-card {
+  background-color: #ffffff; /* 카드 배경 색상 */
+  border: 1px solid #e0e0e0; /* 카드 테두리 */
+  border-radius: 5px; /* 카드 모서리 둥글게 */
+  padding: 15px; /* 카드 안 여백 */
+  margin: 10px 0; /* 카드 상하 여백 */
+  transition: transform 0.2s; /* 호버 효과 전환 */
+}
+
+.stock-card h3 {
+  font-size: 1.2em; /* 주식 이름 폰트 크기 */
+  color: #007bff; /* 주식 이름 색상 */
+}
+
+.stock-card p {
+  font-size: 1em; /* 가격 폰트 크기 */
+  color: #666; /* 가격 색상 */
+}
+
+.stock-card:hover {
+  transform: translateY(-5px); /* 카드 호버 시 위로 이동 */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* 호버 시 그림자 효과 */
+}
+.popular-stocks {
+  background-color: #f9f9f9; /* 배경 색상 */
+  border: 1px solid #e0e0e0; /* 테두리 색상 */
+  border-radius: 8px; /* 테두리 둥글기 */
+  padding: 20px; /* 안쪽 여백 */
+  margin: 20px 0; /* 위쪽과 아래쪽 여백 */
+}
+
+.stock-list {
+  list-style-type: none; /* 기본 목록 스타일 제거 */
+  padding: 0; /* 패딩 제거 */
+  font-size: 12px; /* 원하는 크기로 설정 (예: 12px) */
+}
+
+.stockItem {
+  font-size: 12px; /* 원하는 크기로 설정 (예: 12px) */
+  margin-bottom: 15px; /* 각 항목 사이의 간격 */
+  padding: 10px; /* 항목의 안쪽 여백 */
+  border-bottom: 1px solid #e0e0e0; /* 항목 사이의 테두리 */
+}
+
+.stockItem h3 {
+  margin: 0; /* 제목의 기본 여백 제거 */
+  font-size: 18px; /* 제목 크기 */
+}
+
+.stockItem p {
+  margin: 5px 0 0; /* 가격의 여백 설정 */
+  color: #666; /* 가격 색상 */
+}
+#boardList_ui {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.board {
+  border-bottom: 1px solid #e0e0e0;
+  padding: 15px 0;
+  list-style: none;
+}
+
+.board-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.comment-header {
+  display: flex;
+  align-items: center;
+  /*justify-content: space-between;*/
+  margin-bottom: -10px;
+  gap: 8px;
+}
+.comment-author {
+  display: flex;
+  align-items: center;
+}
+
+.author-name {
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+.author-badge {
+  background-color: #ffc34229;
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-size: 11px;
+}
+
+.board-body {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.board-text {
+  flex-grow: 1;
+}
+
+.follower-btn {
+  background-color: #17a2b8; /* 버튼 배경색 (파란색) */
+  color: #ffffff; /* 버튼 글자색 (흰색) */
+  border: none; /* 기본 테두리 제거 */
+  font-size: 14px; /* 글자 크기 */
+  padding: 5px 5px; /* 버튼 안쪽 여백 */
+  border-radius: 5px; /* 버튼 모서리 둥글게 */
+  margin-left: auto;
+}
+.comment-body {
+  margin-top: 10px;
+}
+.board-title {
+  font-weight: bold;
+}
+.board-text{
+	white-space: pre-wrap;
+}
+.board-text a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.board-footer {
+  margin-top: 10px;
+  text-align: right; /* 오른쪽 정렬 */
+}
+.comment-footer {
+  margin-top: 10px;
+  text-align: right; /* 오른쪽 정렬 */
+}
+.follow-btn {
+  margin-left: auto; /* 오른쪽 끝으로 버튼을 밀어냄 */
+}
+.follow-btn,.btn-like,.reply-btn,.btn-report,.btn-retouch,.btn-delete,.btn-save {
+  background-color: transparent;
+  border: none;
+  color: gray;
+  cursor: pointer;
+}
+
+.follow-btn:hover,
+.like-btn:hover,
+.reply-btn:hover {
+  color: #0056b3;
+}
+.boarddivider {
+  border-bottom: 2px solid #ccc; /* 줄 두께와 색상 */
+  margin: 20px 0; /* 위 아래 여백 */
+  width: 100%; /* 선의 길이를 50%로 설정 */
+  margin-left: auto; /* 왼쪽 여백을 자동으로 설정 */
+  margin-right: auto; /* 오른쪽 여백을 자동으로 설정하여 중앙 정렬 */
+}
+.commentdivider{
+	border-bottom: 2px solid #ccc; /* 줄 두께와 색상 */
+	margin: 15px 0; /* 위 아래 여백 */
+	width: 100%; /* 선의 길이를 50%로 설정 */
+	margin-left: auto; /* 왼쪽 여백을 자동으로 설정 */
+	margin-right: auto; /* 오른쪽 여백을 자동으로 설정하여 중앙 정렬 */
+}
+.btn-like,.btn-retouch {
+  margin-right: 5px; /* like 버튼의 오른쪽에 간격 추가 */
+  margin-left: 5px;
+}
+.stock-name {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+.comment-input {
+	width: 100%;
+    padding: 8px;
+    border: none;
+    border-bottom: 2px solid #ddd; /* 아래쪽 테두리만 */
+    background-color: transparent; /* 배경색 제거 */
+    font-size: 16px;
+    outline: none; /* 클릭 시 파란 테두리 제거 */
+}
+.edit-input{
+	width: 100%; /* 버튼 공간을 제외한 너비 설정 */
+	padding: 10px; /* 내부 여백 */
+	border: 1px solid #ddd; /* 경계선 추가 */
+	border-radius: 5px; /* 모서리 둥글게 */
+	resize: none; /* 크기 조정 비활성화 */
+}
+/* 댓글 제출 버튼 스타일 */
+.submit-reply {
+  margin-top: 10px; /* 위쪽 여백 */
+  background-color: transparent;
+  border: none;
+  color: gray;
+  cursor: pointer;
+}
+.comment-btn{
+	color: gray;
+}
+blockquote {
+	line-height: 0.8;
+} 
+.input-group{
+	flex-direction: row-reverse
+}
+.submit-reply:hover {
+  background-color: #218838; /* 호버 시 색상 변경 */
+}
+.div-ul {
+  margin-top: 5px;
+  overflow: auto;
+  white-space: nowrap;
+  max-height: 400px;
+}
+.bxs-heart.active {
+  color: #ff0000 !important; /* 좋아요 활성화 시 색상 */
+}
+
+.bx-x-circle.active {
+  color: #0000ff !important; /* 신고 활성화 시 색상 */
+}
+.comm-stock-hots{color: #17a2b8; text-decoration-line: none;}
+.comm-stock-hots:hover{color: #17a2b8; text-decoration-line: none;}
+.board-none{text-align: center;}

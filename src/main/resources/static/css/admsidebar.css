@@ -1,0 +1,66 @@
+
+
+/* 사이드바 설정 */
+#menu {
+	position: fixed;
+	top: 0;
+	left: 0;
+	max-width: 220px;
+	height: 100%;
+	margin-top: 50px
+}
+
+#nav_icon {
+	/* 사이드바 아이콘 및 글자 크기 조정 */
+	font-size: 20px;
+	padding-left: 6px;
+	margin: 8px;
+}
+
+/* 헤더 탑과 사이드바 사이 간격 줄이기용 */
+ul {
+	padding: 0;
+	margin: 0;
+}
+
+#menu_ul {
+	position: relative;
+	height: 100%;
+	background: #ebebeb;
+	width: 210px;
+	list-style: none;
+}
+
+#menu_li {
+	padding: 1px;
+	padding-left: 17px;
+	background: #ffffff;
+	border: 1px solid #77777759;
+}
+
+.sub-menu {
+	display: none; /* 기본적으로 숨김 */
+	padding-left: 20px;
+	margin-bottom: 10px; /* 각 세부 메뉴 간격 */
+	background-color: #fff; /* 세부 메뉴 배경색 */
+	border-left: 3px solid #60718b; /* 세부 메뉴 구분선 */
+	margin-left: 35px;
+	font-size: 16px;
+}
+
+.sub-menu-item{
+margin: 5px;
+margin-bottom: 9px;
+font-size: 15px;
+}
+.sub-menu-item a{
+font-size: 15px;
+}
+
+li a{
+	display: block;
+}
+
+li a:hover, a:active {
+	background-color : rgb(23, 162, 184, 0.2);
+}

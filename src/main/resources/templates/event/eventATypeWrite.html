@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html 
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout.html}">
+<head>
+<meta charset="UTF-8">
+<title>시드키 : 어드민 : 이벤트 작성 : Atype</title>
+	<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
+</head>
+<body>
+	<main layout:fragment="content">
+
+		<h1 class="text-center mt-4 mb-4">참여형 이벤트 작성</h1>
+
+		<div class="container mt-5">
+
+			<form th:action="@{/event/eventATypeWrite}" method="post" enctype="multipart/form-data">
+
+                <p>정보 : 이벤트 번호에 맞추어서 /event/Aevent/(이벤트 link) 로 주소가 만들어집니다.
+                    상품을 여러번 등록하시면 여러게 표기됩니다.</p>
+				<div class="form-group">
+					<label for="pr_name">상품명:</label>
+					<input type="text" class="form-control" id="pr_name" name="pr_name" placeholder="상품명">
+				</div>
+
+				<div class="form-group">
+					<label for="pr_point">소모될 포인트:</label>
+					<input type="text" class="form-control" id="pr_point" name="pr_point" placeholder="포인트">
+				</div>
+
+				<div class="form-group">
+					<label for="pr_link">(이벤트 포스트 작성시 가게될 주소)저장될 이벤트 주소:</label>
+					<input type="text" class="form-control" id="pr_link" name="pr_link" placeholder="이벤트 주소">
+				</div>
+
+
+                
+                <div class="form-group" th:with="eventNumber = ${param.evNum}">
+                    <label for="ev_no">연동될 Event Post 주소</label>
+                    <select class="form-control" id="ev_no" name="ev_no">
+                        <th:block th:each="event : ${eventList}">
+                            <option th:value="${event.ev_no}"
+                            th:selected="${#strings.equals(event.ev_no, eventNumber)}"
+                            th:text="${event.ev_title}"></option> 
+                        </th:block>
+                    </select>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="pr_startLevel">레벨(start Line)(Default level 1)</label>
+                    <select class="form-control" id="pr_startLevel" name="pr_startLevel">
+                      <option selected>1</option>
+                      <option>2</option>
+                      <option>3</option>
+                      <option>4</option>
+                      <option>5</option>
+                      <option>6</option>
+                      <option>7</option>
+                      <option>8</option>
+                      <option>9</option>
+                    </select>
+                </div>
+
+                
+
+                <div class="form-group">
+                    <label for="pr_endLevel">레벨(end Line)(Default level 9)</label>
+                    <select class="form-control" id="pr_endLevel" name="pr_endLevel">
+                      <option>1</option>
+                      <option>2</option>
+                      <option>3</option>
+                      <option>4</option>
+                      <option>5</option>
+                      <option>6</option>
+                      <option>7</option>
+                      <option>8</option>
+                      <option selected>9</option>
+                    </select>
+                </div>
+
+
+
+				<div class="form-group">
+					<label>상품 보기 이미지:</label>
+					<input type="file" class="form-control-file border"  name="file">
+				</div>
+				
+				<button type="submit" class="btn btn-outline-dark col-12 mb-2">상품 등록</button>
+			</form>
+		</div>
+
+
+
+
+        <script>    
+            
+
+
+        </script>
+
+
+
+	</main>
+</body>
+</html>

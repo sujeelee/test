@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html 
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+	layout:decorate="~{layout/layout.html}">
+<head>
+<meta charset="UTF-8">
+<title>시드키 : 뉴스 리스트</title>
+</head>
+<body>
+	<main layout:fragment="content">
+		<th:block layout:fragment="css">
+			<link rel="stylesheet" th:href="@{/css/newsList.css}" >
+		</th:block>
+		<div class="container">
+			<div class="d-flex">
+				<h1 class="ml-3" th:text="${newspaper.np_name}"></h1>
+				<div class="ml-auto insert-news">
+					<span sec:authorize="isAuthenticated()" th:if="${#authentication.principal.member.mb_level == 7 and (user.mb_news != null ? user.mb_news eq newspaper.np_name : false)}" >
+		            	<a th:href="@{/newspaper/newsInsert/{np_no}(np_no=${newspaper.np_no})}" class="btn">뉴스 등록</a>
+		            </span>
+	            </div>
+			</div>
+			<input type="hidden" name="np_num" th:value="${newspaper.np_no}">
+			<div class="main_wrap">
+		        <!-- 날짜 선택 버튼 영역 -->
+		        <div class="news-date">
+		            <button id="prev-date-btn" class="date-btn">◀</button>
+		            <span id="selected-date"></span>
+		            <section th:replace="~{newspaper/calender.html}"></section>
+		            <input type="hidden" name="ne_datetime" th:value="${ne_datetime}">
+		            <button id="next-date-btn" class="date-btn">▶</button>
+		        </div>
+		        <div class="explanatory-text">
+	            	<span>뉴스를 누른 채 이동하면 순서 변경이 가능합니다.</span>
+	       		</div>
+		        <!-- 뉴스 리스트 박스 -->
+		        <div class="news-container">
+		            <ul class="news-list">
+		                <li class="news-item" th:each="item:${newsList}">
+		                	<div class="news-box">
+		                		<div class="news-heading-box">
+			                        <span>신문 발행 날짜</span>
+			                    </div>
+			                    <div class="news-content-box">
+			                    	<div class="newx-text-box">
+				                    	<div class="news-title mb-2">
+				                    		<a href="#" style="font-size: 18px;">헤드라인 제목</a>
+				                    	</div>
+				                    	<div class="news-content">
+					                        <a href="#">헤드라인 내용</a>                   		
+				                    	</div>
+			                    	</div>
+			                    	<div class="news-image-box">
+			                    		<img src="썸네일 이미지">
+			                    	</div>
+			                    </div>
+		                    </div>
+		                </li>
+		            </ul>
+		        </div>
+		    </div>
+		</div> 
+		<script th:inline="javascript">
+			$(document).ready(function() {
+			    let today = new Date();
+			    let date = new Date($('input[name=ne_datetime]').val());
+			    let currentDate = new Date(date);
+			    $('#selected-date').text(formatDate(currentDate).substr(0, 7));
+	
+			    function formatDate(date) {
+			        const year = date.getFullYear();
+			        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+			        const day = date.getDate().toString().padStart(2, '0');
+			        const yyyy_mm_dd = year + "-" + month + "-" + day;
+			        return yyyy_mm_dd;
+			    }
+	
+			    $('#prev-date-btn').click(function () {
+			    	currentDate.setDate(1);
+			        currentDate.setMonth(currentDate.getMonth() - 1);
+			        update();
+			    });
+	
+			    $('#next-date-btn').click(function () {
+			    	currentDate.setDate(1);
+			        currentDate.setMonth(currentDate.getMonth() + 1);
+			        update();
+			    });
+	
+			    function buttonStatus() {
+			        if (currentDate.getFullYear() == today.getFullYear() && 
+			            currentDate.getMonth() == today.getMonth()) {
+			            $('#next-date-btn').prop('disabled', true);
+			        } else {
+			            $('#next-date-btn').prop('disabled', false);
+			        }
+			    }
+	
+			    function update() {
+			        $('#selected-date').text(formatDate(currentDate).substr(0, 7));
+			        fetchNews(currentDate);
+			        buttonStatus();
+			    }
+			    
+			    function deleteTag(content) {
+			    	 return content.replace(/<\/?[^>]+(>|$)/g, "");
+			    }
+
+	
+			    function fetchNews(date) {
+			        let ne_datetime = formatDate(date);
+			        let np_no = $('input[name=np_num]').val();
+			        let news = {
+			            ne_datetime: ne_datetime,
+			            np_no: np_no
+			        }
+			        $.ajax({
+			            async: true,
+			            url: '/newspaper/newsList/views',
+			            type: 'post',
+			            data: JSON.stringify(news),
+			            contentType: "application/json; charset=utf-8",
+			            dataType: "json",
+			            success: function (data) {
+			                displayNewsList(data.newsList);
+			            }
+			        });
+			    }
+	
+			    function displayNewsList(list) {
+			        if (list == null || list.length == 0) {
+			        	let tmp = `
+							<div class="undata-box">
+								<p>발행된 종이 신문이 없거나<br>신문게재 정보가 입력되지 않았습니다.</p>
+							</div>
+						`;
+						$('.news-container').html(tmp);
+						return;
+			        }
+			        let str1 = '';
+			        let str2 = '';
+			        for (news of list) {
+			            var ne_datetime = formatDate(new Date(news.ne_datetime));
+			            var ne_content = deleteTag(news.ne_content);
+			            str1 += `
+			                <li class="news-item" draggable="true">
+			                    <div class="news-box">
+			                        <div class="news-heading-box">
+			                            <span>${ne_datetime}</span>
+			                        </div>
+			                        <div class="news-content-box">
+			                        	<div class="news-text-box ${news.fi_path ? '' : 'no-image'}">
+				                            <div class="news-title">
+				                                <a href="/newspaper/newsDetail/${news.ne_no}" style="font-size: 20px;">${news.ne_title}</a>
+				                            </div>
+				                            <div class="news-content">
+				                                <a href="/newspaper/newsDetail/${news.ne_no}">${ne_content}</a>
+				                            </div>
+				                        </div>
+				                        ${news.fi_path ? `
+				                            <div class="news-image-box">
+				                                <img src="/uploads${news.fi_path}" alt="헤드라인 이미지">
+				                            </div>
+					                     ` : ''}
+			                        </div>
+			                    </div>
+			                </li>
+	           			 `;
+		            str2 = `
+						<ul class="news-list">${str1}</ul>
+					`;
+			        }
+			        $('.news-container').html(str2);
+			        displayDrag();
+			    }
+	
+			    fetchNews(currentDate);
+			    buttonStatus();
+			    
+			    function displayDrag() {
+				    const newsItems = $('.news-item');
+				    let draggedItem = null;
+
+				    newsItems.on('dragstart', function() {
+				        draggedItem = $(this);
+				        draggedItem.css('opacity', 0.5);
+				    });
+
+				    newsItems.on('dragend', function() {
+				        draggedItem = null;
+				        $(this).css('opacity', '');
+				    });
+
+				    newsItems.on('dragover', function(event) {
+				        event.preventDefault();
+				    });
+
+				    newsItems.on('drop', function(event) {
+				        event.preventDefault();
+				        if (draggedItem) {
+				            const list = $('.news-list');
+				            const items = list.children();
+				            const draggedIndex = items.index(draggedItem);
+				            const dropIndex = items.index($(this));
+
+				            if (draggedIndex < dropIndex) {
+				                $(this).after(draggedItem);
+				            } else {
+				                $(this).before(draggedItem);
+				            }
+				        }
+				    });
+				}
+				$("input[name=calender]").change(function(){
+					var new_date = $("input[name=calender]").val();
+					currentDate = new Date(new_date);
+					$("#selected-date").text(new_date);
+					update();
+				});
+			});
+		</script>
+	</main>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/admlayout.html}" layout:fragment="content">
+<head>
+<script
+	src="https://demo.sir.kr/gnuboard5/js/jquery.menu.js?ver=2304171"></script>
+<meta charset="UTF-8">
+<link href="/css/admapproval.css" rel='stylesheet'>
+<title>관리자 페이지</title>
+<!--  스타일 적용 했음  -->
+</head>
+<body>
+	<div id="wrapper">
+		<div id="container">
+			<h1 id="container_title">회원권한 승인 페이지</h1>
+			<div id="container_main" class="content">
+				<div id="select_left">
+					<form action="/admin/admApproval/admApprovalPage/search"
+						method="get" class="local_sch" onsubmit="return unableform()">
+						<input type="text" name="mp_company" id="mp_company" required th:placeholder="${mb_id != null ? mb_id : '아이디를 입력하세요'}"
+							class="in_sch" style="height: 30px">
+						<button type="submit" class="btn_submit btn"
+							style="margin-left: 2px;">검색</button>
+						<a href="/admin/admApproval/admApprovalPage"
+							class="btn_submit btn btn_a" style="padding-top: 5px;">초기화</a>
+					</form>
+				</div>
+				<table>
+					<thead>
+						<tr>
+							<th>요청 타입</th>
+							<th>요청사 ID</th>
+							<th>요청사 이름</th>
+							<th>신청일자</th>
+							<th>승인/거절</th>
+							<th>승인여부</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="list : ${list}">
+							<td th:text="${list.mp_type}" class="app_td"></td>
+							<td th:text="${list.mb_id}" class="app_td"></td>
+							<td th:text="${list.mp_company}" class="app_td"></td>
+							<td th:text="${list.mp_datetime}" class="app_td"></td>
+							<td class="app_btn">
+								<!-- 승인 버튼 폼 -->
+								<form th:action="@{/admin/admApproval/admApprovalPage/slt}"
+									method="post" class="apo_btn">
+									<input type="hidden" name="mp_yn" value="y" /> <input
+										type="hidden" name="mb_no" th:value="${list.mb_no}" /> <input
+										type="hidden" name="mp_type" th:value="${list.mp_type}" /> <input
+										type="hidden" name="mp_company" th:value="${list.mp_company}" />
+									<button type="submit" class="btn_submit btn">승인</button>
+								</form> <!-- 거절 버튼 폼 -->
+								<form th:action="@{/admin/admApproval/admApprovalPage/slt}"
+									method="post" class="apo_btn">
+									<input type="hidden" name="mp_yn" value="n" /> <input
+										type="hidden" name="mb_no" th:value="${list.mb_no}" /> <input
+										type="hidden" name="mp_type" th:value="${list.mp_type}" /> <input
+										type="hidden" name="mp_company" th:value="${list.mp_company}" />
+									<button type="submit" class="btn_submit btn">거절</button>
+								</form>
+							</td>
+							<td class="app_td">
+							    <span th:if="${list.mp_yn == 'y'}">승인 상태입니다</span>
+							    <span th:if="${list.mp_yn == 'n'}">거절 상태입니다</span>
+							    <span th:if="${list.mp_yn != 'y' && list.mp_yn != 'n'}">처리 대기중입니다</span> <!-- 필요시 추가 -->
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<div id="display_box">
+					<ul class="pagination" th:object="${pm_Approval}"
+						th:if="${pm_Approval != null && pm_Approval.endPage != 0 && mp_company != null}">
+						<li th:if="${pm_Approval.prev}"><a
+							th:href="@{/admin/admApproval/admApprovalPage/search(mp_company=${mp_company}, page=${pm_Approval.startPage - 1})}">◀</a>
+						</li>
+						<li
+							th:each="i : ${#numbers.sequence(pm_Approval.startPage, pm_Approval.endPage)}"
+							th:classappend="${pm_Approval.cri.page} == ${i} ? 'active' : ''">
+							<a
+							th:href="@{/admin/admApproval/admApprovalPage/search(mp_company=${mp_company}, page=${i})}"
+							th:text="${i}"></a>
+						</li>
+						<li th:if="${pm_Approval.next}"><a
+							th:href="@{/admin/admApproval/admApprovalPage/search(mp_company=${mp_company}, page=${pm_Approval.endPage + 1})}">▶</a>
+						</li>
+					</ul>
+					<ul class="pagination" th:object="${pm_Approval}"
+						th:if="${pm_Approval != null && pm_Approval.endPage != 0 && mp_company == null}">
+						<li th:if="${pm_Approval.prev}"><a
+							th:href="@{/admin/admApproval/admApprovalPage(page=${pm_Approval.startPage - 1})}">◀</a>
+						</li>
+						<li
+							th:each="i : ${#numbers.sequence(pm_Approval.startPage, pm_Approval.endPage)}"
+							th:classappend="${pm_Approval.cri.page} == ${i} ? 'active' : ''">
+							<a th:href="@{/admin/admApproval/admApprovalPage(page=${i})}"
+							th:text="${i}"></a>
+						</li>
+						<li th:if="${pm_Approval.next}"><a
+							th:href="@{/admin/admApproval/admApprovalPage(page=${pm_Approval.endPage + 1})}">▶</a>
+						</li>
+					</ul>
+				</div>
+
+			</div>
+		</div>
+		
+		<script>
+			function unableform() {
+				const mp_company = document.getElementById("mp_company");
+				const approValue = mp_company.value;
+				const appro = approValue.replace(/\s/g, '')
+
+				document.getElementById('mp_company').value = appro;
+			}
+		</script>
+	</div>
+</body>
+</html>
+
+
+

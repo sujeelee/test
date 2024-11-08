@@ -1,0 +1,69 @@
+.container-event-Participatory-type {
+    display: flex;
+    flex-wrap: nowrap; /* 좌우로 나열 */
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    overflow-x: auto; /* 좌우 스크롤 추가 */
+}
+
+.event-participation {
+    text-align: center;
+    padding: 20px; /* 카드의 내부 여백을 늘려서 더 크고 여유 있게 */
+    background-color: #fff;
+    margin: 15px; /* 카드 사이 간격을 더 크게 */
+    flex: 0 0 250px; /* 카드 크기를 키움 */
+    border-radius: 20px; /* 둥근 모서리 설정 */
+    border: 5px solid;
+    border-image: linear-gradient(45deg, #ff4d4d, #ffadad, #ff4d4d);
+    border-image-slice: 1;
+    box-shadow: 0 8px 20px rgba(255, 77, 77, 0.3); /* 그림자 크기와 강도를 더 키움 */
+    transition: transform 0.3s ease;
+}
+
+.event-participation:hover {
+    transform: scale(1.07); /* 마우스를 올렸을 때 좀 더 확대되도록 */
+}
+
+.event-image {
+    width: 180px; /* 이미지 크기 조정 */
+    height: auto;
+    margin-bottom: 15px; /* 이미지 아래 간격을 더 키움 */
+}
+
+.submit-button {
+    padding: 10px 20px;
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    border-radius: 10px; /* 버튼도 둥근 모서리로 설정 */
+    cursor: pointer;
+    font-size: 14px; /* 버튼의 폰트 크기 증가 */
+}
+
+.points-required {
+    font-size: 16px;
+    font-weight: bold;
+    color: #ff4d4d;
+    margin-top: 10px;
+}
+
+#confirmationMessage {
+    margin-top: 10px;
+}
+
+.loader {
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #ff4d4d;
+    border-radius: 50%;
+    width: 15px;
+    height: 15px;
+    animation: spin 2s linear infinite;
+    display: none;
+    margin: 10px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

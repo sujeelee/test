@@ -1,0 +1,43 @@
+@charset "UTF-8";
+
+.center{text-align: center; margin-bottom: 2%;margin-top: 2%;}
+.btn-list{margin-bottom: 2%;margin-top: 2%;} 
+.center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.form-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 80%; /* 전체 form 너비 */
+    margin-bottom: 5%;
+    margin-top: 5%;
+}
+
+.left_side, .rigth_side {
+    width: 45%; /* 좌우 너비 설정 */
+}
+.divider{
+ 	 border: 1px solid #e3f8fa;
+     width: 2px;
+     height: 350px;
+ }
+.form-footer {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.order_info{margin-bottom: 10% !important;}
+.de_price{margin-bottom: 5%;}
+.title{margin-bottom: 10%; font-weight: bold;}
+.enter_price{margin-top: -5%; margin-left: 5.5%; margin-right: -30%;}
+.won{margin-left: -32%; margin-top: 1%;}
+.money_btn_row{margin-left: 5%;}
+#ect_price{width: 65% !important;}
+.input-money{margin-left: 13% !important;}

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html 
+   xmlns:th="http://www.thymeleaf.org"
+   xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+   layout:decorate="~{layout/layout.html}">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<main layout:fragment="content">
+	<script
+		src="https://code.jquery.com/jquery-3.7.1.js"
+		integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+		crossorigin="anonymous"
+    ></script>
+    <script th:inline="javascript">
+		var msg = /*[[${msg}]]*/ '';
+		if (msg != "") {
+		  alert(msg);
+		}
+		var type = /*[[${windows} ? windows : '']]*/ '';
+		if(type != ""){
+			window.close();
+		} else {
+			let url = /*[[@{${url}}]]*/ '';
+			location.href = url;
+		}
+    </script>
+   </main>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html 
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+	layout:decorate="~{layout/layout.html}">
+    
+	
+<head>
+<meta charset="UTF-8">
+<title>시드키 : 이벤트</title>
+</head>
+<body>
+
+   
+
+    
+<main layout:fragment="content">
+	 <!--/* 스타일 */-->
+<th:block layout:fragment="css">
+    <link rel="stylesheet" th:href="@{/css/eventpage.css}" >
+</th:block>
+
+
+<h2 class="center"  style="color: dodgerblue; text-align: center; margin-top: 2%; margin-bottom: 2%;">이벤트</h2>
+    
+
+<div class="event-container">
+
+    <ul class="tab">
+        <li><a class="tablinks" style="text-decoration-line: none;" th:classappend="${eventStatus} == 'Opening' ? 'active' : '' "  th:href="@{/event/eventhome/Opening}" >진행중인 이벤트</a></li>
+        <li class="separator">|</li>
+        <li><a class="tablinks" style="text-decoration-line: none;" th:classappend="${eventStatus} == 'Ending' ? 'active' : '' " th:href="@{/event/eventhome/Ending}" >종료된 이벤트</a></li>
+        <li class="separator">|</li>
+        <li><a class="tablinks" style="text-decoration-line: none;" th:classappend="${eventStatus} == 'resUser' ? 'active' : '' " th:href="@{/event/eventhome/resUser}" >당첨자 발표</a></li>
+    </ul>        
+
+    <div id="ongoing" class="tabcontent" th:if="${eventStatus} == 'Opening' or ${eventStatus} == 'Ending'">
+        <ul class="event-list" th:if="${#lists.size(list) != 0}">
+          <!--/* th:each로 list 돌려줄 예정 */-->
+            <li class="event-item" th:each="event : ${list}">
+                <a th:href="@{/event/eventhome/{eventStatus}/{ev_no}(ev_no = ${event.ev_no}, eventStatus = ${eventStatus})}">
+                    <img th:src="@{'/uploads' + ${event.fi_path}}" alt="Event Image" style="height: 200px;">
+                    <h4 class="mt-3">[[${event.ev_title}]]</h4>
+                    <p style="font-size: 16px;"><i class="fa-solid fa-calendar"></i>&nbsp;[[${#dates.format(event.ev_start, 'yyyy년 MM월 dd일 ')}]] ~ [[${#dates.format(event.ev_end, 'yyyy년 MM월 dd일')}]]</p>
+                </a>
+            </li>
+        </ul>
+
+
+        <ul th:if="${#lists.size(list) == 0}" style="width: 100%; flex-basis: 100%;  list-style: none;">
+            <li class="noneList" style="text-decoration: none;">
+                <p style= " text-align: center; width: 100%; flex-basis: 100%;" >아무런 이벤트가 없어요! 다음에 찾아주세요.</p>
+            </li>
+        </ul>
+    </div>
+
+
+    <div id="ongoing" class="container" th:if="${eventStatus} == 'resUser'">
+
+        <table class="table table-hover" th:if="${#lists.size(list) != 0}" th:each="event : ${list}">
+            <tr th:onclick="|location.href='@{/event/eventhome/{eventStatus}/{ev_no}(ev_no = ${event.ev_no}, eventStatus = ${eventStatus})}'|">
+                <td style="text-align: left;">[[${event.ev_title}]]</td>
+                <td style="text-align: right;"><i class="fa-solid fa-calendar"></i>&nbsp;[[${#dates.format(event.ev_end, 'yyyy-MM-dd')}]]</td>
+            </tr>
+        </table>
+
+        <div th:if="${#lists.size(list) == 0}">
+            <p style= " text-align: center; width: 100%;" >아무런 게시글이 없어요! 다음에 찾아주세요.</p>
+        </div>
+
+    </div>
+
+    <div id="ongoing" class="tabcontent" th:if="${eventStatus} == 'Hidden'">
+        <ul class="event-list" th:if="${#lists.size(list) != 0}">
+          <!--/* th:each로 list 돌려줄 예정 */-->
+            <li class="event-item" th:each="event : ${list}">
+                <a th:href="@{/event/eventhome/{eventStatus}/{ev_no}(ev_no = ${event.ev_no}, eventStatus = ${eventStatus})}">
+                    <img th:src="@{'/uploads' + ${event.fi_path}}" alt="Event Image" style="height: 200px;">
+                    <h4 class="mt-3">[[${event.ev_title}]]</h4>
+                    <p style="font-size: 16px;"><i class="fa-solid fa-calendar"></i>&nbsp;[[${#dates.format(event.ev_start, 'yyyy년 MM월 dd일 ')}]] ~ [[${#dates.format(event.ev_end, 'yyyy년 MM월 dd일')}]]</p>
+                </a>
+            </li>
+        </ul>
+
+
+        <ul th:if="${#lists.size(list) == 0}" style="width: 100%; flex-basis: 100%;  list-style: none;">
+            <li class="noneList" style="text-decoration: none;">
+                <p style= " text-align: center; width: 100%; flex-basis: 100%;" >아무런 이벤트가 없어요! 다음에 찾아주세요.</p>
+            </li>
+        </ul>
+    </div>
+
+
+
+     
+</div>
+<!--/* 로그인을 했고 + 아이디 권한이 9 이상이면 보임 */-->
+<div class="container" sec:authorize="isAuthenticated()" th:if="${#authentication.Principal.member.mb_level} >= 9">
+    <p>★운영자 전용 이벤트 작성 페이지</p>
+    <a th:href="@{/event/write}" class="btn btn-outline-secondary" >이벤트 작성</a>
+    <a th:href="@{/event/eventhome/Hidden}" class="btn btn-outline-secondary" th:classappend="${eventStatus} == 'Hidden' ? 'active' : '' ">숨겨진 이벤트 보기</a>
+    <a th:href="@{/event/prizeList}" class="btn btn-outline-secondary">이벤트 별 상품 리스트 보기</a>
+</div>
+
+    <script th:inline="javascript">
+        var count = 0;
+        [# th:each="event, stat : ${list}"]
+        var event[[${stat.count}]] = [[${event}]];
+        var nDate = new Date([[${event.ev_end}]]);
+        if(nDate < new Date()){count++}
+        [/]
+        if(count >= 1 && [[${eventStatus}]] == "Opening"){
+            setEventDateAndStatus();
+        }
+
+        function setEventDateAndStatus(){
+            $.ajax({
+                url: '/event/ajax/updateEventDateAndStatus',
+                method: 'post',
+                dataType : 'text',
+                data : {},
+                success: function (data) {
+                    location.reload(true);
+                },
+                error: function (data, status, err) {
+                    console.log(data)
+                },
+
+            });
+        }
+    </script>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,166 @@
+@charset "UTF-8";
+/* Container */
+.my-container {
+    display: grid;
+    grid-template-columns: 184px minmax(10px, 1fr);
+    grid-column-gap: 40px;
+    column-gap: 40px;
+    padding: 0 40px 40px 24px;
+    min-width: 940px;
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+/* Sidebar */
+.my-sidebar {
+    position: sticky;
+    top: 60px;
+    padding-top: 30px;
+    border-radius: 50px;
+    background-color: #fff;
+}
+
+     .my-list {
+         list-style: none;
+         padding: 0;
+         margin: 0;
+     }
+
+     .my-list li {
+         margin-bottom: 10px;
+     }
+     
+     .my-item {
+     	list-style: none;
+     }
+
+     .my-btn {
+         background-color: transparent;
+         border: none;
+         text-align: left;
+         cursor: pointer;
+         padding: 10px 15px;
+         border-radius: 50px;
+         transition: background-color 0.2s;
+         width: 100%;
+     }
+
+     .my-list li:hover {
+   border-radius: 20px;
+   background-color: #f9fafb;
+     }
+     .my-text {
+     	font-weight: 500;
+         font-size: 17px;
+         color: #888;
+     }
+/* Header */
+.my-header {
+    margin-bottom: 30px;
+}
+
+.header-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333d4b;
+}
+
+.sub-header-title {
+	font-size: 20px;
+	font-weight: bold;
+	color: #333d4b;
+}
+
+.my-section {
+	margin-bottom: 60px;
+	
+}
+
+.my-details {
+	flex-grow: 1;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 8px;
+}
+
+.my-info-left {
+	display: flex;
+          flex-direction: column;
+}
+
+.my-info-right {
+	display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+}
+
+.my-text-left {
+          color: #4e5968;
+          font-size: 17px;
+}
+
+.my-text-left1 {
+          color: #4e5968;
+          font-size: 17px;
+          text-align: left
+}
+
+.my-text-left2 {
+          color: #4e5968;
+          font-size: 14px;
+}
+
+.my-text-right {
+	font-weight: bold;
+	color: #4e5968;
+          font-size: 18px;
+}
+
+.my-button {
+	width:100%; 
+	background-color: transparent;   
+	border: none;
+		outline: none;
+		background-color: inherit ;
+			cursor: pointer;
+}
+
+.my-button:hover{
+	background-color: #f9fafb;
+	border-radius: 10px;
+}
+
+input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+input[type="checkbox"]:checked {
+    background-color: #4e5968;
+}
+
+.drop-btn {
+	width: 100%;
+	border: 0;
+		background-color: #fff;
+}
+
+.drop-btn:hover {
+	background-color: #f9fafb;
+}
+
+#selected-value {
+	margin-left: 10px; 
+	font-weight: bold; 
+	color: #333d4b; 
+	font-size: 26px;
+}
+
+input[type="number"] {
+	width: 100%;
+	height: 36px;
+	border-radius: 5px;
+	padding: 6px 12px;
+}

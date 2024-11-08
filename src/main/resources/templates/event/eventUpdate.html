@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html 
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout.html}">
+<head>
+<meta charset="UTF-8">
+<title>시드키 : 이벤트 수정</title>
+	<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
+</head>
+<body>
+	<main layout:fragment="content">
+
+
+
+		<h1 class="text-center mt-4 mb-4">이벤트 업데이트</h1>
+
+		<div class="container mt-5">
+			<form th:action="@{/event/eventUpdate}" method="post" enctype="multipart/form-data">
+
+
+				<div class="form-group">
+					<label for="ev_title">이벤트 제목:</label>
+					<input type="text" class="form-control" id="ev_title" name="ev_title" th:value="${event.ev_title}">
+				</div>
+
+
+				<label>이벤트 상태:</label>
+				<select name="ev_status" class="custom-select mb-3" th:value="${event.ev_status}">
+					<option selected>이벤트 상태 선택 (반드시 선택해 주세요.)</option>
+					<option value="Opening" th:selected="${event.ev_status} == 'Opening'">Opening</option>
+					<option value="Ending" th:selected="${event.ev_status} == 'Ending'">Ending</option>
+					<option value="resUser" th:selected="${event.ev_status} == 'resUser'">resUser</option>
+					<option value="Hidden" th:selected="${event.ev_status} == 'Hidden'">Hidden</option>
+				</select>
+
+				<label>이벤트 폼 종류:</label>
+				<select name="ev_form" class="custom-select mb-3" th:value="${event.ev_form}">
+					<option value="Post" th:selected="${event.ev_form} == 'Post'">Post (기본값)</option>
+					<option value="Participatory" th:selected="${event.ev_form} == 'Participatory'">Participatory event(참여형)</option>
+					<option value="none">새로 추가해 주세요</option>
+				</select>
+
+
+				<div class="mt-3">
+					<label>이벤트 시작일, 종료일(게시물 게시일):</label>
+					<div class="form-row ">
+						<div class="col">
+							<input type="date" id="ev_start" name="ev_start" class="form-control" placeholder="시작일" th:value="${#dates.format(event.ev_start, 'yyyy-MM-dd')}">
+						</div>	
+						<div class="col">
+							<input type="date" id="ev_end" name="ev_end" class="form-control" placeholder="종료일" th:value="${#dates.format(event.ev_end, 'yyyy-MM-dd')}">
+						</div>
+					</div>
+				</div>
+
+				<div class="form-group mt-3" th:if="${file} != null">
+					<div ><label>기존 이벤트 썸네일 이미지:</label></div>
+					<p>[[${event.fi_path}]]</p>
+					<div style="border: 1px solid black; width: 400px;">
+						<img  th:src="@{'/uploads' + ${event.fi_path}}" alt="Event Image" style="height: 200px;">
+					</div>
+				</div>
+
+				<div class="form-group mt-3">
+					<label>변경할 섬네일 이미지 썸네일 이미지:</label>
+					<input type="file" class="form-control-file border"  name="file">
+				</div>
+				
+				<div class="form-group">
+					<label for="ev_content"></label>
+					<textarea class="form-control" id="ev_content" name="ev_content" style="min-height: 400px; height: auto;">[[${event.ev_content}]]</textarea>
+				</div>
+				<button type="submit" class="btn btn-outline-dark col-12 mb-2">등록</button>
+
+
+
+				<!--/* 히든 */-->
+				<input type="hidden" th:name="ev_no" th:value="${event.ev_no}">
+				<input type="hidden" th:name="fi_path" th:value="${event.fi_path}">
+
+			</form>
+		</div>
+
+
+
+		<script type="text/javascript">
+		 	$('#ev_content').summernote({
+				placeholder: '내용을 작성하세요',
+				tabsize: 2,
+				height: 400
+			})
+		</script>
+
+	</main>
+</body>
+</html>

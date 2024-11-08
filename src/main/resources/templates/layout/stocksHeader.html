@@ -1,0 +1,115 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet" type="text/css" th:href="@{/css/stockdetail.css}">
+<div class="cmcontainer">
+	<section class="title">
+		<div class="stock-info">
+			<span class="stock-name" th:text="${stock.st_name}"></span>
+			<div class="stock-info-price">
+				<span class="stock-price" th:text="${#numbers.formatInteger(today.si_price, 0, 'COMMA')} + '원'"></span>
+				전보다 <span th:class="${today.si_vs  == '0' ? 'stock-before hold' : (today.si_vs.contains('-') ? 'stock-before blue' : 'stock-before red')}" th:text="${#numbers.formatInteger(today.si_vs, 0, 'COMMA')} + '원 ('+${#numbers.formatDecimal(today.si_fltRt, 1, 2)}+'%)' "></span>
+			</div>
+		</div>
+	</section> 
+	<section class="details-right">
+		<!-- 오른쪽 섹션 (나머지) -->
+		<div class="details">
+		    <div class="detail">
+		        <span class="label">시가총액</span>
+		        <span class="value" th:text="${today.price_text}"></span>
+		    </div>
+		    <div class="detail">
+		        <span class="label">1일 최저</span>
+		        <span class="value" th:text="${#numbers.formatInteger(today.si_lopr, 0, 'COMMA')} + '원' "></span>
+		    </div>
+		    <div class="detail">
+		        <span class="label">1일 최고</span>
+		        <span class="value" th:text="${#numbers.formatInteger(today.si_hipr, 0, 'COMMA')} + '원' "></span>
+		    </div>
+	    </div>
+	    <div class="buttons">
+            <button type="button" aria-label="관심 등록" th:class="'button-icon watch '+ ${today.st_code}" th:value="${wish == null} ? 'N' : 'Y'" th:onclick="get_wish([[${today.st_code}]], this.value);">
+              <i th:id="${today.st_code}" th:class="${wish == null} ?'fa-solid fa-heart grey' : 'fa-solid fa-heart pink'"></i>
+            </button>
+        </div>
+	</section>
+</div>
+<section class="button-link">
+	<div class="btn-list">
+		<ul class="list-group list-group-horizontal">
+			<li class="list-group-item list-group-item-light">
+				<a th:href="@{/stock/{st_code}(st_code=${today.st_code})}">
+					<button type="button" class="btn btn-light chart">차트·호가</button>
+				</a>
+			</li>
+			<li class="list-group-item list-group-item-light">
+				<a th:href="@{/stock/{st_code}/news(st_code=${today.st_code})}">
+					<button type="button" class="btn btn-light news">뉴스</button>
+				</a>
+			</li>
+			<li class="list-group-item list-group-item-light">
+				<a th:href="@{/stock/{st_code}/community(st_code=${today.st_code})}">
+					<button type="button" class="btn btn-light community">커뮤니티</button>
+				</a>
+			</li>
+		</ul>
+	</div>
+</section>
+<script th:inline="javascript">
+	$(document).ready(function() {
+		$('.home-section').removeClass('container');
+		
+		var currentUrl = window.location.pathname;
+
+	    if (currentUrl.includes("/news")) {
+	    	$(".news").removeClass("btn-light");
+	        $(".news").addClass("btn-info");
+	    } else if (currentUrl.includes("/community")) {
+	        $(".community").removeClass("btn-light");
+	        $(".community").addClass("btn-info");
+	    } else {
+	        $(".chart").removeClass("btn-light");
+	        $(".chart").addClass("btn-info");
+	    }
+	});
+	function get_wish(code, status){
+		
+		var userid = [[${mb_id}]];
+		if(userid == null){
+			if(confirm("회원만 이용가능합니다.\n로그인페이지로 이동하시겠습니까?")) {
+				location.href = "/member/login";
+				return false;
+			} else {
+				alert("해당 기능은 로그인 후 사용할 수 있습니다.");
+				return false;
+			}
+		}
+		
+		if(status == 'Y'){
+			if(!confirm("위시에서 삭제하시겠습니까?")){
+				alert("삭제를 취소하셨습니다.");
+				return false;
+			}
+		}
+		$.ajax({
+            url: "/stock/wish",
+            type: 'post',
+            data: {st_code: code, status: status},
+            dataType : 'json',
+            async: false, 
+            success: function (data) {
+            	if(data.res == "success"){
+            		if(status == "Y"){
+            			$("#"+code).removeClass("pink");
+            			$("#"+code).addClass("grey");
+            			$("."+code).val("N");
+            		} else {
+            			$("#"+code).removeClass("grey");
+            			$("#"+code).addClass("pink");
+            			$("."+code).val("Y");
+            		}
+            	}
+            	alert(data.msg);
+            }
+        });
+	}
+</script>

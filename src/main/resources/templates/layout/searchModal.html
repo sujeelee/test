@@ -1,0 +1,41 @@
+<html xmlns:th="http://www.thymeleaf.org">
+	<div class="search-modal-table search-result" id="search-result">
+		<div class="result-stock" th:if="${(resType == 'all' || resType == 'stock') && search[0].stockCnt > 0}">
+			<div class="result-mini-title">종목</div>
+			<div class="search-modal-row search-result-stock" th:onclick="modal_link([[${res.code}]], 'stock');" th:each="res, num : ${search}" th:if="${res.type == 'stock'}">
+				<div class="modal-left">
+					<span th:text="${res.title}"></span>
+				</div>
+				<div class="modal-right">
+					<span th:text="${#numbers.formatInteger(res.price, 0, 'COMMA')} + '원'"></span>
+					<div th:class="${res.flt == '0' ? 'dash-grey' : res.flt.contains('-') ? 'dash-blue' :'dash-red' }" th:text="${#numbers.formatDecimal(res.flt, 1, 2)} + '%'"></div>
+				</div>
+			</div> <!-- end search-modal-row -->
+			<div class="search-result-line" th:if="${resType == 'all' && search[0].stockCnt > 5}">
+				<div class="dash-table-line" style="width: 80%;"></div>
+				<span class="nav-item" onclick="search_result('stock');">종목 더보기<i class="fa-solid fa-chevron-right"></i></span>
+			</div>
+		</div>
+		<div class="result-news" th:if="${(resType == 'all' || resType == 'news') && search[0].newsCnt > 0}">
+			<div class="result-mini-title">뉴스</div>
+			<div class="result-modal-row" th:onclick="modal_link([[${res.code}]], 'news');" th:each="res : ${search}" th:if="${res.type == 'news'}">
+				<div class="result-modal-left">
+					<span th:text="${res.title}"></span>
+				</div>
+				<div class="result-modal-bottom">
+					<span th:text="${res.date} + ' · ' + ${res.newspaper}"></span>
+				</div>
+			</div> <!-- end search-modal-row -->
+			<div class="search-result-line" th:if="${resType == 'all' && search[0].newsCnt > 5}">
+				<div class="dash-table-line" style="width: 80%;"></div>
+				<span class="nav-item" onclick="search_result('news');">뉴스 더보기<i class="fa-solid fa-chevron-right"></i></span>
+			</div>
+		</div>
+		<div class="search-result-none" th:if="${(resType == 'all' && search[0].newsCnt <= 0 && search[0].stockCnt <= 0)||(resType == 'stock' && search[0].stockCnt <= 0)||(resType == 'news' && search[0].newsCnt <= 0)}">
+			<div class="result-none-text">검색 키워드 : <span>' [[${mstx}]] '</span></div>
+			<div class="result-none-text">검색결과가 없어요.</div>
+			<div class="result-none-text">단어의 철자가 정확한지 확인해 주세요.</div>
+			<div class="result-none-text">거래소에 상장되지 않았거나, S2D KEY에서 거래할 수 없는 종목은 검색되지 않을 수 있어요.</div>
+		</div>
+	</div>
+</html>

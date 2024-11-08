@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout/layout.html}">
+<head>
+<meta charset="UTF-8" />
+<title>시드키 : 판매 수익</title>
+<link rel="stylesheet" type="text/css" th:href="@{/css/accountprofit.css}">
+</head>
+ <body>
+	<main layout:fragment="content">
+		<div class="my-container mt-5">
+			<div th:replace="~{layout/mySide.html}"></div>
+			<div>
+				<!-- Header -->
+				<div class="mypage-header">
+					<h1 class="header-title">판매 수익</h1>
+				</div>		
+				<section>
+					<div class="btn-list">
+						<ul class="list-group list-group-horizontal">
+							<li class="list-group-item list-group-item-light">
+								<div class="dropdown">
+									<button class="dropdown-toggle btn btn-light" data-toggle="dropdown">전체</button>
+									<div class="dropdown-menu">
+										<div class="dropdown-item">
+											<button class="btn on" type="button" onclick="selectDate(this)" value="all">전체</button>
+										</div>
+										<div class="dropdown-item">
+											<button class="btn" type="button" onclick="selectDate(this)" value="day">일별</button>
+										</div>
+										<div class="dropdown-item">
+											<button class="btn" type="button" onclick="selectDate(this)" value="month">월별</button>
+										</div>
+										<div class="dropdown-item">
+											<button class="btn" type="button" onclick="selectDate(this)" value="year">연도별</button>
+										</div>
+									</div>
+								</div>
+							</li>
+						</ul>
+						<div class="date-box">
+							<div class="date-text" th:text="${mb_datetime + ' ~ ' + now}"></div>
+						</div>
+					</div>
+				</section>
+				<section class="profit-section">
+					<div class="profit-box">
+						<span class="profit-text" id="profit-text" th:text="${#numbers.formatInteger(proceeds,0,'COMMA')} + '원'"></span>
+						<span class="profit-text" id="profit-rate" th:text="'(' + ${rateOfReturn} + '%)'"></span>
+					</div>
+				</section>
+				<div class="transaction-box">
+				    <div class="transaction-container" th:each="list:${list}">
+				        <!-- 날짜 및 시간 정보 -->
+				        <span class="date-info" th:text="${#dates.format(list.od_date, 'MM.dd')}"></span>
+				        <!-- 거래 내역 -->
+				        <div class="transaction-details">
+				            <!-- 사용자 정보 -->
+				            <div class="user-info">
+				                <span class="user-name" th:text="${list.od_st_name} + ' ' + ${list.od_qty} + '주'"></span>
+				                <span class="transaction-type"><span th:text="${#strings.substring(list.od_date, 11, 16)}"></span> ㅣ <span th:text="${list.od_status}"></span></span>
+				            </div>
+				
+				            <!-- 금액 정보 -->
+				            <div class="amount-info">
+				                <span class="amount"><span th:text="${#numbers.formatInteger(list.od_price,0,'COMMA')}"></span>원</span>
+				                <span class="balance"><span th:text="${#numbers.formatInteger(list.od_st_price,0,'COMMA')}"></span>원</span>
+				            </div>
+				        </div>
+				    </div>
+				    <div class="none-list" th:if="${list == null or #lists.isEmpty(list)}">
+				    	<div class="none-content">
+							<i class="fa-solid fa-note-sticky fa-5x fa-color"></i>
+				    		<p class="no-title">내역이 없어요</p>
+				    	</div>
+				    </div>
+				</div>
+		    </div>
+		</div>
+		<script th:inline="javascript">
+	        function selectDate(button) {
+	            $('.dropdown-toggle').text($(button).text());
+	            $('.dropdown-item .on').removeClass('on');
+	            $(button).addClass('on');
+	            
+	            let date = $(button).val();
+	            console.log(date); // value값 확인
+	            
+	            $.ajax({
+	            	async : true, //비동기 : true(비동기), false(동기)
+	            	url : '/myaccount/profit/date', 
+	            	type : 'post', 
+	            	data : 
+	            	{
+	            		date : date
+	            	}, 
+	            	dataType : "json", 
+	            	success : function (data){
+	            		switch(data.status) {
+	            		case 'all':
+	            			displayUpdateMain(data);
+	            			displayUpdateDate(data);
+	            			break;
+	            		case 'day':
+	            			displayUpdateMain(data);
+	            			displayUpdateDate(data);
+	            			break;
+	            		case 'month':
+	            			displayUpdateMain(data);
+	            			displayUpdateDate(data);
+	            			break;
+	            		case 'year':
+	            			displayUpdateMain(data);
+	            			displayUpdateDate(data);
+	            			break;
+	            		}
+	            	}, 
+	            	error : function(jqXHR, textStatus, errorThrown){
+						console.log(jqXHR);
+	            	}
+	            });
+	        }
+            function displayUpdateMain(data) {
+                // 수익 금액 업데이트 (숫자 포맷)
+                $('#profit-text').text(`${formatNumber(data.proceeds)}원`);
+                // 수익률 업데이트
+                $('#profit-rate').text(`(${data.rateOfReturn}%)`);
+                let str = '';
+                if (data.list && data.list.length > 0) {
+                	for(item of data.list) {
+                		str += `
+                            <div class="transaction-container">
+	                            <span class="date-info">${formatDate(item.od_date)}</span>
+	                            <div class="transaction-details">
+	                                <div class="user-info">
+	                                    <span class="user-name">${item.od_st_name} ${item.od_qty}주</span>
+	                                    <span class="transaction-type">${item.od_date.substring(11, 16)} ㅣ ${item.od_status}</span>
+	                                </div>
+	                                <div class="amount-info">
+	                                    <span class="amount">${formatNumber(item.od_price)}원</span>
+	                                    <span class="balance">${formatNumber(item.od_st_price)}원</span>
+	                                </div>
+	                            </div>
+	                        </div>
+                		`;
+                	}
+                }else{
+                	str = `
+    				    <div class="none-list">
+					    	<div class="none-content">
+								<i class="fa-solid fa-note-sticky fa-5x fa-color"></i>
+					    		<p class="no-title">내역이 없어요</p>
+					    	</div>
+					    </div>
+                	`;
+                }
+                $('.transaction-box').html(str);
+            }
+            function displayUpdateDate(data) {
+            	let str = '';
+            	if(data.mb_datetime != null) {
+            		str = `
+            			<div class="date-text">${data.mb_datetime} ~ ${data.now}</div>
+            		`;
+            	}else{
+            		str = `
+            			<div class="date-text">
+	            			<button class="date-btn" id="prev" value="${data.status}" onclick="clickDate(this)"><</button>
+	        	            <span>${data.now}</span>
+	        	            <button class="date-btn" id="next" value="${data.status}" onclick="clickDate(this)">></button>
+            			</div>
+            		`;
+            		
+            	}
+            	$('.date-box').html(str);
+            }
+            
+         	// 숫자 포맷 함수 (천단위 콤마)
+            function formatNumber(number) {
+                return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            }
+
+            // 날짜 포맷 함수 (MM.dd 형식으로 변환)
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${month}.${day}`;
+            }
+	        
+	        function clickDate(btn) {
+	        	let status = $(btn).val(); 								// 버튼의 value 값
+	        	let today = new Date($(btn).siblings('span').text()); 	// span 태그에 있는 날짜
+	        	let isPrev = $(btn).attr('id') == 'prev';
+	        	let now = new Date();
+				
+	        	switch(status) {
+	        	case 'day':
+	        		today.setDate(today.getDate() + (isPrev ? -1 : 1));
+	        		break;
+	        	case 'month':
+	        		today.setMonth(today.getMonth() + (isPrev ? -1 : 1));
+	        		break;
+	        	case 'year':
+	        		today.setFullYear(today.getFullYear() + (isPrev ? -1 : 1));
+	        		break;
+	        	}
+	            // 현재 날짜를 넘어갈 수 없도록 제한
+	            if (today > now) {
+	            	today = now;
+	            }
+	            // 변경된 날짜를 화면에 업데이트
+	            $(btn).siblings('span').text(formatDate2(today, status));
+	            
+	            $.ajax({
+	            	async : true, //비동기 : true(비동기), false(동기)
+	            	url : '/myaccount/profit/today', 
+	            	type : 'post', 
+	            	data : 
+	            		{
+	            			today : today, 
+	            			status : status
+	            		}, 
+	            	dataType : "json", 
+	            	success : function (data){
+	            		console.log(data);
+	            		displayUpdateMain(data);
+	            	}, 
+	            	error : function(jqXHR, textStatus, errorThrown){
+
+	            	}
+	            });
+	        }
+	        
+	        function formatDate2(date, status) {
+	            const year = date.getFullYear();
+	            const month = String(date.getMonth() + 1).padStart(2, '0');
+	            const day = String(date.getDate()).padStart(2, '0');
+	            switch(status) {
+	            case 'day':
+	            	return `${year}. ${month}. ${day}`;
+				case 'month':
+					return `${year}. ${month}`;
+				case 'year':
+					return `${year}`;
+	            }
+	        }
+		</script>
+	</main>
+</body>
+</html>

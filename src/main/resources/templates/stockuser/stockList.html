@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html 
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+	layout:decorate="~{layout/layout.html}">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" th:href="@{/css/stockuser.css}">
+</head>
+<body>
+	<main layout:fragment="content">
+		<section>
+			<div class="btn-list">
+				<ul class="list-group list-group-horizontal">
+					<li class="list-group-item list-group-item-light">
+						<div class="dropdown">
+							<button th:class="${(typeText != null) ? 'dropdown-toggle btn btn-info on' : 'dropdown-toggle btn btn-light'}" data-toggle="dropdown" th:text="${#strings.isEmpty(typeText) ? '시장' : '시장 · ' + typeText}"></button>
+							<div class="dropdown-menu">
+								<a class="dropdown-item" th:href="@{/stock/stockList/KOSPI}">
+									<button type="button" th:class="${type == 'KOSPI'} ? 'btn on':'btn'">코스피 시장만 보기</button>
+								</a>
+								<a class="dropdown-item" th:href="@{/stock/stockList/KOSDAQ}">
+									<button type="button" th:class="${type == 'KOSDAQ'} ? 'btn on':'btn'">코스닥 시장만 보기</button>
+								</a>
+								<a class="dropdown-item" th:href="@{/stock/stockList}">
+									<button type="button" class="btn btn-outline-info heart margin-left">초기화</button>
+								</a>
+							</div>
+						</div>
+					</li>
+					<li class="list-group-item list-group-item-light">
+						<div class="dropdown">
+							<button th:class="${(mrkText != null) ? 'dropdown-toggle btn btn-info on' : 'dropdown-toggle btn btn-light'}" data-toggle="dropdown" th:text="${#strings.isEmpty(mrkText) ? '시가총액' : '시가총액 · ' + mrkText}">시가총액</button>
+							<div class="dropdown-menu">
+								<a class="dropdown-item" th:href="@{/stock/stockList/{type}/small(type=${type}?${type}:'all')}">
+									<button type="button" th:class="${mrk == 'small'} ? 'btn on':'btn'">소형주(3,000억원 미만)</button>
+								</a>
+								<a class="dropdown-item" th:href="@{/stock/stockList/{type}/medium(type=${type}?${type}:'all')}">
+									<button type="button" th:class="${mrk == 'medium'} ? 'btn on':'btn'">중형주(3,000억원 ~ 1조원 미만)</button>
+								</a>
+								<a class="dropdown-item" th:href="@{/stock/stockList/{type}/large(type=${type}?${type}:'all')}">
+									<button type="button" th:class="${mrk == 'large'} ? 'btn on':'btn'">대형주(1조원 이상)</button>
+								</a>
+								<a class="dropdown-item" th:href="@{/stock/stockList}">
+									<button type="button" class="btn btn-outline-info heart margin-left-big">초기화</button>
+								</a>
+							</div>
+						</div>
+					</li>
+				</ul>
+			</div>
+			<div class="transaction-box">
+				<table class="table table-borderless">
+					<thead>
+						<tr>
+							<th>검색된 주식 <span th:text="${#numbers.formatInteger(total, 0, 'COMMA')}"></span> 개</th>
+							<th>현재가</th>
+							<th>등락률</th>
+							<th>대비</th>
+							<th>시가총액</th>
+							<th>거래량</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="list, price:${list}">
+							<td class="left_td">
+								<button type="button" th:class="'btn heart ' + ${list.st_code}" th:value="${list.wish}" th:onclick="get_wish([[${list.st_code}]], this.value);">
+									<i th:id="${list.st_code}" th:class="${list.wish.contains('Y')} ? 'fa-solid fa-heart pink':'fa-solid fa-heart grey'"></i>
+								</button>
+								<span class="fake_click" th:text="${list.st_name}" th:onclick="go_detail([[${list.st_code}]]);"></span>
+							</td>
+							<td>
+								<span th:text="${#numbers.formatInteger(prices[price.index].si_price, 3, 'COMMA')}"></span>원
+							</td>
+							<td>
+								<span th:class="${prices[price.index].si_fltRt == '0' ? 'hold' : (prices[price.index].si_fltRt.contains('-') ? 'blue' : 'red')}" th:text="${#numbers.formatDecimal(prices[price.index].si_fltRt, 1, 2)} + '%'"></span>
+							</td>
+							<td>
+								<span th:class="${prices[price.index].si_vs == '0' ? 'hold' : (prices[price.index].si_vs.contains('-') ? 'blue' : 'red')}" th:text="${#numbers.formatInteger(prices[price.index].si_vs, 0, 'COMMA')}"></span>
+							</td>
+							<td>
+								<span th:text="${prices[price.index].price_text}"></span>
+							</td>
+							<td>
+								<span th:text="${#numbers.formatInteger(prices[price.index].si_trqu, 0, 'COMMA')}"></span>주
+							</td>
+						</tr>
+						<tr class="none-list" th:if="${list == null or #lists.isEmpty(list)}">
+							<td colspan="9">
+								<div class="none-content">
+									<i class="fa-solid fa-note-sticky fa-5x fa-color"></i>
+						    		<p class="no-title">내역이 없어요</p>
+						    	</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</section>
+		<div class="page_div">
+			<ul class="pagination justify-content-center center" 
+				th:object="${pm}" 
+				th:if="${pm.endPage != 0}">
+			    <li class="page-item" th:if="*{prev}">
+			    	<a class="page-link" th:if="${type == null && mrk == null}" th:href="@{/stock/stockList(page=*{startPage-1})}">이전</a>
+			    	<a class="page-link" th:if="${type != null && !type.contanins('all') && mrk == null}" th:href="@{/stock/stockList/{type}(type=${type}, page=*{startPage-1})}">이전</a>
+			    	<a class="page-link" th:if="${mrk != null}" th:href="@{/stock/stockList/{type}/{mrk}(type=${type},mrk=${mrk},page=*{startPage-1})}">이전</a>
+			    </li>
+			    <li class="page-item" 
+			    	th:each="i : *{#numbers.sequence(startPage, endPage)}"
+			    	th:classappend="*{cri.page} == ${i} ? 'active' : ''">
+			    	<a class="page-link" th:if="${type == null && mrk == null}" th:href="@{/stock/stockList(page=${i})}" th:text="${i}"></a>
+			    	<a class="page-link" th:if="${type != null && !type.contains('all') && mrk == null}" th:href="@{/stock/stockList/{type}(type=${type}, page=${i})}" th:text="${i}"></a>
+			    	<a class="page-link" th:if="${mrk != null}" th:href="@{/stock/stockList/{type}/{mrk}(type=${type},mrk=${mrk},page=${i})}" th:text="${i}"></a>
+			    </li>
+			    <li class="page-item" th:if="*{next}">
+			    	<a class="page-link" th:if="${type == null && mrk == null}" th:href="@{/stock/stockList(page=*{endPage+1})}">다음</a>
+			    	<a class="page-link" th:if="${type != null && !type.contains('all') && mrk == null}" th:href="@{/stock/stockList/{type}(type=${type}, page=*{endPage+1})}">다음</a>
+			    	<a class="page-link" th:if="${mrk != null}" th:href="@{/stock/stockList/{type}/{mrk}(type=${type},mrk=${mrk},page=*{endPage+1})}">다음</a>
+			    </li>
+			</ul>
+		</div>
+		<script th:inline="javascript">
+			function get_wish(code, status){
+				
+				var userid = [[${mb_id}]];
+				if(userid == null){
+					if(confirm("회원만 이용가능합니다.\n로그인페이지로 이동하시겠습니까?")) {
+						location.href = "/member/login";
+						return false;
+					} else {
+						alert("해당 기능은 로그인 후 사용할 수 있습니다.");
+						return false;
+					}
+				}
+				
+				if(status == 'Y'){
+					if(!confirm("위시에서 삭제하시겠습니까?")){
+						alert("삭제를 취소하셨습니다.");
+						return false;
+					}
+				}
+				$.ajax({
+		            url: "/stock/wish",
+		            type: 'post',
+		            data: {st_code: code, status: status},
+		            dataType : 'json',
+		            async: false, 
+		            success: function (data) {
+		            	if(data.res == "success"){
+		            		if(status == "Y"){
+		            			$("#"+code).removeClass("pink");
+		            			$("#"+code).addClass("grey");
+		            			$("."+code).val("N");
+		            		} else {
+		            			$("#"+code).removeClass("grey");
+		            			$("#"+code).addClass("pink");
+		            			$("."+code).val("Y");
+		            		}
+		            	}
+		            	alert(data.msg);
+		            }
+		        });
+			}
+			function go_detail(code){
+				location.href = "/stock/" + code;
+			}
+		</script>
+	</main>
+</body>
+</html>

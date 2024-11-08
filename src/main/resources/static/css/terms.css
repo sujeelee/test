@@ -1,0 +1,8 @@
+@charset "UTF-8";
+.terms-content{white-space: pre-wrap;}
+.terms-div{margin-top: 5%;}
+.center{text-align:center;}
+.extra-margin{margin-top: 10%;}
+.terms-table{margin-top: 5%;display: flex;flex-wrap: wrap;}
+.terms-row{cursor:pointer; margin-right: 2%; width: calc(96% / 2);border: 1px solid #888; border-radius: 10px;text-align: center;padding: 5%; margin-bottom: 2%;}
+.terms-row:hover{background-color: #17a2b8; color:#fff;border: 1px solid #17a2b8;}

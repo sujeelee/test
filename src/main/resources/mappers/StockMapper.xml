@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kh.st.boot.dao.StockDAO"> 
+
+	<select id="getStockCompany" resultType="StockVO">
+		select * from stock where st_code = #{st_code}
+	</select>
+	<update id="companyType">
+		update stock 
+		set st_type = #{st_type}
+		<if test="st_status != null">
+			, st_status = #{st_status} 
+		</if>
+		where st_code = #{st_code}
+	</update>
+	<insert id="insertStockCompany">
+		insert into stock
+		set st_code = #{st.st_code},
+			st_name = #{st.st_name},
+			st_qty = #{st.st_qty},
+			st_board_cnt = 0,
+			st_status = #{st.st_status},
+			st_issue = #{st.st_issue},
+			st_type = #{st.st_type}
+	</insert>
+	<select id="getCompanyList" resultType="StockVO">
+		select * from stock where (1) 
+		<if test="type != null">
+			and st_status != #{type}
+		</if>
+		<if test="cri != null and cri.st_type != null and cri.st_type.size() > 0 ">
+			and st_type in
+			<foreach collection="cri.st_type" item="items" open="(" close=")" separator=",">
+				#{items}
+			</foreach>
+		</if>
+		<if test="cri != null and cri.stx != null and cri.stx != ''">
+			<if test="cri.sfl == 'st_code'">
+				and st_code LIKE CONCAT('%', #{cri.stx}, '%') 
+			</if>
+			<if test="cri != null and cri.sfl == 'st_name'">
+				and st_name LIKE CONCAT('%', #{cri.stx}, '%') 
+			</if>
+			<if test="cri != null and cri.sfl == ''">
+				and (st_name LIKE CONCAT('%', #{cri.stx}, '%') or st_code LIKE CONCAT('%', #{cri.stx}, '%') ) 
+			</if>
+		</if>
+		<if test="cri != null and cri.state != null and cri.state != ''">
+			and st_status = #{cri.state}
+		</if>
+		order by st_name ASC
+		<if test="cri != null">
+			limit #{cri.pageStart}, #{cri.perPageNum}
+		</if>
+	</select>
+	<select id="getStockPrice" resultType="StockPriceVO">
+		select * from stock_info where si_date = #{si_date} and st_code = #{st_code}
+	</select>
+	<insert id="insertStockPrice" useGeneratedKeys="true" keyColumn="si.si_no">
+		insert into stock_info
+		set	si_date = #{si.si_date},
+			si_price = #{si.si_price},
+			st_code = #{si.st_code},
+			si_vs = #{si.si_vs},
+			si_fltRt = #{si.si_fltRt},
+			si_mrkTotAmt = #{si.si_mrkTotAmt},
+			si_hipr = #{si.si_hipr},
+			si_lopr = #{si.si_lopr},
+			si_trqu = #{si.si_trqu}
+	</insert>
+	<select id="getCount" resultType="int">
+		select count(*) from stock where (1)
+		<if test="cri.st_type != null and cri.st_type.size() > 0 ">
+			and st_type in
+			<foreach collection="cri.st_type" item="items" open="(" close=")" separator=",">
+				#{items}
+			</foreach>
+		</if>
+		<if test="cri.stx != null and cri.stx != ''">
+			<if test="cri.sfl == 'st_code'">
+				and st_code LIKE CONCAT('%', #{cri.stx}, '%') 
+			</if>
+			<if test="cri.sfl == 'st_name'">
+				and st_name LIKE CONCAT('%', #{cri.stx}, '%') 
+			</if>
+			<if test="cri.sfl == ''">
+				and (st_name LIKE CONCAT('%', #{cri.stx}, '%') or st_code LIKE CONCAT('%', #{cri.stx}, '%') ) 
+			</if>
+		</if>
+		<if test="cri.state != null and cri.state != ''">
+			and st_status = #{cri.state}
+		</if>
+	</select>
+	<select id="getStockInfoList" resultType="StockPriceVO">
+		select * from stock_info where st_code = #{st_code} order by si_date DESC
+	</select>
+	<select id="getCountStockPrice" resultType="int">
+		select count(*) from stock_info where st_code = #{st_code}
+	</select>
+	<select id="getStockPriceOne" resultType="StockPriceVO">
+		select * from stock_info where st_code = #{st_code} order by si_date DESC limit 1
+	</select>
+	<select id="getCompanyListMrk" resultType="StockVO">
+		<![CDATA[  
+			SELECT a.*
+			FROM stock a
+			JOIN (
+			    SELECT si.st_code, si.si_mrkTotAmt
+			    FROM stock_info si
+			    JOIN (
+			        SELECT st_code, MAX(si_date) AS latest_date
+			        FROM stock_info
+			        GROUP BY st_code
+			    ) latest ON si.st_code = latest.st_code AND si.si_date = latest.latest_date
+			) b ON a.st_code = b.st_code
+			where (1)
+		]]>
+		<if test="cri.st_type != null and cri.st_type.size() > 0 ">
+			and a.st_type in
+			<foreach collection="cri.st_type" item="items" open="(" close=")" separator=",">
+				#{items}
+			</foreach>
+		</if>
+		<if test="cri.mrk != null and cri.mrk.length() > 0 ">
+			<choose>
+				<when test="cri.mrk == 'small'">
+					<![CDATA[  
+						and b.si_mrkTotAmt < 300000000000
+					]]> 
+				</when>
+				<when test="cri.mrk == 'medium'">
+					<![CDATA[  
+						and b.si_mrkTotAmt BETWEEN 300000000000 and 1000000000000
+					]]> 
+				</when>
+				<otherwise>
+					<![CDATA[  
+						and b.si_mrkTotAmt > 1000000000000
+					]]> 
+				</otherwise>
+			</choose>
+		</if>
+		order by a.st_name ASC
+		<if test="cri != null">
+			limit #{cri.pageStart}, #{cri.perPageNum}
+		</if>
+	</select>
+	<select id="getCountMrk" resultType="int">
+		<![CDATA[  
+			SELECT count(*)
+			FROM stock a
+			JOIN (
+			    SELECT si.st_code, si.si_mrkTotAmt
+			    FROM stock_info si
+			    JOIN (
+			        SELECT st_code, MAX(si_date) AS latest_date
+			        FROM stock_info
+			        GROUP BY st_code
+			    ) latest ON si.st_code = latest.st_code AND si.si_date = latest.latest_date
+			) b ON a.st_code = b.st_code
+			where (1)
+		]]>
+		<if test="cri.st_type != null and cri.st_type.size() > 0 ">
+			and a.st_type in
+			<foreach collection="cri.st_type" item="items" open="(" close=")" separator=",">
+				#{items}
+			</foreach>
+		</if>
+		<if test="cri.mrk != null and cri.mrk.length() > 0 ">
+			<choose>
+				<when test="cri.mrk == 'small'">
+					<![CDATA[  
+						and b.si_mrkTotAmt < 300000000000
+					]]> 
+				</when>
+				<when test="cri.mrk == 'medium'">
+					<![CDATA[  
+						and b.si_mrkTotAmt BETWEEN 300000000000 and 1000000000000
+					]]> 
+				</when>
+				<otherwise>
+					<![CDATA[  
+						and b.si_mrkTotAmt > 1000000000000
+					]]> 
+				</otherwise>
+			</choose>
+		</if>
+	</select>
+	<insert id="wishStockInsert" useGeneratedKeys="true" keyColumn="wi_id">
+		insert into wish_stock 
+		set	st_code = #{code},
+			mb_id = #{mb_id}
+	</insert>
+	<delete id="wishStockDelete">
+		delete from wish_stock where st_code = #{code} and mb_id = #{mb_id}
+	</delete>
+	<select id="wishCheck" resultType="WishVO">
+		select * from wish_stock where st_code = #{code} and mb_id = #{mb_id}
+	</select>
+	<select id="getStockPriceLater" resultType="StockPriceVO">
+		select * from stock_info where st_code = #{code} order by si_date DESC limit 1
+	</select>
+	<select id="getStockInfoListDate" resultType="StockPriceVO">
+		select *, si_price - si_vs as yesterPrice from stock_info 
+		where st_code = #{code} 
+		<if test="to != null">
+			and si_date between #{to} and #{from}
+		</if>
+		order by si_date ASC
+	</select>
+	<select id="getHotStockList" resultType="kh.st.boot.model.dto.HotStockDTO">
+		SELECT RANK() OVER (ORDER BY o.cnt DESC) AS ranks, o.cnt as cnt, 
+			   s.st_code as code, s.st_name as st_name, 
+			   si.si_price as price, si.si_vs as vs, si.si_fltRt as flt, 
+			   si.si_trqu as trqu, si.si_mrkTotAmt as mrk
+		FROM stock s
+		JOIN (
+		    SELECT od_st_code, SUM(od_qty) AS cnt
+		    FROM `order`
+		    GROUP BY od_st_code
+		) o ON s.st_code = o.od_st_code
+		JOIN (
+		    SELECT si1.st_code, si1.si_price, si1.si_vs, si1.si_fltRt, si1.si_trqu, si1.si_mrkTotAmt
+		    FROM stock_info si1
+		    JOIN (
+		        SELECT st_code, MAX(si_date) AS max_date
+		        FROM stock_info
+		        GROUP BY st_code
+		    ) si2 ON si1.st_code = si2.st_code AND si1.si_date = si2.max_date
+		) si ON s.st_code = si.st_code
+		ORDER BY o.cnt DESC limit #{limit};
+	</select>
+	<select id="getMyStock" resultType="kh.st.boot.model.dto.DashListDTO">
+		SELECT a.st_code as code, a.st_name as stockName, b.si_vs as vs, b.si_fltRt as flt, c.total_qty as stocksQty, SUM(c.total_qty * b.si_price) as price
+		FROM stock a 
+		JOIN (
+			SELECT od_st_code, od_qty, od_status, COALESCE(SUM(CASE WHEN od_status LIKE '매수%' THEN od_qty ELSE 0 END), 0) - 
+		    COALESCE(SUM(CASE WHEN od_status LIKE '매도%' THEN od_qty ELSE 0 END), 0) AS total_qty 
+		    FROM `order` 
+		    WHERE mb_id = #{mb_id}
+		    group by od_st_code
+		    having total_qty > 0
+		) c ON a.st_code = c.od_st_code
+		JOIN (
+		    SELECT si1.st_code, si1.si_price, si1.si_vs, si1.si_fltRt
+		    FROM stock_info si1
+		    JOIN (
+		        SELECT st_code, MAX(si_date) AS max_date
+		        FROM stock_info
+		        GROUP BY st_code
+		    ) si2 ON si1.st_code = si2.st_code AND si1.si_date = si2.max_date
+		) b ON a.st_code = b.st_code
+		group by a.st_code
+		ORDER BY a.st_name ASC;
+	</select>
+	<select id="getMyWish" resultType="kh.st.boot.model.dto.DashListDTO">
+		SELECT a.st_code as code, a.st_name as stockName, b.si_price as price, b.si_vs as vs, b.si_fltRt as flt
+		FROM stock a 
+		JOIN (SELECT st_code FROM wish_stock WHERE mb_id = #{mb_id}) c ON a.st_code = c.st_code
+		JOIN (
+		    SELECT si1.st_code, si1.si_price, si1.si_vs, si1.si_fltRt
+		    FROM stock_info si1
+		    JOIN (
+		        SELECT st_code, MAX(si_date) AS max_date
+		        FROM stock_info
+		        GROUP BY st_code
+		    ) si2 ON si1.st_code = si2.st_code AND si1.si_date = si2.max_date
+		) b ON a.st_code = b.st_code
+		ORDER BY a.st_name ASC;
+	</select>
+	<select id="getOldJisu" resultType="StockJisuVO">
+		select * from stock_jisu where ji_type = #{type} and ji_date = #{date}
+	</select>
+	<insert id="insertStockJisu">
+		insert into stock_jisu
+		set	ji_type = #{ji.ji_type},
+			ji_date = #{ji.ji_date},
+			ji_clpr = #{ji.ji_clpr},
+			ji_vs = #{ji.ji_vs},
+			ji_fltRt = #{ji.ji_fltRt},
+			ji_mkp = #{ji.ji_mkp},
+			ji_hipr = #{ji.ji_hipr},
+			ji_lopr = #{ji.ji_lopr},
+			ji_trqu = #{ji.ji_trqu}
+	</insert>
+	<select id="jisuConfig" resultType="StockJisuVO">
+		select * from stock_jisu AS s1
+		where 
+		<choose>
+			<when test="type == 'kospi'">
+				ji_type = '코스피'
+				AND ji_date IN (
+				    SELECT ji_date 
+				    FROM (
+				        SELECT ji_date 
+				        FROM stock_jisu 
+				        WHERE ji_type = '코스피' 
+				        ORDER BY ji_date DESC 
+				        LIMIT 20
+				    ) AS last_dates
+				)
+			</when>
+			<when test="type == 'kosdaq'">
+				ji_type = '코스닥'
+				AND ji_date IN (
+				    SELECT ji_date 
+				    FROM (
+				        SELECT ji_date 
+				        FROM stock_jisu 
+				        WHERE ji_type = '코스닥' 
+				        ORDER BY ji_date DESC 
+				        LIMIT 20
+				    ) AS last_dates
+				)
+			</when>
+			<otherwise>
+				ji_type = 'KRX 300'
+				AND ji_date IN (
+				    SELECT ji_date 
+				    FROM (
+				        SELECT ji_date 
+				        FROM stock_jisu 
+				        WHERE ji_type = 'KRX 300' 
+				        ORDER BY ji_date DESC 
+				        LIMIT 20
+				    ) AS last_dates
+				)
+			</otherwise>
+		</choose>
+		order by ji_date asc
+	</select>
+	<select id="getReservation" resultType="ReservationVO">
+		select * from reservation where re_st_code = #{code} and re_state like '%대기%'
+	</select>
+</mapper>

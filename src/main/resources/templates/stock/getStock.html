@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/admlayout.html}" layout:fragment="content">
+<head>
+<head>
+<meta charset="UTF-8">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<style type="text/css">
+
+
+.use_td_set {
+	text-align: center;
+	border: 1px solid #d6dce7;
+	padding: 5px;
+}
+
+.btn {
+	font-size: 12px;
+	padding: 0px;
+	margin: 3px;
+	height: 22px;
+	width: 57px;
+	border: none;
+}
+
+.sfl {
+	height: 22px;
+}
+.btn_ateg{
+    padding-top: 3px;
+    height: 22px;
+    display: inline-block;
+    width: 54px;
+    text-align: center;
+    position: absolute;
+    }
+</style>
+</head>
+<body>
+	<main id="wrapper">
+		<div id="container">
+			<h1 id="container_title">주식회사관리</h1>
+			<div id="container_main" class="content">
+				<form th:action="@{/admin/stock/getListStock}" method="get"
+					onsubmit="return fsearchstocksubmit(this);">
+					<div style="text-align: left; margin-bottom: 10px;">
+						<select name="sfl" class="sfl">
+							<option value="cmpname"
+								th:selected="${#strings.equals(param.sfl, 'cmpname')}">주식회사명</option>
+							<option value="crno"
+								th:selected="${#strings.equals(param.sfl, 'crno')}">법인등록번호</option>
+						</select> <input type="text" placeholder="검색어를 입력하세요" name="stx"
+							class="sfl" th:value="${param.stx}">
+						<button type="submit" class="btn_submit btn ">검색</button>
+						<a type="submit" th:href="@{/admin/stock/getListStock}"
+							class="btn_submit btn btn_ateg">초기화</a>
+					</div>
+				</form>
+				<table>
+					<thead>
+						<tr>
+							<th>기준일자</th>
+							<th>주식회사명</th>
+							<th>법인등록번호</th>
+							<th>주식회사코드</th>
+							<th>시장 구분</th>
+							<th>관리</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="list:${list}">
+							<td th:text="${list.basDt}"></td>
+							<td th:text="${list.itmsNm}"></td>
+							<td th:text="${list.crno}"></td>
+							<td th:text="${list.isinCd}"></td>
+							<td th:text="${list.mrktCtg}"></td>
+							<td class="use_td_set">
+								<button type="button" th:if="${list.tmp.equals('N')}"
+									th:onclick="saveStock([[${list}]]);" class="btn_submit btn btn-info">DB저장</button>
+							</td>
+						</tr>
+						
+						<tr th:if="${list == null or #lists.isEmpty(list)}">
+							<td colspan="6">주식 리스트가 존재하지 않습니다.</td>
+						</tr>
+					</tbody>
+				</table>
+				<div id="display_box">
+					<ul class="pagination" th:object="${pm}" th:if="${pm.endPage != 0}">
+						<li class="page-item" th:if="*{prev}"><a class="page-link"
+							th:href="@{/admin/stock/getListStock(page=*{startPage-1},sfl=${param.sfl},stx=${param.stx})}">이전</a>
+						</li>
+						<li class="page-item"
+							th:each="i : *{#numbers.sequence(startPage, endPage)}"
+							th:classappend="*{cri.page} == ${i} ? 'active' : ''"><a
+							class="page-link"
+							th:href="@{/admin/stock/getListStock(page=${i},sfl=${param.sfl},stx=${param.stx})}"
+							th:text="${i}"></a></li>
+						<li class="page-item" th:if="*{next}"><a class="page-link"
+							th:href="@{/admin/stock/getListStock(page=*{endPage+1},sfl=${param.sfl},stx=${param.stx})}">다음</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+			
+		</div>
+
+		<script th:inline="javascript">
+			function fsearchstocksubmit(f) {
+				if (f.sfl.value && !f.stx.value) {
+					alert("검색어를 입력해주세요.");
+					f.stx.focus();
+					return false;
+				}
+				if (!f.stx.value && !f.sfl.value) {
+					alert("검색하실 내용을 선택해주세요.");
+					f.stx.focus();
+					return false;
+				}
+				return true;
+			}
+
+			function saveStock(stockInfo) {
+				// 전달된 데이터 확인
+				var url = '/admin/stock/insertStock';
+				$.ajax({
+					url : url,
+					type : 'post',
+					data : JSON.stringify(stockInfo),
+					dataType : 'json',
+					contentType : 'application/json', // JSON 형식으로 전송
+					async : false,
+					success : function(data) {
+						if (data.res == "fail") {
+							alert(data.msg);
+						} else {
+							alert(data.msg);
+							location.reload();
+						}
+					}
+				});
+			}
+		</script>
+	</main>
+</body>
+</html>

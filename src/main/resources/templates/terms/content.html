@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html 
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+	layout:decorate="~{layout/layout.html}">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" th:href="@{/css/terms.css}">
+</head> 
+<body>
+	<main layout:fragment="content">
+		<section th:switch="${type}">
+			<div th:case="privacy">
+				<h2 class="center">개인정보 처리방침</h2>
+				<div class="terms-div">
+					<div class="terms-content" th:text="${config.cf_privacy}"></div>
+				</div>
+			</div>
+			<div th:case="stock">
+				<h2 class="center">투자 유의사항</h2>
+				<div class="terms-div">
+					<div class="terms-content" th:text="${config.cf_stock}"></div>
+				</div>
+			</div>
+			<div th:case="info">
+				<h2 class="center">이용약관</h2>
+				<div class="terms-div">
+					<div class="terms-content" th:text="${config.cf_info}"></div>
+				</div>
+			</div>
+			<div class="center extra-margin" th:case="noemail">
+				<h2>이메일 무단수집거부</h2>
+				<div class="terms-div">
+					<div class="terms-content" th:text="${config.cf_noemail}"></div>
+				</div>
+				<div class="terms-div">
+					<i class="fa fa-at" style="font-size:80px;"></i>
+				</div>
+			</div>
+		</section>
+	</main>
+</body>
+</html>

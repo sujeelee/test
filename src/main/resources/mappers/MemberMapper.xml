@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kh.st.boot.dao.MemberDAO">
+
+	<select id="findById" resultType="MemberVO">
+        SELECT 
+		    m.*, 
+		    a.ac_deposit AS deposit
+		FROM 
+		    member m
+		LEFT JOIN 
+		    account a ON m.mb_no = a.mb_no
+		WHERE 
+		    m.mb_id = #{id};
+    </select>
+
+    <update id="serUserCookie">
+        update member 
+        set 
+            mb_cookie = #{user.mb_cookie}, 
+            mb_cookie_limit = #{user.mb_cookie_limit}
+        where 
+            mb_id = #{user.mb_id}
+    </update>
+
+    <update id="add_Fail_Number">
+        update member
+        set
+            mb_fail = mb_fail + 1
+        where
+            mb_id = #{id}
+    </update>
+
+    <update id="reset_Fail_Number">
+        update member
+        set
+            mb_fail = 0
+        where
+            mb_id = #{id}
+    </update>
+
+    <insert id="join">
+        insert into member(mb_id, mb_password, mb_name, mb_nick, mb_ph, mb_email, mb_fail, mb_level, mb_point, mb_emailing, mb_datetime, mb_edit_date, mb_zip, mb_addr, mb_addr2, mb_birth, mb_loginMethod)
+        value(#{user.mb_id}, #{user.mb_password}, #{user.mb_name}, #{user.mb_nick}, #{user.mb_ph}, #{user.mb_email}, 0 , 1, 50, #{user.mb_emailing}, now(), now(),  #{user.mb_zip}, #{user.mb_addr}, #{user.mb_addr2}, #{user.mb_birth}, #{user.mb_loginMethod})
+    </insert>
+
+    <select id="findIdByCookie" resultType="MemberVO">
+        select * from member where mb_cookie = #{mb_cookie} and mb_cookie_limit > now()
+    </select>
+    
+    <update id="updateUserAccount">
+    	UPDATE MEMBER
+    	SET
+    		MB_ACCOUNT = #{account}
+    	WHERE
+    		MB_ID = #{id}
+    </update>
+	
+	<insert id="insertAccount">
+		INSERT INTO ACCOUNT(MB_NO, AC_DEPOSIT)
+		SELECT MB_NO, 0
+		FROM
+			MEMBER
+		WHERE
+			MB_ID = #{mb_id}
+	</insert>
+
+    <update id="updateStopTime">
+        update member
+        set
+            mb_stop_date = now()
+        where
+            mb_id = #{id}
+    </update>
+
+    <update id="reset_stop_time">
+        update member
+        set
+            mb_stop_date = null
+        where
+            mb_id = #{id}
+    </update>
+
+    <select id="findByEmail" resultType="MemberVO">
+        select * from member where mb_email = #{email}
+    </select>
+
+    <update id="setTemporaryPassword">
+        update member
+        set mb_password = #{pw}
+        where mb_id = #{id}
+    </update>
+
+	<update id="updateLevel">
+		update member
+		set mb_level = #{mb.mb_level}
+		where mb_id = #{mb.mb_id}
+	</update>
+    
+</mapper>

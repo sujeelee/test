@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout.html}">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="이벤트 상품 관리 시스템">
+    <title>시드키 : 이벤트 : 어드민 상품 리스트</title>
+    <style>
+        .bg-gray {
+            background-color: #c5c5c5; /* 연한 회색 */
+        }
+        .event-info {
+            min-height: 150px; /* 최소 높이 설정 */
+            margin: 10px 0; /* 위아래 여백 추가 */
+            padding: 10px; /* 내부 여백 추가 */
+            position: relative; /* 버튼 위치 조정을 위한 상대적 위치 */
+            border-radius: 0.5rem; /* 둥글게 만들기 */
+            background-color: #c5c5c5; /* 배경색 추가 */
+            border: 1px solid gray;
+        }
+        .add-product-btn {
+            position: absolute; /* 절대 위치 */
+            bottom: 10px; /* 아래쪽 여백 */
+            right: 10px; /* 오른쪽 여백 */
+        }
+        .edit-event-btn {
+            position: absolute; /* 절대 위치 */
+            bottom: 55px; /* 아래쪽 여백 */
+            right: 10px; /* 오른쪽 여백 */
+        }
+        .remove-event-btn {
+            position: absolute; /* 절대 위치 */
+            bottom: 100px; /* 아래쪽 여백 */
+            right: 10px; /* 오른쪽 여백 */
+        }
+    </style>
+</head>
+
+<body>
+<main layout:fragment="content">
+    <div class="container mt-3">
+        <h2 class="text-center">이벤트 별 상품 관리 시스템</h2>
+        <p>상품관리 시스템</p>
+        
+        <!-- 이벤트 목록 -->
+        <ul class="list-group">
+            <!-- 이벤트별 리스트 출력 -->
+            <th:block th:if="${#lists.isEmpty(list)}">
+                <div style="height: 300px; background-color: gray; border: 1px solid black;">
+                    <p style="text-align: center; background-color: bluevioletl; margin-top: 12%; font-size: 20px;">
+                    아직 이벤트가 없습니다!</p>
+                </div>
+                <a th:href="@{/event/write}" class="btn btn-outline-info" style="margin-top: 20px;">이벤트 작성하러 가기</a>
+            </th:block>
+
+
+            <th:block th:if="${!#lists.isEmpty(list)}" th:each="event : ${list}">
+                <li class="list-group-item d-flex justify-content-between align-items-center mb-1"
+                    th:data-event-id="${event.ev_no}">
+                    <!-- 이벤트 명 클릭 시 AJAX 호출 -->
+                    
+                    <a data-toggle="collapse" th:href="'#event' + ${event.ev_no}" 
+                       role="button" aria-expanded="false" th:text="${event.ev_title}" 
+                       class="event-name"></a>
+
+                    <div class="custom-control custom-switch" style="font-size: 15px;">
+                        <input type="checkbox" class="custom-control-input" th:id="'sw'+${event.ev_no}" name="ev_bannerShow"
+                        th:checked="${event.ev_bannerShow == 1}"
+                        th:onclick="bannerShow([[${event.ev_no}]])">
+                        <label class="custom-control-label" th:for="'sw'+${event.ev_no}">메인 배너 표시 여부</label>
+                        <span class="badge badge-primary badge-pill" th:text="'상태 : ' + ${event.ev_status}"></span>
+                    </div>
+
+                </li>
+                
+                <!-- collapse 영역: 상품 리스트가 들어갈 부분 -->
+                <div class="collapse" th:id="'event' + ${event.ev_no}">
+                    <div class="bg-gray event-info">
+                        
+                        <strong>이벤트 번호&nbsp;:&nbsp;</strong><span>[[${event.ev_no}]]</span>
+                        <br><span><strong>이벤트 작성일&nbsp;:&nbsp;</strong>[[${#dates.format(event.ev_datetime,  'yyyy년 MM월 dd일 HH시 mm분 ss초')}]]</span>
+                        <br><span><strong>이벤트 기간&nbsp;:&nbsp;</strong>[[${#dates.format(event.ev_start, 'yyyy년 MM월 dd일 ')}]] ~ [[${#dates.format(event.ev_end, 'yyyy년 MM월 dd일')}]] </span>
+                        <br><span><strong>이벤트 상태&nbsp;:&nbsp;</strong>[[${event.ev_status}]]</span>
+                        <br><span><strong>이벤트 폼 타입&nbsp;:&nbsp;</strong>[[${event.ev_form}]]</span>
+                        <button class="btn btn-danger remove-event-btn" th:onclick="deleteEventPost([[${event.ev_no}]])">이벤트 삭제</button>
+                        <a th:href="@{/event/eventUpdate/{eventStatus}/{ev_no}(ev_no = ${event.ev_no}, eventStatus = ${event.ev_status})}"
+                        class="btn btn-info edit-event-btn">
+                        이벤트 수정</a>
+                        <a th:id="'addPrize' + ${event.ev_no}"
+                        th:if="${event.ev_form == 'Participatory'}"
+                        th:href="@{/event/eventATypeWrite(evNum=${event.ev_no})}"
+                        class="btn btn-success add-product-btn">
+                        상품 추가(5개 까지)</a>
+                    </div>
+
+
+
+                    <div th:id="'prizeList'+${event.ev_no}">
+                        <div id="prizeList">
+                            <ul class="list-group">
+                                
+                            
+                                <th:block th:each="prize, index : ${prizeList}">
+
+                                    <li class="list-group-item bg-gray d-flex justify-content-between align-items-center" th:classappend="${index.last} ? 'mb-2'">
+                                        <span th:text="${prize.pr_name}"></span>
+                                        <div class="ml-auto">
+                                            <a class="btn btn-warning btn-sm"
+                                            th:href="@{/event/eventATypeUpdate(prNum=${prize.pr_no})}">수정</a>
+                                            <button class="btn btn-danger btn-sm" 
+                                            th:onclick="'confirm(\'삭제하시겠습니까?\') ? deletePrize(' + ${prize.pr_no} + ', this) : void(0)'">삭제</button>
+                                        </div>
+                                    </li>
+
+
+                                </th:block>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </th:block>
+            
+        </ul>
+    </div>
+    
+<script>
+$(document).ready(function() {
+    // 이벤트 이름을 클릭하면 AJAX로 상품 리스트를 불러옴
+    $('.event-name').click(function(e) {
+        e.preventDefault(); // 기본 링크 동작 방지
+
+        const eventId = $(this).parent().data('event-id'); // 클릭한 이벤트 ID 가져오기
+
+        $.ajax({
+            url: '/event/ajax/prizeList',
+            method: 'POST',
+            data: { ev_no: eventId }, // 이벤트 번호 전송
+            success: function(data) {
+                // 성공적으로 데이터를 가져오면 해당 이벤트의 prizeList 영역을 교체
+                $('#prizeList' + eventId).replaceWith(data);
+                $.ajax({
+                    url: '/event/ajax/prizeListSize',
+                    method: 'get',
+                    data: { ev_no: eventId }, // 이벤트 번호 전송
+                    success: function(data) {
+                        if(5 <= data.prizeListSize){
+                            $('#addPrize' + data.evNum).addClass("disabled");
+                        } else {
+                            $('#addPrize' + data.evNum).removeClass("disabled");
+                        }
+                    },
+                    error: function(error) {
+                        console.log("Error:", error); // 에러 로그
+                    }
+                });
+            },
+            error: function(error) {
+                console.log("Error:", error); // 에러 로그
+            }
+        });
+    });
+});
+
+
+function deletePrize(prizeNo, button) {
+    $.ajax({
+        url: '/event/ajax/deletePrize', // 서버에서 상품을 삭제할 엔드포인트
+        method: 'POST',
+        data: { pr_no: prizeNo }, // 상품 번호 전달
+        success: function(response) {
+            if (response) { // 서버 응답이 true이면
+                const $li = $(button).closest('li');
+                $li.fadeOut(500, function() {
+                    $li.remove(); // DOM에서 완전히 제거
+                });
+                console.log(response)
+            } else {
+                alert('상품 삭제에 실패했습니다.');
+            }
+        },
+        error: function(error) {
+            console.log("Error:", error); // 에러 로그
+            alert('서버 오류가 발생했습니다.');
+        }
+    });
+}   
+
+
+
+function deleteEventPost(ev_no){
+            if(confirm("정말 삭제하시겠습니까?")){
+                const eventNumber = ev_no
+                removeEventPost(eventNumber);
+            } else {
+            }
+        }
+
+
+function removeEventPost(eventNumber){
+    $.ajax({
+        url: '/event/ajax/deleteEventPost',
+        method: 'post',
+        dataType : 'text',
+        data : {ev_no : eventNumber},
+        success: function (data) {
+            alert("삭제 완료")
+            location.href = location.href
+        },
+        error: function (data, status, err) {
+            console.log(data)
+        },
+
+    });
+}
+
+function bannerShow(ev_no){
+    $.ajax({
+        url: '/event/ajax/bannerShow',
+        method: 'post',
+        dataType : 'text',
+        data : {ev_no : ev_no},
+        success: function (data) {
+        },
+        error: function (data, status, err) {
+            console.log(data)
+        },
+
+    });
+}
+
+</script>
+
+</main>
+</body>
+</html>

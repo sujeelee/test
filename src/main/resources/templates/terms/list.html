@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html 
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+	layout:decorate="~{layout/layout.html}">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" th:href="@{/css/terms.css}">
+</head>
+<body>
+	<main layout:fragment="content">
+		<h2 class="center">S2D KEY 처리방침</h2>
+		<div class="terms-table">
+			<div class="terms-row" onclick="view_terms('privacy');">
+				개인정보 처리방침
+			</div>
+			<div class="terms-row" onclick="view_terms('stock');">
+				투자 유의사항
+			</div>
+			<div class="terms-row" onclick="view_terms('info');">
+				이용약관
+			</div>
+			<div class="terms-row" onclick="view_terms('noemail');">
+				이메일 무단수집거부
+			</div>
+		</div>
+		<script th:inline="javascript">
+			function view_terms(type){
+				window.open("/terms/" + type, "_blank");
+			}
+		</script>
+	</main>
+</body>
+</html>

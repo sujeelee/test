@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html 
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout.html}">
+<head>
+<meta charset="UTF-8">
+<title>시드키 : 내 계좌</title>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<link rel="stylesheet" type="text/css" th:href="@{/css/accountasset.css}">
+</head>
+<body>
+	<main layout:fragment="content">
+		<div class="my-container mt-5">
+			<div th:replace="~{layout/mySide.html}"></div>
+            <div>
+	        	<div class="main-content">
+	            	<!-- 자산 섹션 -->
+	            	<section class="asset-section">
+	                	<div class="account-info">
+                    		<span  class="account-text" 
+                    			   th:text="'S2D KEY ' + ${#authentication.principal.member.mb_account}"></span>
+	                    	<div class="balance-info">
+	                        	<span class="my-balance-text1" 
+	                        		  th:text="${#numbers.formatInteger(account.ac_deposit, 1, 'COMMA')} + '원'"></span>
+	                        	<div class="balance-box">
+		                        	<span class="my-balance-text2"
+		                        		  th:text="'지난주보다 ' + ${#numbers.formatInteger(money, 1, 'COMMA')} + '원'"></span>
+		                        	<span class="my-balance-text2"
+		                        		  th:text="'(' + ${rateOfReturn} + '%)'"></span>		
+	                        	</div>
+	                    	</div>
+	                	</div>
+	            	</section>
+	
+		            <!-- 기간 선택 섹션 -->
+		            <section class="my-section period">
+		                <div class="graph-container" id="graph-container">
+		                
+		                </div>
+		                <div class="period-buttons">
+		                    <button class="period-button active" onclick="loadPeriodData(this)" value="1week">1주</button>
+		                    <button class="period-button" onclick="loadPeriodData(this)" value="1month">1달</button>
+		                    <button class="period-button" onclick="loadPeriodData(this)" value="3month">3달</button>
+		                    <button class="period-button" onclick="loadPeriodData(this)" value="1year">1년</button>
+		                </div>
+		            </section>
+		
+		            <!-- 주문 가능 금액과 투자 중인 금액을 나란히 배치하는 섹션 -->
+					<section class="my-section-wrapper">
+					    <!-- 주문 가능 금액 섹션 -->
+					    <section class="my-section order">
+					        <div class="my-info">
+					            <div class="my-info-title-div">
+					            	<div class="my-header-text">주문 가능 금액</div>
+					            	<div class="order-buttons">
+							            <button class="action-button" onclick="open_window('deposit', 1250, 800);">채우기</button>
+							            <button class="action-button" onclick="open_window('send', 500, 500);">보내기</button>
+						            </div>
+						        </div>
+					            <div>
+					                <span class="my-balance-text1" 
+					                	  th:text="${#numbers.formatInteger(account.ac_deposit, 0, 'COMMA')} + '원'"></span>
+					            </div>
+					        </div>
+					        <!-- 원화  -->
+					        <div class="my-item-box">
+					            <span class="my-item-text1"><i class="fa-solid fa-won-sign"></i> 원화</span>
+					            <div class="my-details">
+					                <span class="my-item-text2" 
+					                	  th:text="${#numbers.formatInteger(account.ac_deposit, 0, 'COMMA')} + '원'"></span>
+					            </div>
+					        </div>
+					    </section>
+					
+					    <!-- 투자 중 섹션 -->
+					    <section class="my-section investment">
+					        <div class="my-info">
+					            <div class="my-header-text margin-header-text">투자 중인 금액</div>
+					            <div>
+					                <span class="my-balance-text1" 
+					                	  th:text="${#numbers.formatInteger(stockMoney, 1, 'COMMA')} + '원'"></span>
+					            </div>
+					        </div>
+					        <!-- 국내 주식 -->
+					        <div class="my-item-box">
+					            <span class="my-item-text1"><img th:src="@{/img/flag.png}" width="24"></img> 국내주식</span>
+					            <div class="my-details">
+					                <span class="my-item-text2" 
+					                	  th:text="${#numbers.formatInteger(stockMoney, 1, 'COMMA')} + '원'"></span>
+					            </div>
+					        </div>
+					    </section>
+					</section>
+					<section class="my-section-wrapper">
+			            <!-- 수익 섹션 -->
+			            <section class="my-section profit">
+			                <div class="my-info">
+			                    <span class="my-header-text">이번달 수익</span>
+			                    <div>
+			                        <span class="my-balance-text1"
+			                        	  th:text="${#numbers.formatInteger(proceeds, 0, 'COMMA')} + '원'"></span>
+			                    </div>
+			                </div>
+			            </section>
+		            </section>
+			        <section class="final-section">
+			        	<a href="/myaccount/profit">
+			        		<button class="final-button" style="width: 100%;">
+			        			<div class="final-details">
+									<div class="my-info-left">
+										<span class="my-text-left"><i class="fa-solid fa-coins"></i> 판매 수익</span>
+									</div>
+									<div class="my-info-right">
+										<span class="my-text-right"
+											  th:text="${#numbers.formatInteger(proceedsAll, 0, 'COMMA')} + '원'"></span>
+									</div>
+								</div>
+			        		</button>
+			        	</a>
+						
+						<a href="/myaccount/point/use">
+							<button class="final-button" style="width: 100%;">
+								<div class="final-details">
+									<div class="my-info-left">
+										<span class="my-text-left"><i class="fa-sharp fa-solid fa-copyright"></i> 포인트</span>
+									</div>
+									<div class="my-info-right">
+										<span class="my-text-right" 
+											  th:text="${#numbers.formatInteger(point, 0, 'COMMA')} + 'P'"></span>
+									</div>
+								</div>
+							</button>
+						</a>
+					</section>
+		        </div>
+		    </div>
+	    </div>
+		<script th:inline="javascript">
+		    /* 서버에서 전달된 graphData를 JSON으로 변환 */
+		    let graphData = /*[[${graphData}]]*/ [];
+		    
+			function loadPeriodData(obj){
+				const period = obj.value;
+			    // 모든 버튼에서 active 클래스를 제거
+			    $('.period-button').removeClass('active');
+			    // 클릭된 버튼에 active 클래스 추가
+			    $(obj).addClass('active');
+				$.ajax({
+					async : true,
+					url : '/myaccount/asset/period', 
+					type : 'post', 
+					data : {
+						period : period
+					}, 
+					dataType : "json",
+					success : function (data){
+						displayBalance(data);
+						updateChart(data.graphData);
+					}, 
+					error : function(jqXHR, textStatus, errorThrown){
+						console.log(jqXHR);
+					}
+				});
+			}
+			function displayBalance(data){
+				var str = '<span class="my-balance-text2">'+data.text+'보다 '+addCommas(parseInt(data.money))+'원 </span>';
+				str += '<span class="my-balance-text2">('+data.rateOfReturn+'%)</span>';
+				$('.balance-box').html(str);
+			}
+			
+		    // Google Charts 로드
+		    google.charts.load('current', { packages: ['corechart'] });
+		    google.charts.setOnLoadCallback(drawChart);
+
+		    // 초기 차트 그리기
+		    function drawChart() {
+		        let data = new google.visualization.DataTable();
+		        data.addColumn('date', '');
+		        data.addColumn('number', '');
+		        data.addColumn({ type: 'string', role: 'tooltip' });
+
+		        data.addRows(
+		            graphData.map(item => [
+		                new Date(item.date), 
+		                item.amount,
+		                `${new Intl.DateTimeFormat('ko-KR', {
+			                month: '2-digit',
+			                day: '2-digit',
+			                hour: '2-digit',
+			                minute: '2-digit',
+			                hour12: false
+			            }).format(new Date(item.date)).replace('.', '월 ').replace('.', '일 ')}\n${item.amount.toLocaleString()}원`
+		            ])
+		        );
+
+		        let options = {
+	        	    width: 920,
+	        	    height: 350,
+	        	    legend: 'none',
+	        	    curveType: 'function',
+	        	    pointSize: 0,
+	        	    hAxis: {
+	        	        gridlines: { color: 'none' },      // 수평축의 눈금선 제거
+	        	        textPosition: 'none',              // 수평축의 라벨 제거
+	        	        baselineColor: 'transparent',      // 수평 기준선을 투명하게 설정
+	        	    },
+	        	    vAxis: {
+	        	        gridlines: { color: 'none' },      // 수직축의 눈금선 제거
+	        	        textPosition: 'none',              // 수직축의 라벨 제거
+	        	        baselineColor: 'transparent'       // 수직 기준선을 투명하게 설정
+	        	    },
+	        	    chartArea: {
+	        	        width: '90%',                      // 차트 영역 너비 최대화
+	        	        height: '80%'                      // 차트 영역 높이 최대화
+	        	    },
+	        	    lineWidth: 2,                          // 선의 굵기
+	        	    backgroundColor: 'transparent'         // 배경 투명화
+	        	};
+
+		        let chart = new google.visualization.LineChart(document.getElementById('graph-container'));
+		        chart.draw(data, options);
+		    }
+
+		    // 차트를 업데이트하는 함수
+		    function updateChart(graphData) {
+		    	let data = new google.visualization.DataTable();
+				data.addColumn('date', ''); 
+				data.addColumn('number', '');
+				data.addColumn({ type: 'string', role: 'tooltip' });
+				
+				data.addRows(
+				    graphData.map(item => [
+				        new Date(item.date), 
+				        item.amount,
+				        `${new Intl.DateTimeFormat('ko-KR', {
+				         month: '2-digit',
+				         day: '2-digit',
+				         hour: '2-digit',
+				         minute: '2-digit',
+				         hour12: false
+				     }).format(new Date(item.date)).replace('.', '월 ').replace('.', '일 ')}\n${item.amount.toLocaleString()}원`
+				    ])
+				);
+
+		        let options = {
+	        	    width: 920,
+	        	    height: 350,
+	        	    legend: 'none',
+	        	    curveType: 'function',
+	        	    pointSize: 0,
+	        	    hAxis: {
+	        	        gridlines: { color: 'none' },      // 수평축의 눈금선 제거
+	        	        textPosition: 'none',              // 수평축의 라벨 제거
+	        	        baselineColor: 'transparent'       // 수평 기준선을 투명하게 설정
+	        	    },
+	        	    vAxis: {
+	        	        gridlines: { color: 'none' },      // 수직축의 눈금선 제거
+	        	        textPosition: 'none',              // 수직축의 라벨 제거
+	        	        baselineColor: 'transparent'       // 수직 기준선을 투명하게 설정
+	        	    },
+	        	    chartArea: {
+	        	        width: '90%',                      // 차트 영역 너비 최대화
+	        	        height: '80%'                      // 차트 영역 높이 최대화
+	        	    },
+	        	    lineWidth: 2,                          // 선의 굵기
+	        	    backgroundColor: 'transparent'         // 배경 투명화
+	        	};
+
+		        let chart = new google.visualization.LineChart(document.getElementById('graph-container'));
+		        chart.draw(data, options);
+		    }
+		</script>
+	</main>
+</body>
+</html>

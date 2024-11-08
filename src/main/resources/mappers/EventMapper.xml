@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kh.st.boot.dao.EventDAO">
+
+    <select id="getEventList" resultType="kh.st.boot.model.dto.EventDTO">
+        select ev_no, ev_title, ev_start, ev_end, ev_status, ev_datetime, fi_path 
+        from event 
+        left join file on  ev_no = fi_reg_no 
+        where fi_type = "event" and ev_status = #{eventStatus}
+        order by ev_start desc
+    </select>
+
+    <select id="getEventPostList" resultType="kh.st.boot.model.dto.EventDTO">
+        select ev_no, ev_title, ev_start, ev_end, ev_status, ev_datetime
+        from event 
+        where ev_status = #{eventStatus}
+        order by ev_end desc
+    </select>
+
+    <select id="getEvent" resultType="EventVO">
+        select event.* , fi_path from event left join file on ev_no = fi_reg_no where fi_type = "event" and ev_no = #{ev_no} and ev_status = #{eventStatus}
+    </select>
+
+    <select id="getEventPost" resultType="EventVO">
+        select * from event where ev_no = ${ev_no} limit 1
+    </select>
+
+    <insert id="setEvent">
+        insert into event(ev_title, ev_content, ev_start, ev_end, ev_status, ev_datetime, ev_form, ev_bannerShow)
+        value(#{ev_title}, #{ev_content}, #{ev_start}, #{ev_end}, #{ev_status}, now(), #{ev_form}, 0)
+    </insert>
+
+    <select id="getEventToImportAFile" resultType="EventVO">
+        SELECT * FROM event order by ev_no desc limit 1
+    </select>
+
+    <insert id="setEventFile">
+		INSERT INTO FILE(FI_ORG_NAME, FI_PATH, FI_REG_NO, FI_TYPE) VALUES
+		(#{fi_org_name}, #{fi_path}, #{fi_reg_no}, #{fi_type})
+	</insert>
+
+    <update id="updateEventDateAndStatus">
+        update event
+        set ev_status = "Ending"
+        where now() > ev_end
+    </update>
+
+    <delete id="deleteEventPost">
+        delete from event where ev_no = ${ev_no}
+    </delete>
+    
+    <select id="getFileByEventNumber" resultType="FileVO">
+        select * from file where fi_reg_no = #{ev_no} and fi_type = 'event'
+    </select>
+
+    <update id="updateEvent">
+        update event
+        set ev_title = #{ev_title}, ev_content = #{ev_content}, ev_start = #{ev_start}, ev_end = #{ev_end}, ev_status = #{ev_status}, ev_form = #{ev_form}
+        where ev_no = #{ev_no}
+    </update>
+
+    <delete id="deleteEventThumbnailFile">
+        delete from file where fi_reg_no = #{ev_no} and fi_type = 'event'
+    </delete>
+    
+    <insert id="setNewCalenderEvent">
+        insert into day_check(dc_datetime, mb_id, dc_days, po_num)
+        value (now(), #{mb_id}, #{checkList}, 50)
+    </insert>
+
+    <update id="setCalenderEvent_add50point">
+        update member
+        set mb_point = mb_point + 50
+        where mb_id = #{mb_id}
+    </update>
+
+    <insert id="setPointByCalenderEvent">
+        insert into point(po_num, po_content, po_datetime, mb_id)
+        values (50, "출석 체크 이벤트", now(), #{mb_id})
+    </insert>
+
+    <select id="getCalenderEventValue" resultType="String">
+        select dc_days FROM day_check where mb_id = #{name} order by dc_datetime desc LIMIT 1
+    </select>
+
+    <select id="getEventListByEventForm" resultType="EventVO">
+        select * from event where ev_form = #{form}
+    </select>
+
+    <insert id="setPrizeToBeUsedFromTheEvent">
+        insert into prize(pr_link, pr_name, pr_point, pr_startLevel, pr_endLevel, ev_no, ep_rank)
+        value(#{pr_link}, #{pr_name}, #{pr_point}, #{pr_startLevel}, #{pr_endLevel}, #{ev_no}, #{ep_rank})
+    </insert>
+
+    <select id="getPrizeListByEv_no" resultType="PrizeVO">
+        select prize.*, fi_path from prize left join file on pr_no = fi_reg_no where fi_type = "prize" and ev_no = #{ev_no}
+    </select>
+
+    <select id="getPrizeLastOne" resultType="PrizeVO">
+        select * from prize order by pr_no desc limit 1
+    </select>
+
+    <select id="getPrizeByPr_no" resultType="PrizeVO">
+           select prize.*, fi_path from prize left join file on pr_no = fi_reg_no where fi_type = "prize" and pr_no = #{pr_no}
+    </select>
+
+    <select id="getEventPrizeTicket" resultType="EventPrizeVO">
+        select * from event_prize where pr_no = #{pr_no} and ep_mb_id = #{ep_mb_id} and ev_no = #{ev_no}
+    </select>
+
+    <insert id="setEventPrizeTicket">
+        insert into event_prize(ev_no, pr_no, ep_count, ep_prize, ep_mb_id, ep_rank)
+        value(#{ev_no}, #{pr_no}, 0, #{ep_prize}, #{ep_mb_id}, #{ep_rank})
+    </insert>
+
+    <update id="updateEventPrizeTicket_AddOne">
+        update event_prize
+        set ep_count = ep_count + 1
+        where ev_no = #{ev_no} and ep_mb_id = #{ep_mb_id} and pr_no = #{pr_no}
+    </update>
+
+    <select id="getEventPrizeTicketList" resultType="EventPrizeVO">
+        select * from event_prize where ev_no = #{ep_no} and ep_mb_id = #{mb_id} order by pr_no 
+    </select>
+
+    <select id="getEventPrizeTicketCounter" resultType="kh.st.boot.model.dto.EventPrizeCounterDTO">
+        select ev_no, pr_no ,sum(ep_count) 'sumCount' from event_prize  where ev_no = #{ev_no} group by pr_no order by pr_no 
+    </select>
+
+    <select id="getEventAllList" resultType="kh.st.boot.model.dto.EventDTO">
+        select ev_no, ev_title, ev_start, ev_end, ev_status, ev_form, ev_datetime, ev_bannerShow from event 
+    </select>
+
+    <delete id="deletePrize">
+         delete from prize where pr_no = #{pr_no}
+    </delete>
+
+    <update id="updatePrize">
+        update prize
+        set pr_link = #{pr_link}, pr_name = #{pr_name}, pr_point = #{pr_point}, pr_startLevel = #{pr_startLevel}, pr_endLevel = #{pr_endLevel}, ep_rank = #{ep_rank}
+        where pr_no = #{pr_no}
+    </update>
+
+    <delete id="deletePrizeThumbnailFile">
+        delete from file where fi_reg_no = #{pr_no} and fi_type = 'prize'
+    </delete>
+
+    <select id="findEventByNumber" resultType="EventVO">
+        select * from event where ev_no = #{ev_no}
+    </select>
+
+    <update id="changeBannerShow">
+        update event
+        set ev_bannerShow = #{i}
+        where ev_no = #{ev_no}
+    </update>
+
+    <select id="getEventListForMainBanner" resultType="EventVO">
+        select event.*, fi_path fi_path_banner
+        from event
+        left join file on ev_no = fi_reg_no 
+        where fi_type = "eventBanner" and  ev_bannerShow = 1
+        order by ev_start desc
+    </select>
+
+</mapper>

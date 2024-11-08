@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kh.st.boot.dao.OrderDAO"> 
+
+	<select id="getReservation" resultType="ReservationVO">
+		select * from reservation 
+		where re_st_code = #{code} and mb_id = #{mb_id} and re_state like '%대기%'
+		order by re_no ASC
+	</select>
+	<insert id="insertReservation" useGeneratedKeys="true" keyColumn="re.re_no">
+		insert into reservation 
+		set	re_datetime = NOW(),
+			mb_id = #{re.mb_id},
+			re_want_price = #{re.re_want_price},
+			re_st_code = #{re.re_st_code},
+			re_qty = #{re.re_qty},
+			re_state = #{re.re_state}
+	</insert>
+	<insert id="insertOrder">
+		insert into `order`
+		set	od_id = #{od.od_id},
+			od_name = #{od.od_name},
+			mb_id = #{od.mb_id},
+			od_price = #{od.od_price},
+			od_point = #{od.od_point},
+			od_date = NOW(),
+			od_status = #{od.od_status},
+			od_st_code = #{od.od_st_code},
+			od_st_name = #{od.od_st_name},
+			od_qty = #{od.od_qty},
+			od_st_price = #{od.od_st_price},
+			od_percent_price = #{od.od_percent_price}
+	</insert>
+	<insert id="setPointBuy">
+		insert into point
+		set po_num = #{po.po_num},
+			po_content = #{po.po_content}, 
+			mb_id = #{po.mb_id},
+			po_datetime = NOW()
+	</insert>
+	<update id="updateMemberPoint">
+		update member 
+		set mb_point = mb_point + #{po.po_num} 
+		where mb_id = #{po.mb_id}
+	</update>
+	<update id="stockQty">
+		update stock
+		set st_qty = st_qty + #{qty}
+		where st_code = #{code}
+	</update>
+	<select id="totalMyStock" resultType="kh.st.boot.model.dto.MyStocksDTO">
+		SELECT 
+        COALESCE(SUM(CASE WHEN od_status LIKE '매수%' THEN od_qty ELSE 0 END), 0) - 
+        COALESCE(SUM(CASE WHEN od_status LIKE '매도%' THEN od_qty ELSE 0 END), 0) AS stocksQty,
+        
+        COALESCE(SUM(CASE WHEN od_status LIKE '매수%' THEN od_qty * od_st_price ELSE 0 END), 0) - 
+        COALESCE(SUM(CASE WHEN od_status LIKE '매도%' THEN od_qty * od_st_price ELSE 0 END), 0) AS stockOrignPrice
+    FROM 
+        `order` 
+    WHERE 
+        od_st_code = #{code} AND mb_id = #{mb_id};
+	</select>
+	<delete id="deleteReservation">
+		delete from reservation where re_st_code = #{code} and re_no = #{re_no}
+	</delete>
+	<update id="ReservationVO">
+		update reservation 
+		set re_state = #{re.re_state},
+			re_done_date = NOW()
+		where re_no = #{re.re_no}
+	</update>
+</mapper>

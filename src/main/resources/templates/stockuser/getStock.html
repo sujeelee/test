@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html 
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+	layout:decorate="~{layout/layout.html}">
+<head>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" th:href="@{/css/stock.css}">
+</head>
+<body>
+<main layout:fragment="content">
+	<h2 class="center">주식회사관리</h2>
+	<div class="btn-list">
+		<a class="btn btn-info" th:href="@{/admin/stock}">주식시세관리</a> 
+	</div>
+	<div class="form-search center">
+		<form th:action="@{/admin/stock/getListStock}" method="get" onsubmit="return fsearchstocksubmit(this);">
+			<div class="form-group">
+			  <select name="sfl">
+			  	<option value="cmpname" th:selected="${#strings.equals(param.sfl, 'cmpname')}">주식회사명</option>
+           		<option value="crno" th:selected="${#strings.equals(param.sfl, 'crno')}">법인등록번호</option>
+			  </select>
+			  <input type="text" placeholder="검색어를 입력하세요" name="stx" th:value="${param.stx}">
+			</div>
+			<div class="form-group">
+			  <button class="btn btn-info" type="submit">검색</button>
+			  <a class="btn btn-info" th:href="@{/stock/getListStock}">초기화</a>
+			</div>
+		</form>
+	</div>
+	<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>기준일자</th>
+					<th>주식회사명</th>
+					<th>법인등록번호</th>
+					<th>주식회사코드</th>
+					<th>시장 구분</th>
+					<th>관리</th>
+				</tr>
+			</thead>
+		    <tbody>
+				<tr th:each="list:${list}">
+					<td th:text="${list.basDt}"></td>
+					<td th:text="${list.itmsNm}"></td>
+					<td th:text="${list.crno}"></td>
+					<td th:text="${list.isinCd}"></td>
+					<td th:text="${list.mrktCtg}"></td>
+					<td>
+						<button type="button" class="btn btn-info"
+					        th:if="${list.tmp.equals('N')}" 
+					        th:onclick="saveStock([[${list}]]);">DB저장</button>
+					</td>
+				</tr>
+				<tr th:if="${list == null or #lists.isEmpty(list)}">
+					<td colspan="6">주식 리스트가 존재하지 않습니다.</td>
+				</tr>
+		    </tbody>
+	    </table>
+	<ul class="pagination justify-content-center center" 
+		th:object="${pm}" 
+		th:if="${pm.endPage != 0}">
+	    <li class="page-item" th:if="*{prev}">
+	    	<a class="page-link" th:href="@{/admin/stock/getListStock(page=*{startPage-1},sfl=${param.sfl},stx=${param.stx})}">이전</a>
+	    </li>
+	    <li class="page-item" 
+	    	th:each="i : *{#numbers.sequence(startPage, endPage)}"
+	    	th:classappend="*{cri.page} == ${i} ? 'active' : ''">
+	    	<a class="page-link" th:href="@{/admin/stock/getListStock(page=${i},sfl=${param.sfl},stx=${param.stx})}" th:text="${i}"></a>
+	    </li>
+	    <li class="page-item" th:if="*{next}">
+	    	<a class="page-link" th:href="@{/admin/stock/getListStock(page=*{endPage+1},sfl=${param.sfl},stx=${param.stx})}">다음</a>
+	    </li>
+	</ul>
+	<script th:inline="javascript">
+		function fsearchstocksubmit(f) {
+			if(f.sfl.value && !f.stx.value){
+				alert("검색어를 입력해주세요.");
+				f.stx.focus();
+				return false;
+			}
+			if(!f.stx.value && !f.sfl.value){
+				alert("검색하실 내용을 선택해주세요.");
+				f.stx.focus();
+				return false;
+			}
+			return true;
+		}
+		
+		function saveStock(stockInfo){
+			// 전달된 데이터 확인
+		    var url = '/admin/stock/insertStock';
+			$.ajax({
+	            url: url,
+	            type: 'post',
+	            data: JSON.stringify(stockInfo),
+	            dataType : 'json',
+	            contentType: 'application/json',  // JSON 형식으로 전송
+	            async: false, 
+	            success: function (data) {
+	                if(data.res == "fail"){
+	                	alert(data.msg);
+	                } else {
+	                	alert(data.msg);
+	                	location.reload();
+	                }
+	            }
+	        });
+		}
+	</script>
+</main>
+</body>
+</html>

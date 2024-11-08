@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+   xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+   layout:decorate="~{layout/admlayout.html}" layout:fragment="content">
+<head>
+<meta charset="UTF-8">
+<title>Admin Level Page</title>
+<link th:href="@{/css/admnews.css}" rel="stylesheet" />
+<!--  스타일 적용 했음  -->
+</head>
+<style>
+</style>
+<body>
+   <div class="content">
+      <!--  이거 추가하니까 사이드바랑 곂치던거 해결됨 wht?>???>??<>>?>?>?>?>?>>? -->
+      <h1>레벨정보 관리 페이지</h1>
+      <div class="update-from">
+         <!-- insert 레이아웃 나눈거 -->
+         <form action="/admin/admLevel/admLevelPage/update" method="post">
+
+            <input type="text" name="lv_name" placeholder="등급" required>
+            <input type="text" name="lv_num" placeholder="레벨" required>
+            <input type="text" name="lv_alpha" placeholder="등급 혜택" required>
+            <select name="lv_auto_use" required>
+               <option value="1">자동 승급</option>
+               <option value="0">관리자 승인 필요</option>
+            </select> <input type="text" name="lv_up_limit" placeholder="레벨업 기준" required>
+            <button type="submit">수정</button>
+         </form>
+      </div>
+      <div class="register-form">
+         <!-- insert 레이아웃 나눈거 -->
+         <form action="/admin/admLevel/admLevelPage/insert" method="post">
+
+            <input type="text" name="lv_name" placeholder="등급" required>
+            <input type="text" name="lv_num" placeholder="레벨" required>
+            <input type="text" name="lv_alpha" placeholder="등급 혜택" required>
+            <select name="lv_auto_use" required>
+               <option value="1">자동 승급</option>
+               <option value="0">관리자 승인 필요</option>
+            </select> <input type="text" name="lv_up_limit" placeholder="레벨업 기준" required>
+            <button type="submit">등록</button>
+         </form>
+      </div>
+   </div>
+   <!-- 레벨 테이블 -->
+   <table>
+      <thead>
+         <tr>
+            <th>등급</th>
+            <th>레벨</th>
+            <th>등급 혜택</th>
+            <th>승급 심사 여부</th>
+            <!-- 0,1 로 == 자동승급 / 관리자 승인 필요 -->
+            <th>레벨업 기준</th>
+            <th>삭제</th>
+         </tr>
+      </thead>
+      <tbody>
+         <tr th:each="list : ${list}">
+            <td th:text="${list.lv_name}"></td>
+            <td th:text="${list.lv_num}"></td>
+            <td th:text="${list.lv_alpha}"></td>
+            <td th:text="${list.lv_auto_use == 0 ? '자동 승급' : '관리자 승인 필요'}"></td>
+            <td th:text="${list.lv_up_limit}"></td>
+            <td>
+               <!-- 삭제 버튼을 위한 폼 -->
+               <form action="/admin/admLevel/admLevelPage/delet" method="post"
+                  style="display: inline;">
+                  <input type="hidden" name="lv_name" th:value="${list.lv_name}" />
+                  <!-- 레벨 이름 -->
+                  <input type="hidden" name="lv_num" th:value="${list.lv_num}" />
+                  <!-- 레벨 번호 -->
+                  <input type="hidden" name="lv_alpha" th:value="${list.lv_alpha}" />
+                  <!-- 레벨 혜택 -->
+                  <input type="hidden" name="lv_auto_use"
+                     th:value="${list.lv_auto_use}" />
+                  <!-- 승급 심사 여부 -->
+                  <input type="hidden" name="lv_up_limit"
+                     th:value="${list.lv_up_limit}" />
+                  <!-- 레벨업 기준 -->
+                  <button type="submit" style="font-size: 12px;"
+                     onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
+               </form>
+            </td>
+
+         </tr>
+      </tbody>
+   </table>
+</body>
+</html>

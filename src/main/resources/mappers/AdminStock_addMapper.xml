@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kh.st.boot.dao.AdminStock_addDAO">
+
+	<select id="nullSelectAll" resultType="AdminStock_addVO">
+		SELECT * FROM
+		stock_add
+	</select>
+
+
+	<select id="SelectAll" resultType="AdminStock_addVO">
+		SELECT * FROM
+		stock_add
+		WHERE
+		sa_qty = #{sa_qty} AND mb_id = #{mb_id} AND sa_yn IS NULL;
+	</select>
+
+
+	<update id="updateAll">
+		UPDATE stock_add
+		SET
+		sa_yn = #{sa_yn},
+		sa_feedback = #{sa_feedback}
+		WHERE
+		sa_no = #{sa_no}
+	</update>
+	
+ 	<update id="styUpdate">
+  		UPDATE stock
+  		SET st_qty = st_qty + #{sa_qty}
+  		WHERE st_name = #{mb_id}
+	</update>
+
+
+	<select id="search" resultType="AdminStock_addVO">
+		SELECT * FROM
+		stock_add
+		WHERE
+		mb_id = #{mb_id} AND sa_yn IS NULL;
+	</select>
+
+</mapper>
+ 
+ 

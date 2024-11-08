@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout/layout.html}">
+<head>
+<meta charset="UTF-8" />
+<title>시드키 : 포인트 내역</title>
+<link rel="stylesheet" type="text/css" th:href="@{/css/accountpoint.css}">
+</head>
+ <body>
+	<main layout:fragment="content">
+		<div class="my-container mt-5">
+			<div th:replace="~{layout/mySide.html}"></div>
+			<div>
+				<!-- Header -->
+				<div class="mypage-header">
+					<h1 class="header-title">포인트 내역</h1>
+				</div>		
+				<!-- Balance Section -->
+				<div class="balance-section">
+					<div class="balance-info">
+						<p class="balance-text">사용 가능 포인트 · <span th:text="${#numbers.formatInteger(point, 1, 'COMMA')}"></span>포인트</p>
+					</div>
+				</div>
+				<section>
+					<div class="btn-list">
+						<ul class="list-group list-group-horizontal">
+							<li class="list-group-item list-group-item-light">
+								<a th:href="@{/myaccount/point/use}">
+									<button type="button" th:class="${type == 'use'} ? 'btn btn-info on':'btn btn-light'">사용</button>
+								</a>
+							</li>
+							<li class="list-group-item list-group-item-light">
+								<a th:href="@{/myaccount/point/get}">
+									<button type="button" th:class="${type == 'get'} ? 'btn btn-info on':'btn btn-light'">획득</button>
+								</a>
+							</li>
+						</ul>
+					</div>
+					<div class="transaction-box">
+					    <div class="transaction-container" th:each="list:${list}">
+					        <!-- 날짜 및 시간 정보 -->
+					        <span class="date-info" th:text="${#dates.format(list.po_datetime, 'MM.dd')}"></span>
+					        <!-- 거래 내역 -->
+					        <div class="transaction-details">
+					            <!-- 사용자 정보 -->
+					            <div class="user-info">
+					                <span class="user-name" th:text="${list.po_content}"></span>
+					                <span class="transaction-type"><span th:text="${#strings.substring(list.po_datetime, 11, 16)}"></span> ㅣ <span th:text="${type == 'use' ? '사용' : '획득'}"></span></span>
+					            </div>
+					
+					            <!-- 금액 정보 -->
+					            <div class="amount-info">
+					                <span class="amount"><span th:text="${#numbers.formatInteger(list.po_num,0,'COMMA')}"></span>P</span>
+					            </div>
+					        </div>
+					    </div>
+						<div class="none-list" th:if="${list == null or #lists.isEmpty(list)}">
+							<div class="none-content">
+								<i class="fa-solid fa-note-sticky fa-5x fa-color"></i>
+						 		<p class="no-title">내역이 없어요</p>
+						 	</div>
+						 </div>
+					</div>
+				</section>
+				<!-- 페이지 네이션 적용할 것임 -->
+				<div class="page_div">
+					<ul class="pagination justify-content-center center" 
+						th:object="${pm}" 
+						th:if="${pm.endPage != 0}">
+					    <li class="page-item" th:if="*{prev}">
+					    	<a class="page-link" th:href="@{/myaccount/point/{type}(type=${type}, page=*{startPage-1})}">이전</a>
+					    </li>
+					    <li class="page-item" 
+					    	th:each="i : *{#numbers.sequence(startPage, endPage)}"
+					    	th:classappend="*{cri.page} == ${i} ? 'active' : ''">
+					    	<a class="page-link" th:href="@{/myaccount/point/{type}(type=${type}, page=${i})}" th:text="${i}"></a>
+					    </li>
+					    <li class="page-item" th:if="*{next}">
+					    	<a class="page-link" th:href="@{/myaccount/point/{type}(type=${type}, page=*{endPage+1})}">다음</a>
+					    </li>
+					</ul>
+				</div>
+		    </div>
+		</div>
+	</main>
+</body>
+</html>

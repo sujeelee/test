@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html 
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layout/layout.html}">
+<head>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>시드키 : 이벤트 : 응모 페이지</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/eventA.css}">
+
+</head>
+<body>
+    <main layout:fragment="content">
+        
+        <div class="container-event-Participatory-type" id="prize">
+            
+            <div class="event-participation" th:each="prize, n : ${list}" th:id="'get'+${prize.pr_link}">
+                
+                <div th:object="${eplist.get(n.index)}">
+                    
+                    <h2>[[${prize.pr_name}]]</h2>
+                    <div class="image-container">
+                        <img th:src="@{'/uploads' + ${prize.fi_path}}" alt="Event Image" class="event-image" style="height: 200px;">
+                    </div>
+                    <p>아래의 버튼을 클릭하여 이벤트에 응모하세요!</p>
+                    <button id="participateButton" class="submit-button"
+                    th:onclick="participate([[${prize.pr_link}]],[[${prize.pr_point}]],[[${prize.pr_no}]], [[${n.index}]],  [[${prize.ep_rank}]], [[*{ep_count}]])" >응모하기</button>
+                    <div th:id="'loader'+${n.index}" class="loader"></div>
+                    <div id="confirmationMessage" style="display: none;"></div>
+                    <p class="points-required">소모 포인트: [[${prize.pr_point}]] P</p>
+                    <p th:object="${epcDtoList.get(n.index)}">총 응모 횟수: <span id="participantCount" th:text="*{sumCount}">0</span>번</p>
+                    <p>응모 횟수: <span id="participantCount" th:text="*{ep_count}">0</span>번</p>
+                    <p th:if="${prize.ep_rank} != 0">응모 가능 횟수: <span id="participantCount" th:text="${prize.ep_rank}">0</span>번</p>
+                    <input type="hidden" th:id="res" th:value="${res}">
+
+                </div>
+            </div>
+        </div>
+
+        
+
+        <script th:inline="javascript">
+
+            
+            const ev_no = /*[[${ev_no}]]*/ '';
+            const mb_id = /*[[${#authentication.Principal.member.mb_id}]]*/ '';
+
+            function participate(pr_link, pr_point, pr_no, index, prizeRank, ep_count){
+                
+                const loader = document.getElementById('loader'+index);
+                
+                loader.style.display = "block";
+
+
+                if(prizeRank !== 0 && prizeRank <=ep_count ){
+                    alert('모든 참여가능 횟수를 소진하였습니다.')
+                    return;
+                }
+
+                var PrizeTicket = {
+                    mb_id : mb_id,
+                    pr_no : pr_no,
+                    ev_no : ev_no,
+                    pr_link : pr_link,
+                    pr_point : pr_point
+                };
+
+                var url = '/event/ajax/participate';
+
+                $.ajax({
+                    url: url,
+                    type: 'post',
+                    data: JSON.stringify(PrizeTicket),
+                    contentType: 'application/json',
+                    success: function (data) {
+                        $('#prize').replaceWith(data);
+                        if($('#res').val() == 'false'){
+                            alert("포인트가 부족합니다.")
+                        } else {
+                            alert("참여완료!")
+                        }
+                        loader.style.display = "none";
+                    },
+                    error: function(xhr, status, error) {
+                        loader.style.display = "none";
+                        console.error('Error:', error);
+                        console.error('Error:', xhr);
+                        console.error('Error:', status);
+                    }
+  
+                });
+
+                
+
+                
+            }
+            
+        </script>
+    </main>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kh.st.boot.dao.AdmUserDAO">
+
+
+	<select id="AdmUserSearch" resultType="AdmMemberVO">
+		SELECT * FROM member
+	</select>
+
+	<update id="AdmUserUpdate">
+		UPDATE member
+			SET mb_nick = #{mb_nick},
+			mb_hp = #{mb_hp},
+			mb_hp = #{mb_hp},
+			mb_stop_date = #{mb_stop_date}
+			mb_edit_date = SYSDATE
+		WHERE
+			 mb_id = #{mb_id} , mb_name = #{mb_name}
+	</update>
+
+	<delete id="">
+		DELETE FROM member
+		WHERE 
+		 	mb_id = #{mb_id},
+		 	mb_name = #{mb_name},
+			mb_nick = #{mb_nick}, 
+			mb_hp = #{mb_hp},
+			mb_datetime = #{mb_datetime} 
+			  
+	</delete>
+</mapper>

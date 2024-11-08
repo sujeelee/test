@@ -1,0 +1,12 @@
+.go-top {position: fixed;width: 60px;bottom: 30px;right: 70px;z-index: 2;}
+.go-cursor{cursor: pointer;display: block;color: #fff;background: rgba(23, 162, 184, 0.8);margin: 5px 0px;text-align: center;border-radius: 50%;width: 42px;height: 42px;line-height: 42px !important;font-size: 19px;}
+.member-sticker{border-radius: 20px; font-size:13px; padding: 3px;}
+.type-sticker1{background-color: rgba(79, 189, 85, 0.2);color: #4fbd55;}
+.type-sticker2{background-color: rgba(255, 250, 99, 0.2);color: #faa131;}
+.type-sticker3{background-color: rgba(250, 113, 0, 0.2);color: #fa7100;}
+.type-sticker4{background-color: rgba(8, 91, 201, 0.2);color: #085bc9;}
+.type-sticker5{background-color: rgba(130, 53, 156, 0.2);color: #82359c;}
+.type-sticker6{background-color: rgba(112, 76, 87, 0.2);color: #704c57;}
+.type-sticker7{background-color: rgba(145, 133, 102, 0.2);color: #918566;}
+.type-sticker8{background-color: rgba(158, 17, 55, 0.2);color: #9e1137;}
+.type-sticker9, .type-sticker10{background-color: rgba(23, 162, 184, 0.2);color: #17a2b8;}

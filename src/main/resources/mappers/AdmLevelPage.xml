@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kh.st.boot.dao.SltAdmLevelPageDAO">
+
+	<select id="getAllssltAdminLevelPage"
+		resultType="AdminLevelPageVO">
+		SELECT * FROM member_lv ORDER BY lv_num ASC
+	</select>
+
+	<select id="selectAdmLev" resultType="AdminLevelPageVO">
+		SELECT * FROM member_lv
+		where lv_num = #{lv_num}
+	</select>
+
+
+
+	<select id="getLvOne" resultType="AdminLevelPageVO">
+		SELECT * FROM member_lv WHERE
+		lv_num = #{lv_num} limit 1
+	</select>
+
+
+	<insert id="insertAdmLv">
+		INSERT INTO member_lv (lv_name,
+		lv_num,lv_alpha,lv_auto_use,lv_up_limit)
+		VALUES
+		(#{lv_name},#{lv_num},#{lv_alpha},#{lv_auto_use},#{lv_up_limit})
+	</insert>
+
+
+	<delete id="dltAdmLvdao">
+		DELETE FROM member_lv
+		WHERE lv_num = #{lv_num} AND
+		lv_name = #{lv_name} AND
+		lv_alpha = #{lv_alpha} AND
+		lv_auto_use =
+		#{lv_auto_use} AND
+		lv_up_limit = #{lv_up_limit}
+	</delete>
+
+
+	<update id="updateAdmLev">
+		UPDATE member_lv
+		SET 
+			lv_name = #{lv_name},
+			lv_alpha = #{lv_alpha},
+			lv_auto_use = #{lv_auto_use},
+			lv_up_limit = #{lv_up_limit}
+		WHERE 
+			lv_num = #{lv_num}
+	</update>
+
+	<insert id="insertNewspaper">
+		INSERT INTO newspaper (np_name, np_use)
+		VALUES
+		(#{np_name}, #{np_use})
+	</insert>
+
+	<update id="updateNewspaper">
+		UPDATE newspaper
+		SET np_name = #{np_name}, np_use =
+		#{np_use}
+		WHERE np_no = #{np_no}
+	</update>
+
+
+	<select id="selectNewspapersByStatus" resultType="NewspaperVO">
+		SELECT * FROM
+		newspaper WHERE np_use = #{np_use}
+	</select>
+	<!-- 왜 이런 쿼리를 썻는지 주석달기 -->
+	<select id="getNewsOne" resultType="NewspaperVO">
+		SELECT * FROM newspaper WHERE
+		np_name = #{name} limit 1
+	</select>
+	<!-- 이게 중복방지 기능인것같은데 먼저 중복체크하고 vo 로 보냄 -->
+
+
+
+
+
+</mapper>

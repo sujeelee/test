@@ -1,0 +1,66 @@
+.container-of-cal {
+  max-width: 600px;
+  margin: 0 auto;
+  margin-top: 100px;
+  margin-bottom: 100px;
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+h1 {
+  color: #333;
+}
+
+.month-header {
+  font-size: 24px;
+  color: #007bff;
+  margin-bottom: 10px;
+}
+
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  margin-top: 20px;
+}
+
+.day,
+.weekday {
+  padding: 15px;
+  background-color: #e0f7fa;
+  border-radius: 5px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.weekday {
+  background-color: #b2ebf2;
+}
+
+.day.today {
+  background-color: #ffe57f; /* 연노란색 */
+  color: black;
+}
+
+.day.checked {
+  background-color: #007bff; /* 푸른색 */
+  color: white;
+}
+
+button:not(.modal-btn) {
+  padding: 10px 20px;
+  margin-top: 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}

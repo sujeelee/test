@@ -1,0 +1,27 @@
+<header class="home-section">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/header.css}">
+	<nav class="navbar">
+		<!-- 왼쪽 로고 -->
+		<div class="logo">
+			<a th:href="@{/}"><img th:src="@{/img/long_logo.png}" width="100px;"></a>
+		</div>         
+		<!--/* 가운데 메뉴 */-->
+		<div class="menu">
+			<a th:href="@{/}">홈</a>
+			<a th:href="@{/newspaper}">뉴스</a>
+			<a th:href="@{/stock/stockList}">주식 골라보기</a>
+			<a th:href="@{/myaccount/asset}" class="myaccount">내 계좌</a>
+			<a th:href="@{/event/eventhome/Opening}">이벤트</a>
+			<button type="button" class="modal-btn search_head" onclick="action_search();">
+				<span class="btn-inner-icon">
+					<i class="fa-solid fa-magnifying-glass"></i>
+				</span>
+				<span class="btn-inner-text slash">/</span>를 눌러 검색하세요
+			</button>		 
+		</div>
+		<div>
+			<a sec:authorize="isAuthenticated()" th:href="@{/event/calendar_event}">출석도장</a>
+		</div>
+
+	</nav>
+</header>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/admlayout.html}" layout:fragment="content">
+<head>
+<meta charset="UTF-8">
+<title>관리자 페이지</title>
+<link href="/css/admstock.css" rel='stylesheet'>
+<style>
+.modal {
+	position: fixed; /* 고정 위치로 변경 */
+	display: none; /* 기본적으로 보이지 않음 */
+	justify-content: center;
+	align-items: center; /* 세로 정렬 추가 */
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.4);
+	z-index: 999; /* 다른 요소 위에 표시되도록 설정 */
+}
+
+.modal_body {
+	width: 1000px;
+	height: 600px;
+	padding: 40px;
+	text-align: center;
+	background-color: rgb(255, 255, 255);
+	border-radius: 10px;
+	box-shadow: 0 2px 3px 0 rgba(34, 36, 38, 0.15);
+}
+
+.stock_cs {
+	text-align: left;
+	margin-bottom: 5px;
+}
+
+td {
+	border: 1px solid #d6dce7;
+	padding: 5px;
+}
+
+.stock_td {
+	text-align: center;
+	width: 60px;
+}
+.stock_p{
+text-align: left;
+font-size: 16px;
+margin-bottom: 5px;
+}
+
+.close-modal2,
+.close-modal{
+font-size: 18px;
+background-color: #17a2b8;
+color: white;
+border-radius: 6px;
+padding: 3px 14px;
+}
+
+
+
+</style>
+</head>
+<body>
+	<div id="wrapper">
+		<div id="container">
+			<h1 id="container_title">주식 발행/소각</h1>
+			<div id="container_main" class="content">
+				<form th:action="@{/admin/admStock/admStock_add/search}"
+					onsubmit="return unableform()" method="post" class="stock_cs">
+					<input type="text" name="mb_id" placeholder="요청사 ID"
+						id="sock_search" style="padding: 5px;" />
+					<button type="submit" style="padding: 5px 10px;"
+						class="btn_submit btn">검색</button>
+				</form>
+				<table>
+					<thead>
+						<tr>
+							<th>요청사 ID</th>
+							<th>소각/발행값</th>
+							<th>작성일</th>
+							<th>처리 여부</th>
+							<th style="width: 80px;">관리</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="item : ${list}">
+							<td th:text="${item.mb_id}"></td>
+							<td th:text="${item.sa_qty}"></td>
+							<td th:text="${item.sa_datetime}"></td>
+							<td
+								th:text="${item.sa_yn == null ? '승인 대기중' : item.sa_yn == 'y' ? '승인' : '거절'}"></td>
+							<td class="stock_td">
+								<button class="btn-open-modal navyBtn btn_submit btn"
+									type="button" th:data-sa_no="${item.sa_no}"
+									th:data-sa_qty="${item.sa_qty}" th:data-mb_id="${item.mb_id}"
+									th:data-sa_content="${item.sa_content}">처리</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<div class="modal">
+					<div class="modal_body">
+						<h2 style="  font-size: 26px; text-align: left;">데이터 처리</h2>
+						<p class="stock_p">
+							소각/발행값: <span id="modal-sa_qty"></span>
+						</p>
+						<p class="stock_p">
+							요청사 ID: <span id="modal-mb_id"></span>
+						</p>
+						<p class="stock_p">
+							요청사유: <span id="modal-sa_content"></span>
+						<p class="stock_p">
+						<form action="/admin/admStock/admStock_add/choose" method="post">
+						<p class="stock_p" >
+								처리: <select id="sa_yn" name="sa_yn" style="width: 75px; height: 26px;">
+									<option value="y">승인</option>
+									<option value="n">거절</option>
+								</select>
+							</p>
+							<p class="stock_p">관리자 코멘트</p>
+							<textarea name="sa_feedback" style="width: 100%; height: 300px"></textarea>
+
+							<!-- sa_qty 값을 전달하기 위한 hidden input 필드 추가 -->
+							<input type="hidden" id="hidden-sa_qty" name="sa_qty"> <input
+								type="hidden" id="hidden-mb_id" name="mb_id">
+
+							<!-- 기존 hidden input 필드들 -->
+							<input type="hidden" id="hidden-sa_no" name="sa_no">
+							<button type="submit" class="close-modal2">처리</button>
+							<button type="button" class="close-modal">닫기</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>  
+	
+
+	<script>
+    const modal = document.querySelector('.modal');
+    const closeModalBtn = document.querySelector('.close-modal');
+    const btnOpenModal = document.querySelectorAll('.btn-open-modal');
+
+    btnOpenModal.forEach(button => {
+        button.addEventListener("click", () => {
+            // 버튼의 data 속성에서 각 값을 가져와 모달에 넣음
+            document.getElementById('modal-sa_qty').innerText = button.dataset.sa_qty;
+            document.getElementById('modal-mb_id').innerText = button.dataset.mb_id;
+            document.getElementById('modal-sa_content').innerText = button.dataset.sa_content;
+
+            // hidden input에 sa_no 값 설정
+            document.getElementById('hidden-sa_no').value = button.dataset.sa_no;
+            document.getElementById('hidden-sa_qty').value = button.dataset.sa_qty;
+            document.getElementById('hidden-mb_id').value = button.dataset.mb_id;
+
+            // 모달창 열기
+            modal.style.display = "flex";
+        });
+    });
+
+    closeModalBtn.addEventListener("click", () => {
+        modal.style.display = "none";  // 모달창 닫기
+    });
+</script>
+
+	<script>
+    function unableform() {
+        const sock_search = document.getElementById("sock_search").value.replace(/\s/g, '');
+        document.getElementById('sock_search').value = sock_search;
+    }
+</script>
+</body>
+</html>

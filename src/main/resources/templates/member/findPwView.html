@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html 
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+    layout:decorate="~{layout/layout.html}">
+<head>
+<title>시드키 : 아이디 찾기</title>
+<link rel="stylesheet" type="text/css" th:href="@{/css/findPwView.css}">
+</head>
+<body>
+<main layout:fragment="content">
+    <div class="form-container">
+        <h2>아이디, 임시 비밀번호 받기</h2>
+        <p>잊어버린 아이디 일부 혹은 비밀번호 재설정 안내 이메일을 보내드리겠습니다. 이메일을 입력해 주세요</p>
+        <form id="passwordForm" method="POST" onsubmit="return findIdPw(this)">
+            <input id="email" type="email" placeholder="이메일 주소를 입력하세요" 
+            th:onkeyup="emailRegexCheck(this)"
+            required>
+            <p id="sendMsg"></p>
+            <div class="radio-container">
+                <label class="radio-label">
+                    <input type="radio" name="findType" id="findId" value="findId" checked required>
+                    <span class="radio-indicator"></span>
+                    아이디 찾기
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="findType" id="findPassword" value="findPassword" required>
+                    <span class="radio-indicator"></span>
+                    비밀번호 찾기
+                </label>
+            </div>
+
+            <input type="submit" value="이메일 확인">
+            <input type="reset" value="초기화">
+        </form> 
+    </div>
+
+<script>
+function emailRegexCheck(that){
+    const pattern = /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-za-z0-9\-]+/;
+    if(pattern.test(that.value) === false) { 
+        $('#email').addClass('error-border');
+        $('#email').removeClass('success-border');
+    } else {
+        $('#email').addClass('success-border');
+        $('#email').removeClass('error-border');
+    }
+}
+
+function findIdPw(that){
+send = { email: that.email.value, findType: that.findType.value };
+$.ajax({
+    url: "/member/find",
+    type: "post",
+    data: send,
+    success: function(data) {
+        if(data.res === 'NotFound'){
+            $('#email').val('');
+            $('#email').addClass('error-border');
+            $('#email').removeClass('success-border');
+            $('#sendMsg').text('존재하지 않는 이메일 입니다.').addClass('fontColorRed');
+        }
+        if(data.res === 'sendId'){
+            $('#sendMsg').removeClass('fontColorRed');
+            $('#sendMsg').text('아이디 : ' + data.userId);
+        }
+        if(data.res === 'sendPw'){
+            startLoadingMessage();
+            sendEmail(that);
+        }
+        if(data.res === 'error'){
+            $('#sendMsg').removeClass('fontColorRed').text("전송오류... 새로고침 후 다시 시도 해 주세요.");
+        }
+
+
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+        $('#email').val('');
+        $('#email').addClass('error-border').removeClass('success-border');
+        $('#sendMsg').text('알수 없는 이유로 아이디, 비밀번호 찾기 오류 잠시 후 시도해 보세요.').addClass('fontColorRed');
+        console.error("error :", textStatus, errorThrown);
+    }
+});
+return false;
+}
+
+function sendEmail(that){
+const mail = {email : that.email.value};
+
+    $.ajax({
+        url: "/mail/ajax/sendCustomPw",
+        type: "post",
+        data: mail,
+        success: function(data) {
+            stopLoadingMessage();
+            if(data.res === true){
+                $('#sendMsg').addClass('fontColor096c8a').text("해당 이메일 "+that.email.value + " 로 임시 비밀번호가 발송 되었습니다.");
+                $('#sendMsg').before('<a class="btn btn-goToLogin" href="/member/login">로그인 하러 가기</a>');
+            } else {
+                $('#email').val('');
+                $('#email').addClass('error-border').removeClass('success-border');
+                $('#sendMsg').text('이메일 전송 오류. 잠시 후 시도해 보세요.').addClass('fontColorRed');
+            }
+
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            stopLoadingMessage();
+            $('#email').val('');
+            $('#email').addClass('error-border').removeClass('success-border');
+            $('#sendMsg').text('이메일 전송 오류. 잠시 후 시도해 보세요.').addClass('fontColorRed');
+            console.error("error :", textStatus, errorThrown);
+        }
+    });
+}
+
+let loadingInterval;
+
+function startLoadingMessage() {
+    const getNextMessage = createLoadingMessageGenerator();
+    loadingInterval = setInterval(() => {
+        $('#sendMsg').text(getNextMessage());
+    }, 500); // 0.5초마다 메시지 변경
+}
+
+function stopLoadingMessage() {
+    clearInterval(loadingInterval); // setInterval 중지
+}
+
+function createLoadingMessageGenerator() {
+    const baseMessage = "메일 전송중";
+    let dotCount = 0; // 점의 개수 카운터
+
+    return function getNextMessage() {
+        const message = baseMessage + ".".repeat(dotCount); // 점을 반복하여 문자열 생성
+        dotCount = (dotCount + 1) % 4; // 점 개수는 0, 1, 2, 3을 반복
+        return message;
+    };
+}
+
+
+</script>
+
+</main>
+</body>
+</html>

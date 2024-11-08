@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout/layout.html}">
+<head>
+<meta charset="UTF-8" />
+<title>시드키 : 계좌 관리</title>
+<link rel="stylesheet" type="text/css" th:href="@{/css/accountsettings.css}">
+</head>
+ <body>
+	<main layout:fragment="content">
+		<div class="my-container mt-5">
+			<div th:replace="~{layout/mySide.html}"></div>
+			<div>
+				<!-- Header -->
+				<div class="my-header">
+					<h1 class="header-title">계정 관리</h1>
+				</div>
+				<section class="my-section mt-5">
+					<span class="sub-header-title">내 계정 정보</span>
+					<hr>
+					<div class="my-details">
+						<div class="my-info-left">
+							<span class="my-text-left">계좌번호</span>
+						</div>
+						<div class="my-info-right">
+							<span class="my-text-right"
+								  th:text="${#authentication.principal.member.mb_account}"></span>
+						</div>
+					</div>
+					<div class="my-details">
+						<div class="my-info-left">
+							<span class="my-text-left">개설일</span>
+						</div>
+						<div class="my-info-right">
+							<span class="my-text-right" 
+								  th:text="${#dates.format(#authentication.principal.member.mb_datetime, 'yyyy년 MM월 dd일')}"></span>
+						</div>
+					</div>
+					<div class="my-details">
+						<div class="my-info-left">
+							<span class="my-text-left">회원 등급</span>
+						</div>
+						<div class="my-info-right">
+							<span class="my-text-right" 
+								  th:text="${member.lv_txt}"></span>
+						</div>
+					</div>
+				</section>
+				<section class="my-section">
+					<span class="sub-header-title">내 계정 관리</span>
+					<hr>
+					<a href="#" onclick="window.open('/myaccount/password', '_blank', 'width=600,height=400,left=650,top=300'); return false;">
+						<button class="my-button">
+							<div class="my-details">
+								<div class="my-info-left">
+									<span class="my-text-left">비밀번호 변경</span>
+									
+								</div>
+								<div class="my-info-right">
+									<span class="my-text-right">></span>
+								</div>
+							</div>
+						</button>
+					</a>
+					<a href="#" onclick="window.open('/myaccount/delete', '_blank', 'width=600,height=400,left=650,top=300'); return false;">
+						<button class="my-button">
+							<div class="my-details">
+								<div class="my-info-left">
+									<span class="my-text-left">계정 탈퇴</span>
+								</div>
+								<div class="my-info-right">
+									<span class="my-text-right">></span>
+								</div>
+							</div>
+						</button>
+					</a>
+				</section>
+				<section class="my-section">
+					<span class="sub-header-title">이체</span>
+					<hr>
+					<button class="my-button" onclick="open_window('send', 500, 500);">
+						<div class="my-details">
+							<div class="my-info-left">
+								<span class="my-text-left1">송금 한도</span>
+								<span class="my-text-left2">1회 100만원</span>
+							</div>
+							<div class="my-info-right">
+								<span class="my-text-right">></span>
+							</div>
+						</div>
+					</button>
+				</section>
+				<section class="my-section member-success">
+					<span class="sub-header-title">회원 신청</span>
+					<hr>
+					<div class="my-details">
+						<div class="my-info-left">
+							<label class="my-text-left" for="news">뉴스 회원</label>
+				        </div>
+				        <div class="my-info-right ">
+				            <input type="checkbox" name="mp_type" id="news" value="news" onclick="checkOnlyOne(this);"/>
+				        </div>
+					</div>
+					<div class="my-details">
+						<div class="my-info-left">
+							<label class="my-text-left" for="stock">주식 회원</label>
+				        </div>
+				        <div class="my-info-right">
+				            <input type="checkbox" name="mp_type" id="stock" value="stock" onclick="checkOnlyOne(this);"/>
+				        </div>
+					</div>
+					<div class="d-flex mt-2">
+						<div>
+							<button type="button" class="btn btn-outline-info" id="company" style="display: none;" onclick="openCompany()">
+			      				선택
+							</button>
+						</div>
+						<div class="mr-auto">
+			        		<span id="selected-value"></span>
+			        	</div>
+			        	<button class="btn btn-outline-info" onclick="submitForm()">신청</button>
+			        </div>
+				</section>
+				<form id="submit-form" action="/myaccount/settings" method="post">
+					<input type="hidden" id="mp_type" name="mp_type">
+					<input type="hidden" id="mp_company" name="mp_company">
+					<input type="hidden" id="mb_no" name="mb_no" th:value="${#authentication.principal.member.mb_no}">
+				</form>
+		    </div>
+		</div>
+		<script th:inline="javascript">
+			$(document).ready(function(){
+				$.ajax({
+					async : true,
+					url: '/myaccount/checkStatus',
+					type: 'post',
+					dataType: 'json',
+					success: function(data) {
+						if(data.status == 'news') {
+							// 승인 요청중일 때
+							displayNews();
+						}
+						else if(data.status == 'stock') {
+							// 승인 요청중일 때
+							displayStock();
+						}
+						else if(data.status == 'success') {
+							// 승인이 성공했을 때
+							displaySuccess(data.mp);
+						}
+						else if(data.status == 'fail') {
+							// 승인이 실패했을 때
+							displayFail();
+						}
+					},
+					error : function(jqXHR, textStatus, errorThrown){
+			    		console.log(jqXHR);
+			    	}
+				});
+				function displayNews() {
+					$('#news').replaceWith('<button class="btn btn-outline-info" id="news" onclick="cancel();">요청 중</button>');
+					$('#stock').attr('disabled', true);
+					$('button[onclick="submitForm()"]').hide();
+				} // 뉴스 회원 승인 요청중일 때
+				
+				function displayStock() {
+					$('#stock').replaceWith('<button class="btn btn-outline-info" id="stock" onclick="cancel();">요청 중</button>');
+					$('#news').attr('disabled', true);
+					$('button[onclick="submitForm()"]').hide();
+				} // 주식 회원 승인 요청중일 때
+				
+				function displaySuccess(mp) {
+					let mp_app_date = new Date(mp.mp_app_date).toLocaleString('ko-KR', {
+					    year: 'numeric',
+					    month: 'long',
+					    day: 'numeric'
+					});
+					let mp_type = (mp.mp_type === 'news') ? '뉴스' : '주식';
+					let str = `
+						<span class="sub-header-title">${mp_type} 회원</span>
+						<hr>
+						<div class="my-details">
+							<div class="my-info-left">
+								<span class="my-text-left">회사명</span>
+							</div>
+							<div class="my-info-right">
+								<span class="my-text-right">${mp.mp_company}</span>
+							</div>
+						</div>
+						<div class="my-details">
+							<div class="my-info-left">
+								<span class="my-text-left">승인 날짜</span>
+								
+							</div>
+							<div class="my-info-right">
+								<span class="my-text-right">${mp_app_date}</span>
+							</div>
+						</div>
+					`;
+					if(mp.mp_type == 'stock') {
+						str += `
+							<div class="my-details">
+								<div class="my-info-left">
+									<span class="my-text-left">주식 요청</span>
+								</div>
+								<div class="my-info-right">
+				                    <a href="#demo" class="btn btn-outline-info" data-toggle="collapse">요청</a>
+								</div>
+							</div>
+							<div id="demo" class="collapse">
+		                    	<form onsubmit="return false;">
+			                    	<input class="form-control mb-2" type="number" id="sa_qty" placeholder="숫자만 입력해주세요" required>
+			                    	<textarea class="form-control" id="sa_content" name="sa_content" style="min-height: 400px; height: auto;" placeholder="관리자한테 보낼 메시지를 입력해주세요"></textarea>
+			                    	<div class="d-flex my-details">
+			                    		<div class="mr-auto"></div>
+			                    		<button class="btn btn-outline-info mt-2" type="button" onclick="applyStock()">보내기</button>
+			                    	</div>
+			                    </form>
+		                    </div>
+							<div class="d-flex my-details">
+								<div>
+									<button class="btn btn-outline-danger" onclick="deleteMember()">탈퇴</button>
+								</div>
+								<div class="mr-auto"></div>
+								<a href="#" class="btn btn-outline-info" onclick="window.open('/myaccount/stockList', '_blank', 'width=900,height=400,left=500,top=300'); return false;">요청 목록</a>
+					        </div>
+						`;
+					}else{
+						str += `
+							<div class="d-flex my-details">
+								<div>
+									<button class="btn btn-outline-danger" onclick="deleteMember()">탈퇴</button>
+								</div>
+					        </div>
+						`;
+					}
+					$('.member-success').html(str);
+				} // 승인이 성공했을 때
+				
+				function displayFail() {
+			        $('#news').replaceWith('<input type="checkbox" name="mp_type" id="news" value="news" onclick="checkOnlyOne(this);"/>');
+			        $('#stock').replaceWith('<input type="checkbox" name="mp_type" id="stock" value="stock" onclick="checkOnlyOne(this);"/>');
+			        $('#news, #stock').prop('disabled', false);
+			        $('button[onclick="submitForm()"]').show();
+				} // 승인이 거절 당했을 때
+			});
+			
+			function applyStock() {
+			    const sa_qty = $('#sa_qty').val();
+			    const sa_content = $('#sa_content').val();
+			    if (sa_qty === '' || isNaN(sa_qty) || sa_qty == 0) {
+			        alert('올바른 값을 입력해주세요');
+			        return;
+			    }
+			    
+			    $.ajax({
+			    	async : true,
+			        url : '/myaccount/applyStock',
+			        type : 'post',
+			        data : {
+			        	sa_qty : sa_qty,
+			            sa_content : sa_content
+			        },
+			        success: function(data) {
+			            alert('주식 요청이 성공적으로 전달되었습니다.');
+			            $('#sa_qty').val('');
+			            $('#sa_content').val('');
+			            $('#demo').collapse('hide');
+			        },
+			        error : function(jqXHR, textStatus, errorThrown){
+						console.log(jqXHR);
+					}
+			    });
+			}
+			
+			function deleteMember() {
+				if(confirm("탈퇴를 진행하시겠습니까?")){
+					$.ajax({
+						async : true,
+						url : '/myaccount/deleteMember', 
+						type : 'post',  
+						dataType : "json", 
+						success : function (data){
+							if(data.status) {
+			                    alert("탈퇴가 완료되었습니다.");
+			                    displayDelete();
+							} else {
+								alert('요청 취소 중 문제가 발생하였습니다. 잠시 후에 다시 시도해 주세요');
+							}
+						}, 
+						error : function(jqXHR, textStatus, errorThrown){
+							console.log(jqXHR);
+						}
+					});
+				}
+			}
+			
+			function displayDelete() {
+				str = `
+					<span class="sub-header-title">회원 신청</span>
+					<hr>
+					<div class="my-details">
+						<div class="my-info-left">
+							<label class="my-text-left" for="news">뉴스 회원</label>
+				        </div>
+				        <div class="my-info-right ">
+				            <input type="checkbox" name="mp_type" id="news" value="news" onclick="checkOnlyOne(this);"/>
+				        </div>
+					</div>
+					<div class="my-details">
+						<div class="my-info-left">
+							<label class="my-text-left" for="stock">주식 회원</label>
+				        </div>
+				        <div class="my-info-right">
+				            <input type="checkbox" name="mp_type" id="stock" value="stock" onclick="checkOnlyOne(this);"/>
+				        </div>
+					</div>
+					<div class="d-flex mt-2">
+						<div>
+							<button type="button" class="btn btn-outline-dark" id="company" style="display: none;" onclick="openCompany()">
+		      					선택
+							</button>
+						</div>
+						<div class="mr-auto">
+			        		<span id="selected-value"></span>
+			        	</div>
+			        	<button class="btn btn-outline-dark" onclick="submitForm()">신청</button>
+			        </div>
+				`;
+				$('.member-success').html(str);
+			} // 회원탈퇴를 했을 경우 html
+			
+			function cancel() {
+				if(confirm("요청을 취소하시겠습니까?")) {
+					$.ajax({
+						async : true,
+						url : '/myaccount/cancel', 
+						type : 'post',  
+						dataType : "json", 
+						success : function (data){
+							if(data.status) {
+			                    alert("요청이 취소되었습니다.");
+						        $('#news').replaceWith('<input type="checkbox" name="mp_type" id="news" value="news" onclick="checkOnlyOne(this);"/>');
+						        $('#stock').replaceWith('<input type="checkbox" name="mp_type" id="stock" value="stock" onclick="checkOnlyOne(this);"/>');
+						        $('#news, #stock').prop('disabled', false);
+						        $('button[onclick="submitForm()"]').show();
+						        window.location.href = '/myaccount/settings';
+							} else {
+								alert('요청 취소 중 문제가 발생하였습니다. 잠시 후에 다시 시도해 주세요');
+							}
+						}, 
+						error : function(jqXHR, textStatus, errorThrown){
+							console.log(jqXHR);
+						}
+					});
+				}
+			}
+
+			function checkOnlyOne(type) {
+			    const checkboxes = $("input[name='mp_type']");
+			    const company = $("#company");
+
+			    if ($(type).is(":checked")) {
+			        checkboxes.prop("checked", false);
+			        $(type).prop("checked", true);
+			        company.show();
+			    } else {
+			        $(type).prop("checked", false);
+			        company.hide();
+			    }
+			    $('#selected-value').text('');
+			    $('#selected-value').data("text", '');
+			} // 체크박스 하나만 선택, 같은거 누르면 취소
+			
+		    function openCompany() {
+		        const mp_type = $('input[name="mp_type"]:checked').val();
+		        
+		        $.ajax({
+		            async: true,
+		            url: '/myaccount/settings/list',
+		            type: 'post',
+		            data: { mp_type: mp_type },
+		            dataType: "json",
+		            success: function (data) {
+		                const popup = window.open('/myaccount/company', '_blank', 'width=600,height=400,left=650,top=300');
+		                popup.onload = function() {
+		                    popup.postMessage({ list: data.list }, '*');
+		                };
+		            },
+		            error: function(jqXHR, textStatus, errorThrown) {
+		                console.log(jqXHR);
+		            }
+		        });
+		    }
+		    
+		    $(function() {
+		        $(window).on("message", function(e) {
+		            if (e.originalEvent.data.selectedValue) {
+		                var fullValue = e.originalEvent.data.selectedValue;
+		                $('#selected-value').text(fullValue);
+		                
+		                var codeMatch = fullValue.match(/\[(.*?)\]/);
+		                var code = codeMatch ? codeMatch[1] : fullValue;
+		                
+		                $('#selected-value').data("text", code);
+		            }
+		        });
+		    });
+			
+		    function submitForm() {
+		        const mp_type = $('input[name="mp_type"]:checked');
+		        const mp_company = $('#selected-value').data("text");
+		        
+		        if (!mp_type.length || !mp_company) {
+		            alert("회사명을 선택해주세요.");
+		            return;
+		        }
+		        
+		        $('#mp_type').val(mp_type.val());
+		        $('#mp_company').val(mp_company);
+
+		        $('#submit-form').submit();
+		    }
+		</script>
+	</main>
+</body>
+</html>

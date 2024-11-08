@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html 
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+	layout:decorate="~{layout/layout.html}">
+<head>
+<meta charset="UTF-8">
+<title>시드키 : 회원가입</title>
+<link rel="stylesheet" type="text/css" th:href="@{/css/join.css}">
+
+<!-- 부트스트렙 캘린더 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/css/bootstrap.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap-responsive.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/js/bootstrap.js"></script>
+<link rel="stylesheet" type="text/css" th:href="@{/css/greeddatepicker.css}">
+
+</head>
+<body>
+	<main layout:fragment="content">
+		<div class="login-wrapper">
+	        <h2 th:text="${where == 'internal'} ? 'Join' : ${where}+' join'">Join</h2>
+	        <div class="divider"></div> <!-- 줄 추가 -->
+	        <form method="post" onsubmit="return join(this)" name="joinform" id="login-form">
+                <div class="wrapper">
+                <div class="name-wrapper">
+                    <input type="text" name="id" placeholder="ID" id="id"
+                    title="주의사항" data-toggle="popover" data-ok="false"
+                    data-trigger="focus" data-content="영문 숫자 포함 8~20, 중복 될 수 없습니다."
+                    th:value="${not #strings.isEmpty(userInfo)} ? ${userInfo}"
+                    th:readonly="${not #strings.isEmpty(userInfo)} ? 'readonly'"
+                    th:onchange="duplicationCheck(this)"
+                    >
+                    <input type="password" name="pw" placeholder="Password" id="pw"
+                    title="주의사항" data-toggle="popover" data-ok="false"
+                    data-trigger="focus" data-content="영문, 숫자, 특수문자(!@#$)를 포함한 8자리 이상 20자리 이하로 입력해주세요."
+                    th:onchange="passwordCheck(this)"
+                    >
+                    <input type="password" name="pw2" placeholder="Password" id="pw2"
+                    th:onchange="password2Check(this)"
+                    >
+                    <input type="text" name="name" placeholder="Name" id="name">
+                    <input type="text" name="nick" placeholder="Nick Name" id="nickname">
+
+                    <input type="text" name="ph" placeholder="Phone Number" id="ph"
+                    title="주의사항" data-toggle="popover"
+                    data-trigger="focus" data-content="전화번호를 중간 - 를 제외하고 입력해 주세요"
+                    th:onchange="phoneNumberCheck(this)" data-ok="false">
+                    <input type="email" id="email_input" name="email" placeholder="Email"
+                    th:value="${not #strings.isEmpty(userInfo)} ? ${userInfo}"
+                    th:readonly="${not #strings.isEmpty(userInfo)} ? 'readonly'">
+
+                    <!-- 타이머가 표시될 부분 -->
+                    <div id="timer" style="color: red; margin-top: 10px;"></div>
+
+                    <input type="button" id="email" value="이메일 유효성 검사" >
+                    <label for="remember-check">
+                        <input type="checkbox" id="remember-check" name="emailing"> <span>이메일 수신 동의 확인</span>
+                    </label>
+                    <div class="input-with-button">
+                        <input type="text"  onclick="sample3_execDaumPostcode()" id="sample3_postcode" name="zip" placeholder="우편번호 찾기">
+                        <button type="button" class="search-button" onclick="sample3_execDaumPostcode()">우편번호 찾기</button>
+                    </div>
+                        <input type="hidden" id="sample3_extraAddress" name="addr2" placeholder="참고항목" readonly>
+                        <div id="wrap" style="display:none;border:1px solid;width:100%;height:100%;margin:5px 0;position:relative">
+                            <img src="//t1.daumcdn.net/postcode/resource/images/close.png" id="btnFoldWrap"
+                            style="cursor:pointer;position:absolute;right:0px;top:-1px;z-index:1" onclick="foldDaumPostcode()" alt="접기 버튼">
+                        </div>
+                        <input type="text" id="sample3_address" name="addr" placeholder="주소" readonly>
+                        <input type="text" id="sample3_detailAddress" name="addr2" placeholder="상세주소">
+                        <input type="text" id="birth" name="birth" placeholder="birth">
+                        <input type="hidden" id="ec_checked" name="ec" value="f">
+                        <input type="hidden" id="mb_loginMethod" name="mb_loginMethod"
+                        th:value="${not #strings.isEmpty(userInfo)} ? '${where}'">
+                </div>
+                    <!--/* 다음 kakao를 이용한 주소 가져오기 */-->
+                    <div class="address-wrapper terms-wrapper">
+                    	<div class="terms-title" onclick="view_terms('terms-info');">
+                    		이용약관
+                    		<span class="terms-plus">
+                    			<i class="fa-solid fa-plus"></i>
+                    		</span>
+                    	</div>
+						<div class="terms-info terms-display actives">
+							<div class="terms-content" th:text="${config.cf_info}"></div>
+						</div>
+						<div class="terms-title" onclick="view_terms('terms-privacy');">
+                    		개인정보 처리방침
+                    		<span class="terms-plus">
+                    			<i class="fa-solid fa-plus"></i>
+                    		</span>
+                    	</div>
+						<div class="terms-privacy terms-display actives">
+							<div class="terms-content" th:text="${config.cf_privacy}"></div>
+						</div>
+                    </div>
+                </div>
+                <div class="divider"></div> <!-- 줄 추가 -->
+                <input type="submit" value="Join" id="joinBtn">
+	        </form>
+	    </div>
+
+
+<script>
+function view_terms(terms){
+    if($("."+terms).hasClass("actives")){
+        $("."+terms).fadeOut(150);
+        $(".terms-display").removeClass("actives");
+    } else {
+        $("."+terms).fadeIn(150);
+        $("."+terms).addClass("actives");
+    }
+}
+$('#email').click(Email_Check);
+function Email_Check(){
+    const pattern = /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-za-z0-9\-]+/;
+    const mail = $('#email_input').val();
+    $('#timer').text("");
+    if(pattern.test(mail) === false) { 
+        alert("이메일 형식이 일치하지 않습니다.")
+        return false; 
+    }
+    else { 
+        $('#email_input').attr("readonly", true);
+        getEmailCode(mail);
+        alert("이메일을 전송하였습니다. 잠시만 기다려주세요 (최대 5분정도 걸릴 수도 있습니다.)")
+        return true; 
+    }
+}
+
+function getEmailCode(mail){
+        $.ajax({
+        url: '/mail/ajax/set_check',
+        method: 'post',
+        data : {evc_email : mail},
+        success: function (data) {
+            if(data.res === true){
+                $('#email').after('<input type="button" id="codeCheck" value="이메일 코드 확인" >');
+                $('#email').after('<input type="number" id="code"  placeholder="code">');
+                $('#email').attr("disabled", true);
+                $('#email').css("background-color", "gray");
+                startTimer(300);  // 5분(300초) 타이머 시작
+            } else if (data.send === 'duplication'){
+                $('#timer').text("중복된 이메일 입니다.");
+                $('#email_input').attr("readonly", false);
+            } else if (data.res === false) {
+                $('#timer').text("이메일 전송에 실패하였습니다. 잠시후 시도해 주세요.");
+                $('#email_input').attr("readonly", false);
+            }
+        },
+        error: function (data, status, err) {
+            alert("이메일 전송 실패! 이메일이 잘못 되었거나 잠시 후 다시 시도해 주세요.")
+            $('#email_input').attr("readonly", false);
+        },
+
+    });
+}
+
+$(document).on('click', '#codeCheck' ,checkEmailCode);
+$('#codeCheck').click(checkEmailCode);
+function checkEmailCode(){
+    const mail = $('#email_input').val();
+    const code = $('#code').val();
+
+    $.ajax({
+        url: '/mail/ajax/get_check',
+        method: 'post',
+        dataType : 'text',
+        data : {evc_email : mail,
+                code : code},
+        success: function (data) {
+            if(data == 'true'){
+                $('#code').attr("readonly", true);
+                $('#codeCheck').remove();
+                $('#ec_checked').val("t");
+                alert("Email 인증 성공");
+
+                clearInterval(timerInterval); 
+                
+                removeEmail_varification(mail);
+            }else{
+                alert("잘못된 코드입니다! 다시 확인해주세요!")
+            }
+        },
+        error: function (data, status, err) {
+            alert("오류! 전송이 잘못되었습니다.")
+        },
+
+    });
+}
+
+//타이머
+
+var timerInterval;
+
+function startTimer(duration) {
+    var timer = duration, minutes, seconds;
+    timerInterval = setInterval(function () {
+        minutes = parseInt(timer / 60, 10);
+        seconds = parseInt(timer % 60, 10);
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        $('#timer').text("이메일 전송 완료! 인증 가능 시간 " + minutes + ":" + seconds);
+
+        if (--timer < 0) {
+            clearInterval(timerInterval);
+            $('#timer').text("인증 시간이 만료되었습니다.");
+            removeEmail_varification();//이메일 삭제
+            alert("이메일 인증 시간이 만료되었습니다. 다시 시도해 주세요.");
+
+            $('#email').attr("disabled", false);
+            $('#email').css("background-color", "#096c8a");
+
+            // 이메일 입력을 다시 가능하게 하고 버튼을 복구
+            let empty = isEmptyCheck($('#mb_loginMethod').val());
+            
+            //카카오, 네이버면 이메일을 지우지 않음
+            if(empty){
+                $('#email_input').attr("readonly", false);
+                $('#email_input').val(''); // 이메일 입력 필드 초기화
+            }
+            $('#code').remove();  // 인증 코드 필드 제거
+            $('#codeCheck').remove();  // 인증 확인 버튼 제거
+
+            
+        }
+    }, 1000);  // 1초마다 실행
+}
+
+
+
+
+function removeEmail_varification(mail){
+    let empty = isEmptyCheck(mail);
+    if (empty == true){
+        mail = $('#email_input').val();
+    }
+    $.ajax({
+        url: '/mail/ajax/delete_mail',
+        type: 'POST',
+        dataType : 'text',
+        data: {
+            evc_email : mail
+        },
+        success: function(data) {
+            
+        },
+        error: function(xhr, status, error) {
+            console.log('error:', error);
+            // 에러 처리
+        }
+    });
+
+}
+
+function NotReload(){
+    if( (event.ctrlKey == true && (event.keyCode == 78 || event.keyCode == 82)) || (event.keyCode == 116) ) {
+        event.keyCode = 0;
+        event.cancelBubble = true;
+        event.returnValue = false;
+    } 
+}
+document.onkeydown = NotReload;
+
+</script>
+
+
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script>
+    // 우편번호 찾기 찾기 화면을 넣을 element
+    var element_wrap = document.getElementById('wrap');
+
+    function foldDaumPostcode() {
+        // iframe을 넣은 element를 안보이게 한다.
+        element_wrap.style.display = 'none';
+    }
+
+    function sample3_execDaumPostcode() {
+        // 현재 scroll 위치를 저장해놓는다.
+        var currentScroll = Math.max(document.body.scrollTop, document.documentElement.scrollTop);
+        new daum.Postcode({
+            oncomplete: function(data) {
+                // 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+
+                // 각 주소의 노출 규칙에 따라 주소를 조합한다.
+                // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+                var addr = ''; // 주소 변수
+                var extraAddr = ''; // 참고항목 변수
+
+                //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
+                if (data.userSelectedType === 'R') { // 사용자가 도로명 주소를 선택했을 경우
+                    addr = data.roadAddress;
+                } else { // 사용자가 지번 주소를 선택했을 경우(J)
+                    addr = data.jibunAddress;
+                }
+
+                // 사용자가 선택한 주소가 도로명 타입일때 참고항목을 조합한다.
+                if(data.userSelectedType === 'R'){
+                    // 법정동명이 있을 경우 추가한다. (법정리는 제외)
+                    // 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
+                    if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+                        extraAddr += data.bname;
+                    }
+                    // 건물명이 있고, 공동주택일 경우 추가한다.
+                    if(data.buildingName !== '' && data.apartment === 'Y'){
+                        extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                    }
+                    // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
+                    if(extraAddr !== ''){
+                        extraAddr = ' (' + extraAddr + ')';
+                    }
+                    // 조합된 참고항목을 해당 필드에 넣는다.
+                    document.getElementById("sample3_extraAddress").value = extraAddr;
+                
+                } else {
+                    document.getElementById("sample3_extraAddress").value = '';
+                }
+
+                // 우편번호와 주소 정보를 해당 필드에 넣는다.
+                document.getElementById('sample3_postcode').value = data.zonecode;
+                document.getElementById("sample3_address").value = addr;
+                // 커서를 상세주소 필드로 이동한다.
+                document.getElementById("sample3_detailAddress").focus();
+
+                // iframe을 넣은 element를 안보이게 한다.
+                // (autoClose:false 기능을 이용한다면, 아래 코드를 제거해야 화면에서 사라지지 않는다.)
+                element_wrap.style.display = 'none';
+
+                // 우편번호 찾기 화면이 보이기 이전으로 scroll 위치를 되돌린다.
+                document.body.scrollTop = currentScroll;
+            },
+            // 우편번호 찾기 화면 크기가 조정되었을때 실행할 코드를 작성하는 부분. iframe을 넣은 element의 높이값을 조정한다.
+            onresize : function(size) {
+                element_wrap.style.height = size.height+'px';
+            },
+            width : '100%',
+            height : '100%'
+        }).embed(element_wrap);
+
+        // iframe을 넣은 element를 보이게 한다.
+        element_wrap.style.display = 'block';
+    }
+    $( "#birth" ).datepicker({
+        format: 'yyyy-mm-dd',
+    	endDate : "-19y",	//선택할 수 있는 최대 날짜  +1m +1w 은 1달 1주일 뒤 까지 선택가능  [+,-][숫자][y,m,w,d] 
+    	startDate : '-100y',
+        autoclose: true,
+        buttonImageOnly: true
+    });
+
+function duplicationCheck(that){
+$.ajax({
+    url: '/member/ajax/idCheck',
+    type: 'POST',
+    data: {id : that.value},
+    success: function(data) {
+        const pattern = /^[a-zA-z0-9]{8,20}$/
+        if(pattern.test(that.value)){
+            $('#id').addClass('success-border').removeClass('error-border')
+        } else {
+            $('#id').addClass('error-border').removeClass('success-border')
+            return false;
+        }
+        if(data.res === true){
+            $('#id').addClass('success-border').removeClass('error-border');
+            $('#id').attr('data-content', '영문 숫자 포함 8~20, 중복 될 수 없습니다.');
+            $('#id').attr('data-ok', 'true');
+        } else {
+            $('#id').addClass('error-border').removeClass('success-border');
+            $('#id').attr('data-content','중복된 아이디 입니다.')
+            $('#id').attr('data-ok', 'false');
+            $('#id').focus();
+        }
+    },
+    error: function(xhr, status, error) {
+        console.log('error:', error);
+    }
+});
+}
+
+function passwordCheck(that){
+    const pattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$])[A-Za-z\d!@#$]{8,20}$/
+    if(pattern.test(that.value)){
+        $('#pw').addClass('success-border').removeClass('error-border')
+        $('#pw').attr('data-ok', 'true');
+    } else {
+        $('#pw').addClass('error-border').removeClass('success-border')
+        $('#pw').attr('data-ok', 'false');
+    }
+}
+
+function password2Check(that){
+    if($(pw).val() == that.value){
+        $('#pw2').addClass('success-border').removeClass('error-border')
+    } else {
+        $('#pw2').addClass('error-border').removeClass('success-border')
+    }
+}
+
+function phoneNumberCheck(that){
+    const pattern = /^(?:(010)|(01[1|6|7|8|9]))\d{3,4}(\d{4})$/;
+    if(pattern.test(that.value)){
+        $('#ph').addClass('success-border').removeClass('error-border')
+        $('#ph').attr('data-ok', 'true');
+    } else {
+        $('#ph').addClass('error-border').removeClass('success-border')
+        $('#ph').attr('data-ok', 'false');
+    }
+}
+
+function join(that){
+    $('#alertText').remove();
+    if(that.id.dataset.ok == 'false'){
+        $('#joinBtn').before(alertText('경고!', '아이디가 중복되거나 규칙에 올바르지 않습니다.'));
+        that.id.focus();
+        return false;
+    }
+    if(that.pw.value.trim().length == 0 || that.pw.dataset.ok == 'false'){
+        $('#joinBtn').before(alertText('경고!', '비밀번호를 확인해 주세요.'));
+        that.pw.focus();
+        return false;
+    }
+    if(that.pw.value != that.pw2.value){
+        $('#joinBtn').before(alertText('경고!', '비밀번호와 비밀번호 확인이 일치하지 않습니다.'));
+        that.pw2.focus();
+        return false;
+    }
+    if(that.name.value.trim().length == 0){
+        $('#joinBtn').before(alertText('경고!', '이름을 입력해 주세요.'));
+        that.name.focus();
+        return false;
+    }
+    if(that.nickname.value.trim().length == 0){
+        $('#joinBtn').before(alertText('경고!', '닉네임을 입력해 주세요.'));
+        that.nickname.focus();
+        return false;
+    }
+    if(that.ph.value.trim().length == 0 || that.ph.dataset.ok == 'false'){
+        $('#joinBtn').before(alertText('경고!', '전화번호를 확인해 주세요.'));
+        that.ph.focus();
+        return false;
+    }
+    if(that.ec_checked.value == 'f'){
+        $('#joinBtn').before(alertText('경고!', '이메일 인증이 완료되지 않았습니다.'));
+        return false;
+    }
+    if(that.sample3_address.value.trim().length == 0 || that.sample3_detailAddress.value.trim().length == 0){
+        $('#joinBtn').before(alertText('경고!', '주소지를 입력해 주세요.'));
+        return false;
+    }
+    if(that.birth.value.trim().length == 0){
+        $('#joinBtn').before(alertText('경고!', '생일을 선택해 주세요.'));
+        return false;
+    }
+    return true;
+}
+
+function alertText(title, content){
+    str = `<div class="alert alert-danger alert-dismissible fade show" id="alertText">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <strong>`+ title + `</strong> <small>`+ content +`</small>
+            </div>`
+    return str;
+}
+
+$(document).ready(function(){
+  $('[data-toggle="popover"]').popover();
+});
+
+</script>
+
+</main>
+</body>
+</html>
+

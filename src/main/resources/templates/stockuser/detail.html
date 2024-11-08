@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html  
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+	layout:decorate="~{layout/layout.html}">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" th:href="@{/css/stockuser.css}">
+<link rel="stylesheet" type="text/css" th:href="@{/css/stockorder.css}">
+</head>
+<body> 
+	<main layout:fragment="content">
+		<div th:replace="~{layout/stocksHeader.html}"></div>
+		<div class="full-content">
+			<div class="form-content">
+				<section class="chart-section">
+					<div class="stock-chart-graph">
+						<div class="btn-list">
+							<span class="mini-title">차트</span>
+							<button class="graph-date-btn btn btn-info" value="all" onclick="data_filter(this);">전체</button>
+							<button class="graph-date-btn btn" value="month" onclick="data_filter(this);">이번달</button>
+							<button class="graph-date-btn btn" value="year" onclick="data_filter(this);">이번년도</button>
+							<button class="graph-date-btn btn" value="3month" onclick="data_filter(this);">최근 3개월</button>
+						</div>
+						<div id="graph" class="none-stock-order"></div>
+					</div>
+					<div class="stock-day-section">
+						<span class="mini-title">일별시세</span>
+						<div class="stock-day-list">
+							<table class="table table-borderless stock-day-table">
+								<thead class="head-sticky">
+									<tr>
+										<th>일자</th>
+										<th>종가</th>
+										<th>등락률</th>
+										<th>시가</th>
+										<th>고가</th>
+										<th>저가</th>
+										<th>누적체결수량</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:each="i : ${#numbers.sequence(list.size()-1, 0, -1)}">
+										<td th:text="${list[i].si_date.substring(4, 6) + '.' + list[i].si_date.substring(6, 8)}"></td>
+										<td th:text="${#numbers.formatInteger(list[i].si_price, 0, 'COMMA')} + '원'"></td>
+										<td>
+											<span th:class="${list[i].si_fltRt == '0' ? 'hold' : (list[i].si_fltRt.contains('-') ? 'blue' : 'red')}" th:text="${#numbers.formatDecimal(list[i].si_fltRt, 1, 2)} + '%'"></span>
+										</td> 
+										<td th:text="${#numbers.formatInteger(list[i].yesterPrice, 0, 'COMMA')} + '원'"></td>
+										<td th:text="${#numbers.formatInteger(list[i].si_hipr, 0, 'COMMA')} + '원'"></td>
+										<td th:text="${#numbers.formatInteger(list[i].si_lopr, 0, 'COMMA')} + '원'"></td>
+										<td th:text="${#numbers.formatInteger(list[i].si_trqu, 0, 'COMMA')}"></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</section>
+				<section class="order-section">
+					<div th:replace="~{layout/stocksOrder.html}"></div>
+				</section>
+			</div>
+		</div>
+		<script th:inline="javascript">
+			google.charts.load('current', {'packages':['corechart']});
+			google.charts.setOnLoadCallback(drawGraph);
+
+			function drawGraph(tmps) {
+				if(!tmps){
+					tmps = /*[[${list != null ? list : '[]'}]]*/;
+				}
+				var data_array = [];
+				for(var i=0;i<tmps.length;i++){
+					var price = parseInt(tmps[i].si_price);
+					var yprice = parseInt(tmps[i].yesterPrice);
+					var hipr = parseInt(tmps[i].si_hipr);
+					var lopr = parseInt(tmps[i].si_lopr);
+					var dateStock = tmps[i].si_date.substring(4, 6) + '-' +tmps[i].si_date.substring(6, 8);
+					var fltRt = "";
+					if(tmps[i].si_fltRt < 0){
+						fltRt =  ' (<span class="blue">'+tmps[i].si_fltRt.replace("-.", "-0.")+"%</span>)";
+					} if(tmps[i].si_fltRt == 0) {
+						fltRt =  ' (<span class="hold">'+tmps[i].si_fltRt+"%</span>)";
+					} else if(tmps[i].si_fltRt > 0){
+						fltRt =  ' (<span class="red">'+tmps[i].si_fltRt.replace(".", "0.")+"%</span>)";
+					}
+					var tooltip = "시작 " +addCommas(yprice) + " 종가 " +addCommas(price)
+					+ "<div>고가 " +addCommas(hipr) + " 저가 " +addCommas(lopr) + "</div>";
+					tooltip += "<div>대비 " +addCommas(parseInt(tmps[i].si_vs))
+					+ fltRt + "</div>";
+					
+					/*candle [0]: date, [1]: Low, [2]: Open, [3]: Close, [4]: High, [5]: option*/
+					data_array.push([dateStock, lopr, yprice, price, hipr, tooltip]);
+				}
+				var data = new google.visualization.DataTable(); 
+				
+				data.addColumn('string', 'Day'); // 첫 번째 열: 날짜 또는 범주
+				data.addColumn('number', 'Low'); // 두 번째 열: 최소값
+				data.addColumn('number', 'Open'); // 세 번째 열: 시작값
+				data.addColumn('number', 'Close'); // 네 번째 열: 종료값
+				data.addColumn('number', 'High'); // 다섯 번째 열: 최대값
+				data.addColumn({type: 'string', role: 'tooltip', 'p': {'html': true}}); // 여섯 번째 열: 툴팁
+				
+				data.addRows(data_array);
+				var options = {
+					legend:'none',
+					bar: { groupWidth: '100%' }, // Remove space between bars.
+					candlestick: {
+						fallingColor: { strokeWidth: 0, fill: '#0000FF' }, // 파랑 (하락)
+						risingColor: { strokeWidth: 0, fill: '#FF0000' }   // 빨강 (상승)
+					},
+					width:2450,
+					height:400,
+					chartArea: { left : '3%', right : 0, top: '5%', bottom: '15%'},
+					tooltip: { isHtml: true } // HTML 툴팁 사용
+				};
+				
+				var chart = new google.visualization.CandlestickChart(document.getElementById('graph'));
+				chart.draw(data, options); 
+			}
+		</script>
+	</main>
+</body>
+</html>

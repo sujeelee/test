@@ -1,0 +1,10 @@
+@charset "UTF-8";
+
+table{text-align:center;}
+.center{text-align: center; margin-bottom: 2%;margin-top: 2%;}
+.btn-list{text-align: right; margin-bottom: 2%;} 
+ /* 모달 백그라운드(Backdrop)를 연한 투명한 회색으로 설정 */
+.modal-backdrop {background-color: rgba(128, 128, 128, 0.8) !important;}
+.form-check-label {margin-left: 10px;}
+.separator {margin: 0 5px; /* 구분자의 간격 조절 */}
+.form-search{background-color: #ebf1f7; border: 1px solid #dcebfa; padding: 2%;}

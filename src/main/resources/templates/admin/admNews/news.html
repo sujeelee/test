@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/admlayout.html}" layout:fragment="content">
+<head>
+<script src="https://kit.fontawesome.com/3f892a70ad.js"
+	crossorigin="anonymous">
+	
+</script>
+<link href="/css/admnews.css" rel='stylesheet'>
+<script
+	src="https://demo.sir.kr/gnuboard5/js/jquery.menu.js?ver=2304171"></script>
+<meta charset="UTF-8">
+<title>관리자 페이지</title>
+<style type="text/css">
+</style>
+</head>
+<body>
+	<div id="wrapper">
+		<div id="container">
+			<h1 id="container_title">신문사 리스트</h1>
+			<div id="container_main" class="content">
+				<div id="select_left">
+					<!-- 검색기능 form -->
+					<form action="/admin/admNews/news/search" method="get"
+						onsubmit="return unableform()" class="local_sch"
+						style="text-align: left;">
+						<input type="text" name="np_name" required class="in_sch"
+							id="newspaper_sh"
+							th:placeholder="${np_name != null ? np_name : '신문사명을 입력하세요'}">
+						<input type="submit" value="검색" class="btn_submit btn in_sch"
+							accesskey="5"> <a type="submit"
+							href="/admin/admNews/news" class="btn_submit btn btn_a">초기화</a>
+					</form>
+				</div>
+				<div class="tbl_col">
+					<table>
+						<thead>
+							<tr>
+								<th>신문사명</th>
+								<th>사용여부</th>
+								<th>사용여부변경</th>
+								<th>관리</th>
+							</tr>
+						</thead>
+						<tbody>
+							<!-- 값 불러오기 -->
+							<tr th:each="newspaper : ${newspapers}">
+								<td th:text="${newspaper.np_name}" class="new_td"></td>
+								<td th:text="${newspaper.np_use == 1 ? '사용 중' : '사용 안 함'}"
+									class="new_td"></td>
+								<td class="td_upd new_td" style="text-align: center;"><form
+										action="/admin/admNews/newspapers/usechange" method="post">
+										<input type="hidden" name="np_no"
+											th:value="${newspaper.np_no}" /> <input type="hidden"
+											name="np_use" th:value="${newspaper.np_use}" /> <input
+											type="submit" value="사용여부변경" class="btn_submit btn btn_use"
+											accesskey="5" style="width: 110px;">
+									</form></td>
+								<td class="td_upd new_td" style="text-align: center;">
+
+									<form action="/admin/admNews/newspapers/delete" method="post">
+										<input type="hidden" name="np_no"
+											th:value="${newspaper.np_no}" /> <input type="hidden"
+											name="np_name" th:value="${newspaper.np_name}" /> <input
+											type="hidden" name="np_use" th:value="${newspaper.np_use}" />
+										<input type="submit" value="삭제" class="btn_submit btn"
+											accesskey="5" onclick="return confirm('정말 삭제하시겠습니까?');">
+									</form>
+
+								</td>
+							</tr>
+							<tr th:if="${#lists.isEmpty(newspapers)}">
+								<td colspan="4" class="no-data not_search">검색 결과가 없습니다.</td>
+							</tr>
+						</tbody>
+					</table>
+					<div id="display_box">
+						<ul class="pagination" th:object="${pm_news}"
+							th:if="${pm_news != null && pm_news.endPage != 0 && np_name != null}">
+							<li th:if="${pm_news.prev}"><a
+								th:href="@{/admin/admNews/news/search(np_name=${np_name}, page=${pm_news.startPage - 1})}">◀</a>
+							</li>
+							<li
+								th:each="i : ${#numbers.sequence(pm_news.startPage, pm_news.endPage)}"
+								th:classappend="${pm_news.cri.page} == ${i} ? 'active' : ''">
+								<a
+								th:href="@{/admin/admNews/news/search(np_name=${np_name}, page=${i})}"
+								th:text="${i}"></a>
+							</li>
+							<li th:if="${pm_news.next}"><a
+								th:href="@{/admin/admNews/news/search(np_name=${np_name}, page=${pm_news.endPage + 1})}">▶</a>
+							</li>
+						</ul>
+						<ul class="pagination" th:object="${pm_news}"
+							th:if="${pm_news != null && pm_news.endPage != 0 && np_name == null}">
+							<li th:if="${pm_news.prev}"><a
+								th:href="@{/admin/admNews/news(page=${pm_news.startPage - 1})}">◀</a>
+							</li>
+							<li
+								th:each="i : ${#numbers.sequence(pm_news.startPage, pm_news.endPage)}"
+								th:classappend="${pm_news.cri.page} == ${i} ? 'active' : ''">
+								<a th:href="@{/admin/admNews/news(page=${i})}" th:text="${i}"></a>
+							</li>
+							<li th:if="${pm_news.next}"><a
+								th:href="@{/admin/admNews/news(page=${pm_news.endPage + 1})}">▶</a>
+							</li>
+						</ul>
+					</div>
+					<section id="sec_ing">
+						<h2 id="point_ins_txt" style="text-align: left;">신문사 추가</h2>
+						<form action="/admin/admNews/newspapers/register" method="post"
+							style="text-align: left;">
+							<table>
+								<colgroup>
+									<col id="grid_4">
+									<col>
+								</colgroup>
+								<tbody>
+									<tr>
+										<th><label>신문사명</label></th>
+										<td><input type="text" name="np_name" required id="mb_id"
+											class="point_ins in_sch"></td>
+									</tr>
+									<tr>
+										<th><label>사용중 사용안함</label></th>
+										<td><select name="np_use" required class="in_sch">
+												<option value="1">사용 중</option>
+												<option value="0">사용 안 함</option>
+										</select></td>
+									</tr>
+
+								</tbody>
+							</table>
+							<input type="submit" value="추가" class="btn_submit btn ins"
+								accesskey="5">
+						</form>
+
+					</section>
+				</div>
+
+			</div>
+			<footer id="ft">
+				<p>Copyright © demo.sir.kr. All rights reserved.</p>
+			</footer>
+		</div>
+		<script>
+			function unableform() {
+				const newspaper_sh = document.getElementById("newspaper_sh").value
+						.replace(/\s/g, '');
+				document.getElementById('newspaper_sh').value = newspaper_sh;
+			}
+		</script>
+	</div>
+
+</body>
+</html>

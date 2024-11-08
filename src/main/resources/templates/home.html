@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout/layout.html}"
+>
+<head>
+<meta charset="UTF-8" />
+<title>시드키 : </title>
+<link rel="stylesheet" type="text/css" th:href="@{/css/main.css}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<style type="text/css">
+	.swiper {
+		width: 1200px;
+		height: 150px;
+	}
+	.swiper-wrapper .swiper-slide a > img {
+    	width: 100%; height: 150px;
+    }
+    .swiper-pagination > span{background-color: #17a2b8 !important;}
+    div.swiper-color{color: #17a2b8 !important;}
+</style>
+</head>
+<body>
+	<main layout:fragment="content">
+		<div class="main-container">
+			<div class="main-jisu">
+					<h4 class="main-title">이벤트</h4>
+					<div class="main-table">
+						<div class="main-row">
+							<div class="swiper">
+								<div class="swiper-wrapper">
+									<div  class="swiper-slide" th:if="${eventList != null or !#lists.isEmpty(eventList)}" th:each="event : ${eventList}">
+										<a th:href="@{/event/eventhome/{status}/{ev_no}(ev_no = ${event.ev_no}, status = ${event.ev_status})}">
+											<img alt="" th:src="@{'/uploads' + ${event.fi_path_banner}}">
+										</a>
+									</div>
+									<div class="swiper-slide" th:if="${eventList == null or #lists.isEmpty(eventList)}">
+										<img src="/img/no_event.png">
+									</div>
+								</div>
+								<div class="swiper-pagination"></div>
+								<div class="swiper-button-prev swiper-color"></div>
+								<div class="swiper-button-next swiper-color"></div>
+							</div>
+						</div> <!-- end main-row -->
+					</div>
+				</div>
+				<script type="text/javascript">
+				const swiper = new Swiper('.swiper', {
+					  // Optional parameters
+					  direction: 'horizontal',
+					  loop: true,
+
+					  // If we need pagination
+					  pagination: {
+					    el: '.swiper-pagination',
+					  },
+
+					  // Navigation arrows
+					  navigation: {
+					    nextEl: '.swiper-button-next',
+					    prevEl: '.swiper-button-prev',
+					  },
+					  autoplay: {
+						   delay: 5000,
+						 },
+					});
+				</script>
+			<div class="main-jisu">
+				<h4 class="main-title">주가지수</h4>
+				<div class="main-table jisu-row-background">
+					<div class="main-row">
+						<div class="right">
+							<div class="jisu-title">코스피 <img th:src="@{img/flag.png}" height="16px;"/></div>
+							<div class="jisu-price" th:text="${#numbers.formatDecimal(kospi[kospi.size() - 1].ji_mkp, 1, 2)}"></div>
+							<div th:class="${kospi[kospi.size() - 1].ji_fltRt == '0' ? 'dash-grey' : kospi[kospi.size() - 1].ji_fltRt.contains('-') ? 'dash-blue' :'dash-red' } + ' jsiu-vs'" th:text="${#numbers.formatDecimal(kospi[kospi.size() - 1].ji_vs, 1, 2)} + ' ('+${#numbers.formatDecimal(kospi[kospi.size() - 1].ji_fltRt, 1, 2)}+'%)'"></div>
+						</div>
+						<div class="left">
+							<div id="graph1"></div>
+						</div>
+					</div> <!-- end main-row -->
+					<div class="main-row">
+						<div class="right">
+							<div class="jisu-title">코스닥 <img th:src="@{img/flag.png}" height="16px;"/></div>
+							<div class="jisu-price" th:text="${#numbers.formatDecimal(kosdaq[kosdaq.size() - 1].ji_mkp, 1, 2)}"></div>
+							<div th:class="${kosdaq[kosdaq.size() - 1].ji_fltRt == '0' ? 'dash-grey' : kosdaq[kosdaq.size() - 1].ji_fltRt.contains('-') ? 'dash-blue' :'dash-red' } + ' jsiu-vs'" th:text="${#numbers.formatDecimal(kosdaq[kosdaq.size() - 1].ji_vs, 1, 2)} + ' ('+${#numbers.formatDecimal(kosdaq[kosdaq.size() - 1].ji_fltRt, 1, 2)}+'%)'"></div>
+						</div>
+						<div class="left">
+							<div id="graph2"></div>
+						</div>
+					</div> <!-- end main-row -->
+					<div class="main-row">
+						<div class="right">
+							<div class="jisu-title">KRX 300 <img th:src="@{img/flag.png}" height="16px;"/></div>
+							<div class="jisu-price" th:text="${#numbers.formatDecimal(krx[krx.size() - 1].ji_mkp, 1, 2)}"></div>
+							<div th:class="${krx[krx.size() - 1].ji_fltRt == '0' ? 'dash-grey' : krx[krx.size() - 1].ji_fltRt.contains('-') ? 'dash-blue' :'dash-red' } + ' jsiu-vs'" th:text="${#numbers.formatDecimal(krx[krx.size() - 1].ji_vs, 1, 2)} + ' ('+${#numbers.formatDecimal(krx[krx.size() - 1].ji_fltRt, 1, 2)}+'%)'">0(0%)</div>
+						</div>
+						<div class="left">
+							<div id="graph3"></div>
+						</div>
+					</div> <!-- end main-row -->
+				</div>
+			</div>
+			<div class="main-news">
+				<div class="main-title">
+					<h4>주요뉴스</h4>
+					<span class="more-link">
+						<a href="/newspaper">더보기</a>
+					</span>
+				</div>
+				<div class="main-table">
+					<div class="main-row news-row" th:each="newsImgList : ${newsImgList}">
+						<a th:href="@{/stock/detail/{ne_no}(ne_no=${newsImgList.ne_no})}" 
+       					   th:onclick="'window.open(this.href, \'_blank\', \'width=860,height=2150,left=550\'); return false;'" >
+							<div class="news-img">
+								<img th:src="@{'/uploads' + ${newsImgList.fi_path}}" width="300" height="168">
+								<div class="news-title" th:text="${newsImgList.ne_title}"></div>
+								<div class="news-mini-text">
+									<span th:text="${#dates.format(newsImgList.ne_datetime, 'MM월 dd일')} + ' · '"></span>
+									<span th:text="${newsImgList.np_name}"></span>
+								</div>
+							</div>
+						</a>
+					</div> <!-- end main-row -->
+				</div>
+				<div class="main-news-mini">
+					<div class="news-row" th:each="newsList : ${newsList}">
+						<a th:href="@{/stock/detail/{ne_no}(ne_no=${newsList.ne_no})}" 
+       					   th:onclick="'window.open(this.href, \'_blank\', \'width=860,height=2150,left=550\'); return false;'" >
+							<div class="news-img">
+								<div>
+									<div class="d-flex">
+										<div class="mr-auto">
+											<span th:text="${newsList.ne_title.length() > 36 ? newsList.ne_title.substring(0, 36) + '...' : newsList.ne_title}">[뉴욕증시] 다우, 엿새 만에 반등...나스닥, 3일 연속 상승</span>
+										</div>
+										<div>
+											<span class="news-mini-text">
+												<span th:text="${#dates.format(newsList.ne_datetime, 'MM월 dd일')} + ' · '"></span>
+												<span th:text="${newsList.np_name}"></span>
+											</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</a>
+					</div> <!-- end news-row -->
+				</div>
+			</div>
+			<div class="main-hot">
+				<h4 class="main-title">실시간 차트</h4>
+				<div class="main-table hot-chart-main">
+					<div class="main-row">
+						<table class="table table-borderless">
+							<thead class="main-header-sticky">
+								<tr>
+									<th class="left">종목</th>
+									<th>현재가</th>
+									<th>등락률</th>
+									<th>시가총액</th>
+									<th>거래량</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="hotm : ${hotlist}" th:onclick="stock_link_url('stock/' + [[${hotm.code}]]);">
+									<td class="left">
+										<span class="hot-main-rank" th:text="${hotm.ranks}"></span>
+										<span th:text="${hotm.st_name}"></span>
+									</td>
+									<td>
+										<span th:text="${#numbers.formatInteger(hotm.price, 0, 'COMMA')} + '원'"></span>
+									</td>
+									<td>
+										<span th:class="${hotm.flt == '0' ? 'dash-grey' : hotm.flt.contains('-') ? 'dash-blue' :'dash-red' } " th:text="${#numbers.formatInteger(hotm.vs, 0, 'COMMA')}+'원 ('+ ${#numbers.formatDecimal(hotm.flt, 1, 2)}+'%)'"></span>
+									</td>
+									<td class="table-black">
+										<span th:text="${hotm.price_text}"></span>
+									</td>
+									<td>
+										<span th:text="${#numbers.formatInteger(hotm.trqu, 0, 'COMMA')} + '주'"></span>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div> <!-- end main-row -->
+				</div>
+			</div>
+			<div class="main-board main-board-comm">
+				<h4 class="main-title">인기 급상승 커뮤니티</h4>
+				<div class="main-table">
+					<div class="main-row">
+						<div class="comm-main-row">
+							<div class="comm-left">
+								<ul>
+									<li th:data-code="${comLists.code}" onclick="get_board(this);" th:each="comLists : ${comRank}">
+										<div class="comm-stock-li">
+											<div>
+												<span class="comm-main-rank"  th:text="${comLists.ranks}"></span>
+												<span class="comm-main-title" th:text="${comLists.title}"></span>
+											</div>
+											<div th:class="${comLists.flt == '0' ? 'dash-grey' : comLists.flt.contains('-') ? 'dash-blue' :'dash-red'} + ' comm-main-vs'" th:text="${#numbers.formatDecimal(comLists.flt, 1, 2)}+'%'"></div>
+										</div>
+									</li>
+								</ul>
+							</div> <!-- comm-left end -->
+							<div class="comm-rigth">
+								<div class="comm-main-list">
+									<table class="table table-borderless" id="comm-main-list"></table>
+								</div>
+								<div class="last-td" data-code="" onclick="moveCommunity(this);">
+									<div>
+										<span class="comm-last-title"></span>커뮤니티&nbsp;
+										<i class="fa-solid fa-chevron-right"></i>
+									</div>
+								</div>
+							</div> <!-- comm-rigth end -->
+						</div>
+					</div> <!-- end main-row -->
+				</div>
+			</div>
+		</div>
+		<script th:inline="javascript">
+			google.charts.load('current', {'packages':['corechart']});
+			google.charts.setOnLoadCallback(drawChart);
+			
+			function drawChart() { 
+				
+				var data = []; // 데이터 테이블을 저장할 배열
+				
+				var kospi = [[${kospi}]] ? [[${kospi}]] : null;
+				var kosdaq = [[${kosdaq}]] ? [[${kosdaq}]] : null;
+				var krx = [[${krx}]] ? [[${krx}]] : null;
+				
+				var options = [];
+				for(var i=1; i<4;i++){
+					var colors = "";
+					var data_array = [];
+					data[i] = new google.visualization.DataTable(); 
+					data[i].addColumn('string', 'Day'); 
+					data[i].addColumn('number', 'price');
+					if(i == 1){
+						for(var j=0;j<kospi.length;j++){
+							data_array.push([kospi[j].ji_date, parseFloat(kospi[j].ji_clpr)]);
+							var lastValue = parseFloat(kospi[kospi.length - 1].ji_vs); // 마지막 값 가져오기
+							if (lastValue < 0) {
+								colors = '#0000FF'; // 마지막 값이 -이면 파란색
+							} else {
+								colors = '#FF0000'; // 기본 색상 (예: 빨간색)
+							}
+						}
+					}
+					if(i == 2){
+						for(var j=0;j<kosdaq.length;j++){
+							data_array.push([kosdaq[j].ji_date, parseFloat(kosdaq[j].ji_clpr)]);
+							var lastValue = parseFloat(kosdaq[kosdaq.length - 1].ji_vs); // 마지막 값 가져오기
+							if (lastValue < 0) {
+								colors = '#0000FF'; // 마지막 값이 -이면 파란색
+							} else {
+								colors = '#FF0000'; // 기본 색상 (예: 빨간색)
+							}
+						}
+					}
+					if(i == 3){
+						for(var j=0;j<krx.length;j++){
+							data_array.push([krx[j].ji_date, parseFloat(krx[j].ji_clpr)]);
+							var lastValue = parseFloat(krx[krx.length - 1].ji_vs); // 마지막 값 가져오기
+							if (lastValue < 0) {
+								colors = '#0000FF'; // 마지막 값이 -이면 파란색
+							} else {
+								colors = '#FF0000'; // 기본 색상 (예: 빨간색)
+							}
+						}
+					}
+					options[i] = {
+						width: 200,
+						height: 100,
+						chartArea: { left : '0', right : 0, top: '0', bottom: '0'},
+						backgroundColor: {fill : '#f5f8fc'},
+						enableInteractivity  : false,
+						vAxis: {
+							gridlines: { color: 'none' },  // 수직축의 눈금선 제거
+							textPosition: 'none'           // 수직축의 라벨 제거
+						},
+						colors: [colors] // 동적으로 설정한 색상 배열
+					};
+					data[i].addRows(data_array);
+				}
+				
+				var chart = new google.visualization.LineChart(document.getElementById('graph1'));
+				
+				chart.draw(data[1], options[1]);
+				
+				var chart2 = new google.visualization.LineChart(document.getElementById('graph2'));
+				
+				chart2.draw(data[2], options[2]);
+				
+				var chart3 = new google.visualization.LineChart(document.getElementById('graph3'));
+				
+				chart3.draw(data[3], options[3]);
+			}
+			function stock_link_url(url){
+				window.open(url, '_blank'); // 새 창에서 URL 열기
+			}
+			
+			get_board($(".comm-left ul li").first());
+			
+			function get_board(target){
+				var title = $(target).find(".comm-main-title").text();
+				var code = $(target).data("code");
+				$(".comm-left ul li").removeClass("on");
+				$(target).addClass("on");
+				$(".comm-last-title").text(title);
+				$(".last-td").data("code", code);
+				$.ajax({
+					url : '/communityAjax',
+					method : "post",
+					async: false, 
+					data : { code : code },
+					success : function(data){
+						//console.log(data);
+						$("#comm-main-list").replaceWith(data);
+					}
+				});
+			}
+			
+			function moveCommunity(target){
+				var url = 'stock/' + $(target).data("code") + '/community';
+				window.open(url, "_blank");
+			}
+		</script>
+	</main>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kh.st.boot.dao.AdminUserDAO">
+	<select id="selectAdmUser" resultType="AdmMemberVO"> select * from member
+		limit #{pageStart}, #{perPageNum}
+	</select>
+
+	<select id="selectCountList" resultType="int"> select count(*) from
+		member
+	</select>
+
+	<select id="UseSelect" resultType="AdmMemberVO"> select * from member where
+		mb_no = #{mb_no}
+	</select>
+	<select id="MemberCheck" resultType="int">
+	select count(*) from member where mb_id = #{mb_id}
+	</select>
+
+	<update id="UseUpdate"> UPDATE member SET 
+	
+	mb_id = #{mb_id}, mb_password =
+		#{mb_password}, mb_name = #{mb_name}, mb_nick = #{mb_nick},
+		mb_ph =
+		#{mb_ph}, mb_email = #{mb_email}, mb_zip = #{mb_zip}, mb_addr
+		=
+		#{mb_addr}, mb_addr2 = #{mb_addr2}, mb_birth = #{mb_birth},
+		mb_level =
+		#{mb_level}, mb_edit_date = NOW(),<if test="mb_stop_date_check == null"> mb_stop_date = null,</if>
+		<if test="mb_stop != null"> mb_stop_date = now(),</if>
+		mb_point = #{mb_point}, mb_emailing
+		= #{mb_emailing},
+		mb_account = #{mb_account} where mb_no = #{mb_no}
+	
+	</update>
+	<delete id="UserDelete" parameterType="int">
+		DELETE FROM member WHERE
+		mb_no = #{mb_no}
+	</delete>
+
+	<select id="selectUser" resultType="AdmMemberVO">
+		SELECT * FROM member
+		WHERE
+		${use_sh} LIKE CONCAT('%', #{cri.search}, '%')
+		LIMIT #{cri.pageStart},
+		#{cri.perPageNum}
+	</select>
+
+	<select id="selectUserCount" resultType="int">
+		SELECT count(*) FROM
+		member
+		WHERE ${use_sh} LIKE CONCAT('%', #{cri.search}, '%')
+	</select>
+
+	<insert id="UserInsert"> INSERT INTO member (
+		mb_id, mb_password, mb_name,
+		mb_nick, mb_ph, mb_email, mb_zip, mb_addr,
+		mb_addr2, mb_birth,
+		mb_level, mb_datetime, mb_stop_date, mb_out_date, mb_cookie,
+		mb_cookie_limit,
+		mb_point, mb_emailing, mb_account
+		) VALUES
+		(#{mb_id},#{mb_password},#{mb_name},#{mb_nick},#{mb_ph},#{mb_email},#{mb_zip},
+		#{mb_addr},#{mb_addr2},#{mb_birth},
+		#{mb_level},NOW(),NULL,NULL,NULL,NULL,0,#{mb_emailing},#{mb_account})
+	</insert>
+
+
+</mapper>

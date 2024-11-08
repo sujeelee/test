@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html 
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+	layout:decorate="~{layout/layout.html}">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<main layout:fragment="content">
+		<th:block layout:fragment="css">
+			<link rel="stylesheet" th:href="@{/css/newsDetail.css}" >
+		</th:block>
+		<div class="entire mt-3">
+			<div class="news-header">
+				<div class="newspaper-name">
+					<a 	th:href="@{/newspaper/newsList/{np_no}/{date}(np_no=${newspaper.np_no},date=${ne_datetime})}"
+						th:text="${newspaper.np_name}"></a>
+				</div>
+				<div class="news-title mt-2 mb-3">
+					<span th:text="${news.ne_title}"></span>
+	            </div>
+	            <div class="d-flex">
+		            <div class="sub-info mr-auto">
+		                <span>입력</span>
+		                <span th:text="${#dates.format(news.ne_datetime, 'yyyy-MM-dd HH:mm:ss')}"></span>
+		                <span th:text="${news.ne_name} + ' 기자'"></span>
+		            </div>
+		            <div sec:authorize="isAuthenticated()" th:if="${#authentication.principal.member.mb_id} == ${news.mb_id}" class="update-delete">
+		            	<a th:href="@{/newspaper/newsUpdate/{ne_no}(ne_no=${news.ne_no})}">수정</a>
+						<a th:href="@{/newspaper/newsDelete/{ne_no}(ne_no=${news.ne_no})}">삭제</a>
+		            </div>
+	            </div>
+	        </div>
+	        <div class="reaction-bar">
+	            <div class="reaction">
+	                <span>👏 추천수 (<span th:text="${totalCount}"></span>)</span>
+	            </div>
+	        </div>
+	        <article>
+	            <div th:utext="${news.ne_content}" style="min-height: 400px; height: auto; font-size: 18px;"></div>
+	        </article>
+	         <section class="recommend-section">
+	            <strong>이 기사를 추천합니다</strong>
+	            <div class="icon-bar">
+				    <label class="icon-item" for="em_1">
+				        <input type="checkbox" name="em_act" id="em_1" value="1" onclick="checkOnlyOne(this);">
+				        <span class="icon"><i class="fa-regular fa-face-smile"></i></span>
+				        <span class="icon-text">기뻐요</span>
+				        <span th:text="${news.ne_happy}"></span>
+				    </label>
+				    <label class="icon-item" for="em_2">
+				        <input type="checkbox" name="em_act" id="em_2" value="2" onclick="checkOnlyOne(this);">
+				        <span class="icon"><i class="fa-regular fa-face-angry"></i></span>
+				        <span class="icon-text">화나요</span>
+				        <span th:text="${news.ne_angry}"></span>
+				    </label>
+				    <label class="icon-item" for="em_3">
+				        <input type="checkbox" name="em_act" id="em_3" value="3" onclick="checkOnlyOne(this);">
+				        <span class="icon"><i class="fa-regular fa-face-surprise"></i></span>
+				        <span class="icon-text">황당해요</span>
+				        <span th:text="${news.ne_absurd}"></span>
+				    </label>
+				    <label class="icon-item" for="em_4">
+				        <input type="checkbox" name="em_act" id="em_4" value="4" onclick="checkOnlyOne(this);">
+				        <span class="icon"><i class="fa-regular fa-face-frown"></i></span>
+				        <span class="icon-text">슬퍼요</span>
+				        <span th:text="${news.ne_sad}"></span>
+				    </label>
+				</div>
+	        </section>
+	        <div class="news-footer mb-3">
+	            <a  th:text="${newspaper.np_name} + ' 언론사홈 바로가기'"
+	            	th:href="@{/newspaper/newsList/{np_no}/{date}(np_no=${newspaper.np_no},date=${ne_datetime})}"></a>
+	        </div>
+		</div>
+        <script th:inline="javascript">
+        	function checkLogin(){
+        		let mb_id = /*[[${#authentication.getName()}]]*/ '';
+	        	if(mb_id != 'anonymousUser') {
+	        		return true;
+	        	}
+        		if(confirm('로그인이 필요한 서비스입니다.\n로그인 페이지로 이동하겠습니까?')){
+    				location.href = "/member/login";
+    			}
+        		return false;
+        	}
+        
+	        function checkOnlyOne(act) {
+	        	if(!checkLogin()) {
+	        		return;
+	        	}
+	            const checkboxes = $("input[name='em_act']");
+	            checkboxes.each(function() {
+	                $(this).prop('checked', false);
+	            });
+	            $(act).prop('checked', true);
+	            let em_act = $(act).val();
+	            let news_emoji = {
+	            	ne_no : '[[${news.ne_no}]]',
+	            	em_act : em_act
+	            }
+	            $.ajax({
+	            	async : true,
+	            	url : '/newspaper/emoji',
+	            	type : 'post', 
+	            	data : JSON.stringify(news_emoji), 
+	            	contentType : "application/json; charset=utf-8",
+	            	dataType : "json", 
+	            	success : function (data){
+	            		displayTotalCount(data.totalCount);
+	            		displayNewsEmoji(data.news);
+	            	}, 
+	            	error : function(jqXHR, textStatus, errorThrown){
+						console.log(jqXHR);
+	            	}
+	            });
+	        }
+	        function displayTotalCount(totalCount){
+	        	str = `
+	                <span>👏 추천수 (${totalCount})</span>	
+	        	`;
+	        	$('.reaction').html(str);
+	        }
+	        function displayNewsEmoji(news){
+	        	if(news == null) {
+	        		return;
+	        	}
+	        	str = `
+	        		<strong class="recommend-section">이 기사를 추천합니다</strong>
+	        		<div class="icon-bar">
+					    <label class="icon-item" for="em_1">
+					        <input type="checkbox" name="em_act" id="em_1" value="1" onclick="checkOnlyOne(this);">
+					        <span class="icon"><i class="fa-regular fa-face-smile"></i></span>
+					        <span class="icon-text">기뻐요</span>
+					        <span>${news.ne_happy}</span>
+					    </label>
+					    <label class="icon-item" for="em_2">
+					        <input type="checkbox" name="em_act" id="em_2" value="2" onclick="checkOnlyOne(this);">
+					        <span class="icon"><i class="fa-regular fa-face-angry"></i></span>
+					        <span class="icon-text">화나요</span>
+					        <span>${news.ne_angry}</span>
+					    </label>
+					    <label class="icon-item" for="em_3">
+					        <input type="checkbox" name="em_act" id="em_3" value="3" onclick="checkOnlyOne(this);">
+					        <span class="icon"><i class="fa-regular fa-face-surprise"></i></span>
+					        <span class="icon-text">황당해요</span>
+					        <span>${news.ne_absurd}</span>
+					    </label>
+					    <label class="icon-item" for="em_4">
+					        <input type="checkbox" name="em_act" id="em_4" value="4" onclick="checkOnlyOne(this);">
+					        <span class="icon"><i class="fa-regular fa-face-frown"></i></span>
+					        <span class="icon-text">슬퍼요</span>
+					        <span>${news.ne_sad}</span>
+					    </label>
+					</div>
+	        	`
+	        	$('.recommend-section').html(str);
+	        }
+        </script>
+	</main>
+</body>
+</html>

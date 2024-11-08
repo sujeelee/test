@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kh.st.boot.dao.FollowerDAO"> 
+
+	<!-- 현재 사용자가 팔로우하는지 확인하는 쿼리 -->	
+	<select id="followorNot" resultType="int">
+        SELECT COUNT(*) 
+        FROM follows 
+        WHERE mb_id = #{mb_id} AND fo_mb_id = #{fo_mb_id}
+    </select>
+
+    <insert id="insertFollower">
+        INSERT INTO follows (mb_id, fo_mb_id)
+        VALUES (#{mb_id}, #{fo_mb_id})
+    </insert>
+
+    <delete id="deleteFollower">
+        DELETE FROM follows 
+        WHERE mb_id = #{mb_id} AND fo_mb_id = #{fo_mb_id}
+    </delete>
+
+</mapper>

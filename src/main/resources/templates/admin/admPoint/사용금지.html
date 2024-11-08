@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/admlayout.html}" layout:fragment="content">
+<head>
+<meta charset="UTF-8">
+<title>Admin Level Page</title>
+<link th:href="@{/css/admnews.css}" rel="stylesheet" />
+
+<!--  스타일 적용 했음  -->
+</head>
+<style>
+</style>
+<body>
+	<div class="content">
+		<h1>포인트 관리</h1>
+		<div class="update-from">
+
+			<form action="/admin/admPoint/admPointPage/Id" method="post">
+				<input type="text" name="mb_id" placeholder="사용자 ID" required>
+				<button type="submit">ID 검색</button>
+			</form>
+		</div>
+		<form action="/admin/admPoint/admPointPage/point" method="post">
+			<input type="text" name="mb_id" placeholder="회원 ID" required>
+			<input type="text" name="po_num" placeholder="+ / - 포인트" required>
+			<input type="text" name="po_content" placeholder="지급사유" required>
+			<button type="submit">저장</button>
+		</form>
+
+		<div class="register-form">
+
+			<form action="/admin/admPoint/admPointPage/delete" method="post">
+				<input type="text" name="po_no" placeholder="등록번호" required>
+				<button type="submit">내역삭제</button>
+			</form>
+
+		<table>
+			<thead>
+				<tr>
+					<th>등록번호</th>
+					<th>포인트</th>
+					<th>지급사유</th>
+					<th>지급일</th>
+					<th>회원 ID</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="list : ${list}">
+					<td th:text="${list.po_no}"></td>
+					<td th:text="${list.po_num}"></td>
+					<td th:text="${list.po_content}"></td>
+					<td th:text="${list.po_datetime}"></td>
+					<td th:text="${list.mb_id}"></td>
+
+				</tr>
+			</tbody>
+		</table>
+</body>
+</html>

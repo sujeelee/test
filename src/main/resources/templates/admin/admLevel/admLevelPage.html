@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/admlayout.html}" layout:fragment="content">
+<head>
+
+<link href="/css/admlevel.css" rel='stylesheet'>
+<script src="https://kit.fontawesome.com/3f892a70ad.js"
+	crossorigin="anonymous">
+	
+</script>
+<script
+	src="https://demo.sir.kr/gnuboard5/js/jquery.menu.js?ver=2304171"></script>
+<meta charset="UTF-8">
+<title>관리자 페이지</title>
+</head>
+<body>
+	<div id="wrapper">
+		<div id="container">
+			<h1 id="container_title">회원 레벨 테이블</h1>
+			<div id="container_main" class="content">
+				<div class="tbl_col">
+						<table>
+							<thead>
+								<tr>
+									<th>등급</th>
+									<th>레벨</th>
+									<th>등급 혜택</th>
+									<th>승급 심사 여부</th>
+									<th>레벨업 기준</th>
+									<th>관리</th>
+								</tr>
+							</thead>
+							<tbody>
+								<!-- 값 불러오기 -->
+								<tr th:each="list : ${list}">
+									<td th:text="${list.lv_name}"></td>
+									<td th:text="${list.lv_num}" style="width: 90px;"></td>
+									<td th:text="${list.lv_alpha}"></td>
+									<td
+										th:text="${list.lv_auto_use.equals('N') ? '자동 승급' : '관리자 승인 필요'}"></td>
+									<td th:text="${list.lv_up_limit}"></td>
+									<td id="level_inp" class="td_upd" style="text-align: center;">
+										<form action="/admin/admLevel/admLevSel" method="post">
+											<input type="hidden" name="lv_num" th:value="${list.lv_num}" />
+											<input type="submit" value="수정" class="btn_submit btn"
+												onclick="location.href='/admin/admLevel/admLevSel'">
+										</form>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+
+				</div>
+
+			</div>
+			<footer id="ft">
+				<p>Copyright © demo.sir.kr. All rights reserved.</p>
+			</footer>
+		</div>
+	</div>
+
+</body>
+</html>

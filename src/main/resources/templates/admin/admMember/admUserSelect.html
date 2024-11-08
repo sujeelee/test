@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/admlayout.html}" layout:fragment="content">
+<head>
+<script type="text/javascript" th:src="@{/js/admmemberselect.js}"></script>
+<link href="/css/admmember.css" rel='stylesheet'>
+
+<meta charset="UTF-8">
+<title>관리자 페이지</title>
+</head>
+<body>
+
+	<div id="wrapper">
+		<div id="container">
+			<h1 id="container_title">회원 정보 수정</h1>
+			<div id="container_main" class="content">
+				<form action="/admin/admMember/admUserSelect/Update" method="post"
+					onsubmit="return validateForm()">
+					<section>
+						<h2 id="main_h2">회원 정보 상세 페이지</h2>
+						<div class="tbl_main">
+							<table>
+								<colgroup>
+									<col class="grid_4">
+									<col>
+									<col class="grid_4">
+									<col>
+								</colgroup>
+								<tbody>
+									<tr>
+										<th><label>회원 아이디</label></th>
+										<td><input type="text" name="mb_id" id="mb_id" readonly
+											th:value="${admUseSel.mb_id}" required class="menu_input"
+											size="40"><input type="hidden" name="mb_no"
+											th:value="${admUseSel.mb_no}" required class="menu_input"
+											size="40"></td>
+									</tr>
+									<tr>
+										<th><label>비밀번호</label></th>
+										<td><input type="password" name="mb_password"
+											id="pw_update" th:value="${admUseSel.mb_password}" required
+											class="menu_input" size="40" readonly>
+											<button type="button" onclick="toggleReadonly('pw_update')"
+												class="btn_submit btn btn_pw">비밀번호 수정</button></td>
+									</tr>
+									<tr>
+										<th><label>회원 이름</label></th>
+										<td><input type="text" name="mb_name"
+											th:value="${admUseSel.mb_name}" required class="menu_input"
+											size="40"></td>
+									</tr>
+									<tr>
+										<th><label>회원 닉네임</label></th>
+										<td><input type="text" name="mb_nick"
+											th:value="${admUseSel.mb_nick}" required class="menu_input"
+											size="40"></td>
+									</tr>
+									<tr>
+										<th><label>회원 전화번호</label></th>
+										<td><input type="text" name="mb_ph" id="mb_ph"
+											th:value="${admUseSel.mb_ph}" required class="menu_input"
+											size="40"></td>
+									</tr>
+									<tr>
+										<th><label>회원 이메일</label></th>
+										<td><input type="text" name="mb_email" id="mb_email"
+											th:value="${admUseSel.mb_email}" required class="menu_input"
+											size="40"></td>
+									</tr>
+									<tr>
+										<th><label>주소</label></th>
+										<!-- 우편번호와 기본주소 사이 간격 조정 가능한지~~? -->
+										<td><input type="text" name="mb_zip"
+											th:value="${admUseSel.mb_zip}" required class="menu_input"
+											size="40" style="margin-bottom: 4px"> <input
+											type="text" name="mb_addr2" th:value="${admUseSel.mb_addr2}"
+											required class="menu_input" size="40"
+											style="margin-bottom: 4px"> <input type="text"
+											name="mb_addr" th:value="${admUseSel.mb_addr}" required
+											class="menu_input" size="87"></td>
+									</tr>
+									<tr>
+										<th><label>생년월일</label></th>
+										<td><input type="text" name="mb_birth" id="mb_birth"
+											required
+											th:value="${#dates.format(admUseSel.mb_birth, 'yyyy-MM-dd')}"
+											class="menu_input" size="40"></td>
+									</tr>
+									<tr>
+										<th><label>회원 레벨</label></th>
+										<td><select name="mb_level" class="menu_input"
+											id="mb_level">
+												<option th:if="${admUseSel.mb_level == null}" disabled selected>레벨
+													설정</option>
+												<option th:each="i : ${#numbers.sequence(1, 10)}"
+													th:value="${i}" th:text="${i}"></option>
+										</select></td>
+									</tr>
+									<tr>
+										<th><label>회원가입일</label></th>
+										<td><input type="text" name="mb_datetime"
+											th:value="${#dates.format(admUseSel.mb_datetime, 'yyyy-MM-dd')}"
+											readonly="readonly" class="menu_input" size="40"></td>
+									</tr>
+									<tr>
+										<th><label>회원 수정일</label></th>
+										<td><input type="text" name="mb_edit_date"
+											th:value="${#dates.format(admUseSel.mb_edit_date, 'yyyy-MM-dd')}"
+											readonly="readonly" class="menu_input" size="40"></td>
+									</tr>
+									<tr>
+										<th><label>회원 정지 확인</label></th>
+										<td><input type="text" name="mb_stop_date"
+											th:value="${#dates.format(admUseSel.mb_stop_date, 'yyyy-MM-dd')}"
+											readonly="readonly" class="menu_input" size="40"> 회원
+											정지<input type="checkbox" name="mb_stop">회원 정지 해제<input
+											type="checkbox" name="mb_stop_date_check"
+											th:checked="${#dates.format(admUseSel.mb_stop_date, 'yyyy-MM-dd') !=null ? true : false}">
+										</td>
+									</tr>
+									<tr>
+										<th><label>회원 탈퇴일</label></th>
+										<td><input type="text" name="mb_out_date"
+											th:value="${#dates.format(admUseSel.mb_out_date, 'yyyy-MM-dd')}"
+											readonly="readonly" class="menu_input" size="40"></td>
+									</tr>
+									<tr>
+										<th><label>이메일수집동의여부</label></th>
+										<td><input type="checkbox" name="mb_emailing_test"
+											th:checked="${admUseSel.mb_emailing == 1 ? true : false}"
+											class="menu_input" size="1">사용 여부</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</section>
+					<div class="btn_fixed_top btn_confirm">
+						<input type="button"
+							onclick="location.href='/admin/admMember/adminUser'" value="취소"
+							class="btn_submit btn btm_no">
+					</div>
+					<div class="btn_fixed_top btn_confirm">
+						<input type="submit" value="확인" class="btn_submit btn">
+					</div>
+				</form>
+			</div>
+			<footer id="ft">
+				<p>Copyright © demo.sir.kr. All rights reserved.</p>
+				<br>
+			</footer>
+		</div>
+	</div>
+
+	<script>
+		let isPasswordEdited = false; // 비밀번호 수정 여부를 저장하는 전역 변수
+
+		function toggleReadonly(inputId, button) {
+			const pw_update = document.getElementById(inputId);
+
+			if (pw_update.hasAttribute('readonly')) {
+				// readonly 속성이 있을 때 -> 수정 가능하게 변경, 값 초기화, 타입을 텍스트로 변경
+				pw_update.removeAttribute('readonly');
+				pw_update.value = ''; // input 값 초기화
+				pw_update.type = 'text'; // 타입을 텍스트로 변경
+				button.innerText = '수정 완료';
+				isPasswordEdited = true; // 수정 버튼 클릭 시 isPasswordEdited 설정
+			} else {
+				// readonly 속성이 없을 때 -> 다시 readonly 설정, 타입을 비밀번호로 변경
+				pw_update.setAttribute('readonly', true);
+				pw_update.type = 'password'; // 타입을 비밀번호로 변경
+				button.innerText = '비밀번호 수정';
+				isPasswordEdited = false; // 수정 완료 후 초기화
+			}
+		}
+
+		function validateForm() {
+			// 정규식 패턴 설정
+			const passwordPattern = /^(?=.*[!@#$])(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$]{8,}$/; // 비밀번호: 최소 8자, 문자 및 숫자 포함
+			const phonePattern = /^01[016789]-\d{3,4}-\d{4}$/; // 전화번호: 한국 전화번호 형식 (예: 010-1234-5678)
+			const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // 이메일: 일반 이메일 형식
+			const datePattern = /^\d{4}-\d{2}-\d{2}$/; // 생년월일: YYYY-MM-DD 형식
+
+			// 입력 필드 값 가져오기
+			const password = document.getElementById("pw_update").value;
+			const phone = document.getElementById("mb_ph").value;
+			const email = document.getElementById("mb_email").value;
+			const birth = document.getElementById("mb_birth").value;
+
+			// 비밀번호 검증 (수정 시에만 검사)
+			if (isPasswordEdited && !passwordPattern.test(password)) {
+				alert("비밀번호는 최소 8자, 문자 및 숫자를 포함해야 합니다.");
+				return false;
+			}
+
+			// 전화번호 검증
+			if (!phonePattern.test(phone)) {
+				alert("전화번호는 형식에 맞게 입력하세요 (예: 010-1234-5678).");
+				return false;
+			}
+
+			// 이메일 검증
+			if (!emailPattern.test(email)) {
+				alert("올바른 이메일 형식이 아닙니다.");
+				return false;
+			}
+
+			// 생년월일 검증
+			if (!datePattern.test(birth)) {
+				alert("생년월일은 YYYY-MM-DD 형식으로 입력하세요.");
+				return false;
+			}
+
+			return true; // 모든 검증 통과 시 폼 제출 허용
+		}
+	</script>
+
+
+</body>
+</html>

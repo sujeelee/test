@@ -1,0 +1,42 @@
+@charset "UTF-8";
+.entire {
+	width: 700px;
+	margin: 0 auto;
+}
+
+.news-header {
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 7px;
+}
+
+.newspaper-name span {
+	font-size: 20px;
+    color: #d63447;
+    text-decoration: none;
+}
+
+.news-title span {
+	font-size: 30px;
+    font-weight: bold;
+    padding: 8px 0 5px;
+}
+
+.sub-info {
+    font-size: 14px;
+    color: #888;
+}
+
+.sub-info span {
+    margin-right: 15px;
+}
+
+.reaction-bar {
+    padding: 10px 0;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 15px;
+}
+
+.reaction{
+ 	font-size: 15px;
+	color: #888;
+}

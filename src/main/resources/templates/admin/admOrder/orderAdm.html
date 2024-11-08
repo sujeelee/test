@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/admlayout.html}" layout:fragment="content">
+<head>
+<script src="https://kit.fontawesome.com/3f892a70ad.js"
+	crossorigin="anonymous">
+	
+</script>
+<script
+	src="https://demo.sir.kr/gnuboard5/js/jquery.menu.js?ver=2304171"></script>
+<meta charset="UTF-8">
+<link th:href="@{/css/admorder.css}" rel="stylesheet" />
+<title>관리자 페이지</title>
+</head>
+<body>
+	<div id="wrapper">
+		<div id="container">
+			<h1 id="container_title">주문내역</h1>
+			<div id="container_main" class="content">
+			<div id="select_left">
+				<!-- 검색기능 form -->
+				<form action="/admin/admOrder/orderAdm/AdmOrderSearch" method="get" onsubmit="return unableform()"
+					class="local_sch" style="text-align: left;">
+					<select name="od_sh">
+						<option value="mb_id">회원아이디</option>
+						<option value="od_name">주문자명</option>
+					</select> <input type="text" name="od_search" required class="in_sch" th:placeholder="${od_search}" id="od_search">
+					<button type="submit" class="btn_submit btn in_sch">검색</button>
+					<a type="submit" href="/admin/admOrder/orderAdm" class="btn_submit btn btn_a" style="padding-top: 7px;">초기화</a>
+				</form>
+				</div>
+				<div class="tbl_col">
+					<table>
+						<thead>
+							<tr>
+								<th>회원아이디</th>
+								<th>주문자명</th>
+								<th>결제금액</th>
+								<th>결제일</th>
+								<th>주식명</th>
+								<th>주식 주 개수</th>
+								<th>주식 주당 가격</th>
+								<th>관리</th>
+							</tr>
+						</thead>
+						<tbody>
+							<!-- 값 불러오기 -->
+							<tr th:each="list : ${list}">
+								<td th:text="${list.mb_id}"></td>
+								<td th:text="${list.od_name}"></td>
+								<td th:text="${list.od_price}"></td>
+								<td th:text="${list.od_date}"></td>
+								<td th:text="${list.od_st_name}"></td>
+								<td th:text="${list.od_qty}"></td>
+								<td th:text="${list.od_st_price}"></td>
+								<td class="td_upd" style="text-align: center;">
+									<form action="/admin/admOrder/orderAdm/delet" method="post">
+										<input type="hidden" name="od_id" th:value="${list.od_id} "
+											placeholder="주문번호" required>
+										<button type="submit" class="btn_submit btn"
+											onclick="return confirm('정말 삭제하시겠습니까?');">내역삭제</button>
+									</form>
+								</td>
+							</tr>
+							<tr th:if="${#lists.isEmpty(list)}">
+								<td colspan="9" class="no-data not_search">검색 결과가 없습니다.</td>
+							</tr>
+						</tbody>
+					</table>
+					<div id="display_box">
+						<ul class="pagination" th:object="${pm_ord}"
+							th:if="${pm_ord != null && pm_ord.endPage != 0 && od_sh != null}">
+							<li th:if="${pm_ord.prev}"><a
+								th:href="@{/admin/admOrder/orderAdm/AdmOrderSearch(od_sh=${od_sh}, od_search=${od_search}, page=${pm_ord.startPage - 1})}">◀</a>
+							</li>
+							<li
+								th:each="i : ${#numbers.sequence(pm_ord.startPage, pm_ord.endPage)}"
+								th:classappend="${pm_ord.cri.page} == ${i} ? 'active' : ''">
+								<a
+								th:href="@{/admin/admOrder/orderAdm/AdmOrderSearch(od_sh=${od_sh}, od_search=${od_search}, page=${i})}"
+								th:text="${i}"></a>
+							</li>
+							<li th:if="${pm_ord.next}"><a
+								th:href="@{/admin/admOrder/orderAdm/AdmOrderSearch(od_sh=${od_sh}, od_search=${od_search}, page=${pm_ord.endPage + 1})}">▶</a>
+							</li>
+						</ul>
+						<ul class="pagination" th:object="${pm_ord}"
+							th:if="${pm_ord != null && pm_ord.endPage != 0 && od_sh == null}">
+							<li th:if="${pm_ord.prev}"><a
+								th:href="@{/admin/admOrder/orderAdm(od_sh=${od_sh}, od_search=${od_search}, page=${pm_ord.startPage - 1})}">◀</a>
+							</li>
+							<li
+								th:each="i : ${#numbers.sequence(pm_ord.startPage, pm_ord.endPage)}"
+								th:classappend="${pm_ord.cri.page} == ${i} ? 'active' : ''">
+								<a
+								th:href="@{/admin/admOrder/orderAdm(od_sh=${od_sh}, od_search=${od_search}, page=${i})}"
+								th:text="${i}"></a>
+							</li>
+							<li th:if="${pm_ord.next}"><a
+								th:href="@{/admin/admOrder/orderAdm(od_sh=${od_sh}, search=${od_search}, page=${pm_ord.endPage + 1})}">▶</a>
+							</li>
+						</ul>
+					</div>
+
+				</div>
+
+			</div>
+			<footer id="ft">
+				<p>Copyright © demo.sir.kr. All rights reserved.</p>
+			</footer>
+		</div>
+		
+		<script>
+			function unableform() {
+				const od_search = document.getElementById("od_search").value.replace(/\s/g, '');
+				document.getElementById('od_search').value = od_search;
+			}
+		</script>
+	</div>
+
+</body>
+</html>

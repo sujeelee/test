@@ -1,0 +1,57 @@
+@charset "UTF-8";
+
+table{text-align:center;}
+.center{text-align: center; margin-bottom: 2%;margin-top: 2%;}
+.left_td{text-align: left;}
+.grey{color: #d4d4d4;}
+.pink{color: #f54747;}
+.blue{color: blue;}
+.red{color: red;}
+.hold{color: #888;}
+.margin-left{margin-left: 50%;}
+.margin-left-big{margin-left: 68%;}
+.dropdown-item:hover{background-color:  rgba(9, 108, 138, 0.2) !important;}
+li{cursor:pointer; color:#0c5460 !important;}
+.list-group-item{border:none !important;padding: .3rem 0.25rem !important;}
+.dropdown-item > .on{color:#0c5460 !important;}
+.dropdown-item > .on:after {content: " ν";}
+.dropdown-menu{min-width: 1em !important;}
+.dropdown-item{padding: 1px !important;}
+li > a > .btn:not(.heart){width: 100% !important; text-align: left; border-radius: 20px;}
+.page_div{margin-top: 5%;}
+.none-list{background-color: #fff !important;}
+.none-content{text-align: center;margin-top: 20%;}
+.fa-color{color: rgba(9, 108, 138, 0.3);}fdjs
+.no-title{margin-top: 2%; font-weight: bold; color: #888; font-size: 0.9em;}
+thead{ border-bottom: 1px solid #888 !important; color: #6b6a6a !important;}
+table{margin-top: 3%;}
+tbody tr:not(.none-list):hover{background-color: rgba(9, 108, 138, 0.4); color: #fff !important;}
+.fake_click{cursor: pointer;}
+.stock-name{font-size: 1.2em; font-weight: bold;}
+.stock-before, .red:before {content: '+';}
+.stock-price{font-size: 1.8em !important; font-weight: bold;}
+.stock-info-price{font-size: 0.8em;}
+.chart-section{width: 80%;}
+#graph{box-sizing: border-box; overflow: auto; overflow-y: hidden;white-space: nowrap;}
+#graph, .stock-day-list, .order-div::-webkit-scrollbar{display: block !important;}
+#graph, .stock-day-list, .order-div{scrollbar-width: thin;scrollbar-color: #17a2b8 #f8f9fa;}
+::-webkit-scrollbar-track {background-color: #f8f9fa;}
+::-webkit-scrollbar-thumb {background-color: #17a2b8;}
+.stock-day-list, .order-div{box-sizing: border-box; overflow: auto;white-space: nowrap;}
+.stock-day-list{height: 250px;}
+.mini-title{font-weight: bold; color: #333D4B !important;font-size: 14px;}
+.stock-chart-graph{margin-top: 2%;margin-bottom: 2%;}
+.head-sticky{position: sticky;top: -1px;z-index: 2; background-color: #fff;}
+.stock-day-section{margin-top: 1%;}
+.order-section{width:20%; margin-left: 1.5%;}
+.order-header{margin-top: 2%;margin-bottom: 3%;}
+.form-content {display: flex; justify-content: space-between;align-items: flex-start;}
+.mystock-div{margin-top: 10%;}
+.order-type{box-sizing: border-box;width: calc(93.6% / 3) !important;border-radius: 5px;background-color: #fff;border-color:#fff; margin-left: calc(1.5% / 3);}
+.btn-outline-danger.on{color: #fff;background-color: #dc3545;border-color: #dc3545;}
+.btn-outline-primary.on{color: #fff;background-color: #007bff;border-color: #007bff;}
+.btn-outline-success.on{color: #fff;background-color: #28a745;border-color: #28a745;}
+.order-btn-list{background-color:rgba(212, 212, 212, 0.5);border-radius: 5px; padding: 2%;margin-bottom: 3%;}
+.order-div{height: 400px;}
+.width-full{width: 100%;}
+.footer-sticky{position: sticky;bottom: 0px;z-index: 2; background-color: #fff; height: 50px;}

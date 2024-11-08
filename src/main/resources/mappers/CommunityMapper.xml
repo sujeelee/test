@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kh.st.boot.dao.CommunityDAO"> 
+
+    <insert id="insertBoard">
+        INSERT INTO board (wr_category, mb_id, wr_content)
+        VALUES (#{wr_category}, #{mb_id}, #{wr_content}) 
+    </insert>
+	
+	<select id="selectCommunityAction" resultType="CommunityActionVO">
+		SELECT *
+		FROM
+			COMMUNITY_ACTION
+		WHERE
+			CG_NUM = #{cg_num} AND
+			MB_ID = #{mb_id}
+	</select>
+	
+    <select id="getBoardList" resultType="BoardVO">
+    	SELECT board.*, member.mb_nick, member.mb_level
+    	FROM board
+		left join member on member.mb_id = board.mb_id
+    	WHERE board.wr_category = #{st_code}
+		ORDER BY wr_no DESC
+    </select>    
+
+	<select id="findBoardByObjBoardVO" resultType="CommunityActionVO">
+		select * from community_action
+		where mb_id = #{mb_id} and cg_type = #{cg_type} and cg_num = #{cg_num}
+	</select>
+
+	<insert id="createBoardOfCommunityAction">
+		insert into community_action(cg_num, cg_type, st_code, mb_id, cg_datetime, cg_like, cg_report)
+		VALUES (#{cg_num}, #{cg_type}, #{st_code},#{mb_id}, now() ,#{cg_like}, #{cg_report})
+	</insert> 
+
+	<update id="updateBoardOfCommunityAction_setLike">
+		update community_action
+		set cg_like = 'like'
+		where mb_id = #{mb_id} and cg_type = #{cg_type} and cg_num = #{cg_num}
+	</update>
+
+	<update id="updateBoardOfCommunityAction_setLikeNull">
+		update community_action
+		set cg_like = ''
+		where mb_id = #{mb_id} and cg_type = #{cg_type} and cg_num = #{cg_num}
+	</update>
+
+	<update id="updateBoardOfCommunityAction_setReport">
+		update community_action
+		set cg_report = 'report'
+		where mb_id = #{mb_id} and cg_type = #{cg_type} and cg_num = #{cg_num}
+	</update>
+
+	<update id="updateBoardOfCommunityAction_setReportNull">
+		update community_action
+		set cg_report = ''
+		where mb_id = #{mb_id} and cg_type = #{cg_type} and cg_num = #{cg_num}
+	</update>
+
+	<insert id="insertComment">
+		INSERT INTO comment (wr_no, mb_id, co_content)
+        VALUES (#{wr_no}, #{mb_id}, #{co_content}) 
+	</insert>
+
+	<select id="getCommentList" resultType="CommentVO">
+		SELECT co.*, mb.mb_nick, mb.mb_level  
+		FROM comment as co
+		left join member mb on mb.mb_id = co.mb_id
+		where wr_no = #{wr_no}
+		 order by co_id desc 
+    </select>
+    
+   	<update id="updateCount">
+		UPDATE board b
+		 set b.wr_comment = (
+		 select COUNT(*)
+		 FROM comment c
+		 WHERE c.wr_no = b.wr_no
+		 )		
+	</update> 
+	
+    <!-- 게시글의 좋아요 및 신고 수 업데이트 -->
+    <update id="updateBoardCounts">
+        UPDATE board
+        SET wr_good = #{likeCount}, wr_singo = #{reportCount}
+        WHERE wr_no = #{cg_num}
+    </update>
+
+    <!-- 댓글의 좋아요 및 신고 수 업데이트 -->
+    <update id="updateCommentCounts">
+        UPDATE comment
+        SET co_good = #{likeCount}, co_bad = #{reportCount}
+        WHERE co_id = #{cg_num}
+    </update>
+
+    <!-- 게시글에 대한 좋아요 카운트 조회 -->
+    <select id="getLikeCountForBoard" resultType="int">
+        SELECT COUNT(*) FROM community_action
+        WHERE cg_num = #{cg_num} AND cg_type = 'board' AND cg_like = 'like'
+    </select>
+
+    <!-- 게시글에 대한 신고 카운트 조회 -->
+    <select id="getReportCountForBoard" resultType="int">
+        SELECT COUNT(*) FROM community_action
+        WHERE cg_num = #{cg_num} AND cg_type = 'board' AND cg_report = 'report'
+    </select>
+
+    <!-- 댓글에 대한 좋아요 카운트 조회 -->
+    <select id="getLikeCountForComment" resultType="int">
+        SELECT COUNT(*) FROM community_action
+        WHERE cg_num = #{cg_num} AND cg_type = 'comment' AND cg_like = 'like'
+    </select>
+
+    <!-- 댓글에 대한 신고 카운트 조회 -->
+    <select id="getReportCountForComment" resultType="int">
+        SELECT COUNT(*) FROM community_action
+        WHERE cg_num = #{cg_num} AND cg_type = 'comment' AND cg_report = 'report'
+    </select>
+    
+	<!-- 좋아요 및 신고 여부 확인 -->
+	<select id="checkUserActions" resultType="CommunityActionVO">
+		SELECT 
+		    IF(cg_like = 'like', 'like', 'n') AS cg_like,
+		    IF(cg_report = 'report', 'report', 'n') AS cg_report,
+		    cg_num 
+		FROM 
+		    community_action 
+		WHERE 
+		    cg_num = #{cg_num} AND 
+		    cg_type = #{cg_type} AND 
+		    mb_id = #{mb_id}
+	</select>
+	
+	<select id="getBoardbyID" resultType="BoardVO">
+		SELECT board.*, member.mb_nick, member.mb_level
+    	FROM board
+		left join member on member.mb_id = board.mb_id
+    	WHERE board.wr_no = #{wr_no} and board.mb_id = #{mb_id}
+    	limit 1
+	</select>
+    
+    <delete id="deleteBoard">
+        DELETE FROM board WHERE wr_no = #{wr_no}
+    </delete>	
+    
+     <update id="updateBoard">
+        UPDATE board
+        SET wr_content = #{bo.wr_content}
+        WHERE wr_no = #{bo.wr_no} AND mb_id = #{bo.mb_id}
+    </update>
+    
+    <select id="getCommentbyID" resultType="CommentVO">
+      	SELECT co.*, mb.mb_nick 
+		FROM comment as co
+		left join member mb on mb.mb_id = co.mb_id
+		WHERE co.co_id = #{co_id} and co.wr_no = #{wr_no}
+		limit 1
+    </select>
+    
+    <delete id="deleteComment">
+    	DELETE FROM comment WHERE wr_no = #{co.wr_no} AND co_id = #{co.co_id} and mb_id = #{co.mb_id}
+    </delete>
+    
+    <update id="updateComment">
+    	UPDATE comment
+        SET co_content = #{co.co_content}
+        WHERE wr_no = #{co.wr_no} AND mb_id = #{co.mb_id} AND co_id = #{co.co_id}
+    </update>
+    
+	<select id="findActionByCommentNumber" resultType="CommunityActionVO">
+		select * from community_action where cg_num = #{co_id} and cg_type = 'comment' and mb_id = #{mb_id}
+	</select>
+	
+		<!-- 현재 사용자가 팔로우하는지 확인하는 쿼리 -->	
+	<select id="followorNot" resultType="int">
+        SELECT COUNT(*) 
+        FROM follow 
+        WHERE mb_id = #{mb_id} AND fo_mb_id = #{fo_mb_id}
+    </select>
+
+    <insert id="insertFollower">
+        INSERT INTO follow (mb_id, fo_mb_id)
+        VALUES (#{mb_id}, #{fo_mb_id})
+    </insert>
+
+    <delete id="deleteFollower">
+        DELETE FROM follow 
+        WHERE mb_id = #{mb_id} AND fo_mb_id = #{fo_mb_id}
+    </delete>
+	
+	<select id="followingStatus" resultType="String">
+        SELECT 
+            IF(COUNT(*) > 0, 'y', 'n') AS follow_status
+        FROM 
+            follow 
+        WHERE 
+            mb_id = #{mb_id} AND fo_mb_id = #{fo_mb_id}
+    </select>
+	<update id="updateBoardBlind">
+		update board 
+		set	wr_blind = 'Y'
+		where wr_no = #{wr_no}
+	</update>
+	<update id="updateCommentBlind">
+		update comment
+		set	co_blind = 'Y'
+		where co_id = #{co_id}
+	</update>
+</mapper>

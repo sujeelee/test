@@ -1,0 +1,84 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap");
+@font-face {
+    font-family: 'HakgyoansimSantteutdotumL';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2307-2@1.0/HakgyoansimSantteutdotumL.woff2') format('woff2');
+    font-weight: 300;
+    font-style: nomal;
+}
+*:not(i){font-family: 'HakgyoansimSantteutdotumL' !important; font-weight: 750 !important;}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  /* 스크롤 삭제 */
+  -ms-overflow-style: none;
+}
+  /* 스크롤 삭제 */
+::-webkit-scrollbar {
+  display: none;
+}
+
+header {
+  background-color: #ffffff;
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 1000;
+  background-color: #ffffff;
+  transition: margin-left 0.3s ease;
+}
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  transition: padding 0.4s ease; /* 패딩에 애니메이션 효과 추가 */
+}
+.logo a {
+	position: static;
+	  font-size: 24px;
+	  font-weight: bold;
+	  color: #0056f7;
+	  text-decoration: none;
+}
+.logo{margin-left: 3%;}
+
+/* 기본 글씨 색상 회색 */
+.menu a {
+  font-size: 16px;
+  color: #888888; /* 회색 */
+  text-decoration: none;
+  padding: 10px;
+}
+
+/* 마우스 호버 시 검은색으로 변경 */
+.menu a:hover {
+  color: #000000; /* 검은색 */
+  border-bottom: 2px solid #096c8a; /* 밑줄 */
+}
+.modal-btn {
+  display: inline-block;
+  vertical-align: middle;
+  user-select: none;
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  text-align: center;
+  background-color: transparent;
+  border-radius: .25rem;
+}
+.search_head{white-space: nowrap; border: 1px solid #096c8a;padding-left: 10px; color: #888888;padding-right: 31px;}
+.slash{border: 1px solid #888; padding: 2% 3%;font-size: 13px;margin-right: 2px;}
+.search_head:hover {color: #888888 !important;}
+.modal-backdrop{background-color: rgba(0, 0, 0, .2);}

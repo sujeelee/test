@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout/layout.html}">
+<head>
+<meta charset="UTF-8" />
+<title>시드키 : 팔로우 목록</title>
+<link rel="stylesheet" type="text/css" th:href="@{/css/myFollow.css}">
+</head>
+ <body>
+	<main layout:fragment="content">
+		<div class="my-container mt-5">
+			<div th:replace="~{layout/mySide.html}"></div>
+			<div>
+				<!-- Header -->
+				<div class="mypage-header">
+					<h1 class="header-title">팔로우 목록</h1>
+				</div>
+				<div class="follow-table">
+					<table class="table table-borderless">
+						<tr th:class="'fo_' + ${fo.fo_no}" th:each="fo : ${follow}">
+							<td>
+								<div class="follow-nick">
+									<div th:text="${fo.fo_mb_nick}"></div>
+									<div class="unfollow-btn">
+										<button class="btn btn-outline-danger" th:onclick="follow_action([[${fo.fo_no}]], 'unfollow');">
+											언팔로우
+										</button>
+									</div>
+								</div>
+							</td>
+							<td>
+								<button class="btn btn-outline-info" th:onclick="follow_action([[${fo.fo_mb_id}]], 'views');">
+									의견 [[${#numbers.formatInteger(fo.cnt, 0, 'COMMA')}]]개 모아보기
+								</button>
+							</td>
+						</tr>
+						<tr th:if="${follow == null or #lists.isEmpty(follow)}">
+							<td colspan="2">
+								팔로우를 한 사람이 없습니다.
+							</td>
+						</tr>
+					</table>
+				</div>
+				<div class="page_div">
+					<ul class="pagination justify-content-center center" 
+						th:object="${pm}" 
+						th:if="${pm.endPage != 0}">
+					    <li class="page-item" th:if="*{prev}">
+					    	<a class="page-link" th:href="@{/myaccount/follow(page=*{startPage-1})}">이전</a>
+					    </li>
+					    <li class="page-item" 
+					    	th:each="i : *{#numbers.sequence(startPage, endPage)}"
+					    	th:classappend="*{cri.page} == ${i} ? 'active' : ''">
+					    	<a class="page-link" th:href="@{/myaccount/follow(page=${i})}" th:text="${i}"></a>
+					    </li>
+					    <li class="page-item" th:if="*{next}">
+					    	<a class="page-link" th:href="@{/myaccount/follow(page=*{endPage+1})}">다음</a>
+					    </li>
+					</ul>
+				</div>
+			</div>	
+		</div>
+		<script th:inline="javascript">
+			function follow_action(fo_id, action){
+				if(action == "views"){
+					window.open('/myaccount/follow/views/' + fo_id, '_blank');
+				} else if(action == "unfollow"){
+					if(!confirm("언팔로우 하시겠습니까?")){
+						alert("언팔로우를 취소하였습니다.");
+						return;
+					}
+					$.ajax({
+						url : '/myaccount/follow/unfollow',
+						method : "post", //원하는 방식 선택
+						data : { //보낸 데이터를 객체로
+							fo_no : fo_id
+						},
+						success : function(data){
+							if(data.res == "success"){
+								$(".fo_" + fo_id).remove();
+							}
+							alert(data.msg);
+						}
+					});
+				}
+			}
+		</script>
+	</main>
+</body>
+</html>

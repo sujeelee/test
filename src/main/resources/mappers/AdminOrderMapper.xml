@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kh.st.boot.dao.AdminOrderDAO">
+
+	<select id="selectAlladminOrder" resultType="admOrderPageVO">
+		SELECT * FROM `order` limit #{pageStart}, #{perPageNum}
+	</select>
+	
+	<select id="selectCountList" resultType="int"> SELECT COUNT(*) FROM `order`</select>
+
+	<select id="searchIdName"
+		resultType="admOrderPageVO">
+		SELECT *
+		FROM `order`
+		WHERE od_name = #{od_name}
+		AND mb_id = #{mb_id} AND od_id = #{od_id}
+	</select>
+	
+
+	<select id="deletOrder" resultType="admOrderPageVO">
+		DELETE 
+		FROM `order`
+		WHERE
+		od_id = #{od_id}
+	</select>
+	
+    <select id="orderSearch" resultType="admOrderPageVO">
+        SELECT * FROM `order`
+        WHERE ${od_sh} LIKE CONCAT('%', #{cri.od_search}, '%')
+        LIMIT #{cri.pageStart}, #{cri.perPageNum}
+    </select>
+    
+    <select id="selectOrderCount" resultType="int">
+        SELECT count(*) FROM `order`
+        WHERE ${od_sh} LIKE CONCAT('%', #{cri.od_search}, '%')
+    </select>
+
+</mapper>

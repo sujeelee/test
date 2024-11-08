@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html 
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout.html}">
+<head>
+<meta charset="UTF-8">
+<title>시드키 : 이벤트 : [[${event.ev_title}]]</title>
+
+
+</head>
+<body>
+	<main layout:fragment="content">
+	
+		<th:block layout:fragment="css">
+			<link rel="stylesheet" th:href="@{/css/eventDetail.css}" >
+		</th:block>
+
+
+		<h2 class="event-title" style="color: dodgerblue;">이벤트</h2>
+    
+		
+		<div class="">
+			
+
+			<div class="event-container">
+				<div class="" style="position: relative;">
+					
+					<div class="tab" style="margin-top: 10px; position: relative;">
+						<span style="font-size: 30px;">
+							<div class="spinner-grow text-muted"></div><strong>&nbsp;&nbsp;[[${event.ev_title}]]</strong>
+							<button class="btn btn-outline-dark" style="position: absolute; text-align: center; right: 0%; top: 38%;"
+							th:onclick="|location.href='@{/event/eventhome/{eventStatus}(eventStatus = ${eventStatus})}'|">이벤트 목록</button>
+						</span>	
+						
+						
+						<p th:if="${eventStatus} != 'resUser'" style="margin-top: 10px; margin-bottom: 10px;"><i class="fa-duotone fa-solid fa-calendar"></i> : [[${#dates.format(event.ev_start, 'yyyy년 MM월 dd일')}]] ~ [[${#dates.format(event.ev_end, 'yyyy년 MM월 dd일')}]]</p>
+						<p th:if="${eventStatus} == 'resUser'" style="margin-top: 10px; margin-bottom: 10px;"><i class="fa-duotone fa-solid fa-calendar"></i> [[${#dates.format(event.ev_end, 'yyyy년 MM월 dd일')}]]</p>
+					</div>
+					
+					<div th:utext="${event.ev_content}"></div>
+
+					<div class="tab" th:if="${event.ev_form} == 'Participatory'" style="text-align: center; ">
+						<a th:href="@{/event/Aevent/{ev_no}(ev_no = ${event.ev_no})}"> ▶이벤트 페이지◀</a>
+					</div>
+
+					<!--/* 로그인을 했고 + 아이디 권한이 9 이상이면 보임 */-->
+					<div class="form-group" sec:authorize="isAuthenticated()" th:if="${#authentication.Principal.member.mb_level} >= 9">
+						<a class="btn btn-outline-secondary" style="position: absolute; right: 1%;"
+						th:href="@{/event/eventUpdate/{eventStatus}/{ev_no}(ev_no = ${event.ev_no}, eventStatus = ${eventStatus})}">수정</a>
+						<button class="btn btn-outline-danger" style="position: absolute; right: 7%;" th:onclick="deleteEventPost()">삭제</button>
+					</div>	
+					<p>&nbsp;</p>
+				</div>
+
+
+			</div>
+
+		</div>
+		<script>
+			function deleteEventPost(){
+				if(confirm("정말 삭제하시겠습니까?")){
+					const eventNumber = "[[${event.ev_no}]]";
+					removeEventPost(eventNumber);
+				} else {
+				}
+			}
+
+
+        function removeEventPost(eventNumber){
+			const eventStatus = "[[${eventStatus}]]"
+            $.ajax({
+                url: '/event/ajax/deleteEventPost',
+                method: 'post',
+                dataType : 'text',
+                data : {ev_no : eventNumber},
+                success: function (data) {
+					alert("삭제 완료")
+                    location.href='/event/eventhome/' + eventStatus;
+                },
+                error: function (data, status, err) {
+                    console.log(data)
+                },
+
+            });
+        }
+		</script>
+
+	</main>
+</body>
+</html>

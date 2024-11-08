@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout.html}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>시드키 : 커뮤니티</title>
+<link rel="stylesheet" type="text/css" th:href="@{/css/stockuser.css}">
+<link rel="stylesheet" type="text/css" th:href="@{/css/stockorder.css}">
+<link rel="stylesheet" type="text/css" th:href="@{/css/community.css}">
+<link rel="stylesheet" type="text/css" th:href="@{/css/stockorder.css}">
+<style type="text/css">
+.blur > div {filter: blur(5px);pointer-events: none;user-select: none;}
+.blind-content{position: relative;top: 37px;left: 36%;color: #c7086c;}
+</style>
+</head>
+<body>
+<main layout:fragment="content">    
+<div th:replace="~{layout/stocksHeader.html}"></div>
+<!--/* 절취선 */-->
+<div class="d-flex">
+    <div class="board-popular-wrapper container">
+        <div class="board-section">
+            <h2 th:text="${stock.st_name} + ' 커뮤니티'"></h2>
+            <!--/* 개시글 작성 */-->
+            <form method="POST" onsubmit="return board_action(this, 'insert')">
+                <div class="board-editor">
+                    <!-- hidden 영역 -->
+                    <input type="hidden" name="wr_category" th:value="${stock.st_code}">
+                    <div class="textarea-container">
+                        <textarea id="wr_content" name="wr_content" rows="4"
+                                  th:placeholder="${not #strings.isEmpty(userInfo) ? '게시글을 입력하세요.' : '로그인 후 이용해 주세요.'}"
+                                  required></textarea>
+                    </div>
+                </div>
+                <div class="board-footer">
+                    <div class="board-button-right">
+                        <button type="submit" class="board-button">
+                            <i class='bx bx-comment' aria-label="본문 남기기"></i>
+                        </button>
+                        
+                    </div>
+                </div>
+            </form>
+            <!--/* 절취선 */-->
+            <div class="boarddivider"></div>
+            <div class="board-none" th:if="${bolist == null or #lists.isEmpty(bolist)}" >
+				<span>아직 게시글이 없습니다. 첫 게시의 영광을 누리세요!</span>
+            </div>
+            <th:block th:each="item : ${bolist} ">
+                <!--/* 게시글 유저정보 + 반복 */-->              
+                <div class="board-header">
+                    <address class="board-author">
+                        <span class="author-name" th:text="${item.mb_nick}?:_"></span>
+                        <span th:class="'member-sticker type-sticker'+${item.mb_level}" th:text="${item.lv_txt}?:_"></span>
+                    </address>
+                </div>                
+                <!--/* 게시글 콘텐츠 */-->
+                <div th:class="${item.wr_blind.equals('Y')} ? 'blur':''">
+	                <span class="blind-content" th:if="${item.wr_blind.equals('Y')}">
+	                	⚠신고로 인하여 게시글이 블라인드처리 되었습니다⚠
+	                </span>
+	                <div class="board-body" th:data-id="${item.wr_no}">
+	                    <p class="board-text" th:text="${item.wr_content}?:_"></p>
+	                    <button class="follower-btn" th:data-mbid="${item.mb_id}"
+				        th:if="${item.mb_id != userInfo}"
+				        th:classappend="${#strings.equals(item.following, 'y')} ? 'follower' : ''"
+				        onclick="follower(this)"
+				        th:text="${#strings.equals(item.following, 'y')} ? '팔로우' : '언팔로우'"></button>                  
+	                    <button class="btn-save" style="display:none; margin-top: auto;"
+	                    th:attr="data-wr-no=${item.wr_no}"                     
+	            		onclick="board_action(this.closest('.board-body'), 'update')">
+	                    <i class='bx bx-edit-alt'></i>
+	                    </button>
+	               </div>
+	                <!--/* 게시글 추천, 신고 */-->
+	                <div class="board-footer" id="board-footer">
+	                	<!--/* 게시글 수정 버튼 */-->
+						<button class="btn-retouch"
+							th:if="${userInfo != null and item.mb_id == userInfo}"
+							th:onclick="'enableEditMode(' + ${item.wr_no} + ', \'post\',this)'">
+							<i class='bx bx-edit-alt'></i>
+	                    </button>
+	                    <!--/* 게시글 삭제 버튼 */-->
+	                    <button class="btn-delete" 
+	                    	th:if="${userInfo != null and item.mb_id == userInfo}"
+	                    	th:attr="data-wr-no=${item.wr_no}"
+	                    	onclick="board_action(this, 'delete')">
+	                    	<i class='bx bx-message-rounded-x'></i>                        
+	                    </button>                   
+	                    <!--/* 게시글 좋아요 버튼 */-->  
+	                    <button class="btn-like"
+							th:attr="data-no=${item.wr_no}, data-action='like', data-type='board'"
+	                    	th:onclick = "action(this)">
+	                        <i class='bx bxs-heart' th:classappend="${item.cg_like}"></i>
+	                        <span class="action-count" th:text="${item.wr_good}"></span>
+	                    </button>
+	                    <!--/* 게시글 싫어요 버튼 */-->
+	                    <button class="btn-report"
+	                    	th:attr="data-no=${item.wr_no}, data-action='report', data-type='board'"
+	                    	th:onclick = "action(this)">
+	                        <i class='bx bx-x-circle' th:classappend="${item.cg_report}"></i>
+	                        <span class="action-count" th:text="${item.wr_singo}"></span>
+	                    </button>                   
+	                </div>
+	                <!--/* 댓글 버튼 */-->
+	                <div class="dreply-btn">
+	                    <button class="reply-btn" type="button"
+	                    data-toggle="collapse" th:data-target="'#commentColl' + ${item.wr_no}" 
+	                    th:onclick="replace_comment([[${item.wr_no}]]);">
+	                        <i class='bx bx-comment'></i>                                
+		                    <span th:id="'commentCount'+${item.wr_no}" class="comment-count" th:text="${item.wr_comment}"></span>
+	                    </button>
+	                    <!--/* 댓글 count */-->
+	                </div>
+                </div>
+                <!--/* 댓글 each */-->
+                <div th:id="'commentColl' + ${item.wr_no}" class="collapse comment">                        
+                    <!--/* 댓글 작성 */-->
+                    <div class="input-group">
+                        <input type="text"
+                        	   th:placeholder="${not #strings.isEmpty(userInfo) ? '댓글을 입력하세요.' : '로그인 후 이용해 주세요.'}"
+                        	   class="comment-input">
+                        <div class="input-group-append">                    
+                            <button type="button" class="btn comment-btn"
+                            th:attr="data-wr-no=${item.wr_no}"
+                            th:data-comment-count="${item.wr_comment}"
+                            onclick="comment_action(this, 'insertComment')"
+                            >등록</button>
+                        </div>
+                    </div> 
+                    <!--/* colist 반복 할 구간 + replaced 할 공간 */-->
+                    <div th:id="'replace_comment' + ${item.wr_no}" class="comment_item"></div>
+                    <!--/* colist 반복 할 구간 종료 */-->
+                </div>                
+                <div class="boarddivider"></div>
+            </th:block>
+            <!--/* 게시글 Done */-->
+        </div>
+    </div>
+    <div class="popular-stocks">
+        <span>인기 급상승 주식</span>
+        <div class="div-ul">
+            <ul class="stock-list">
+                <li th:each="stock : ${top10}" class="stockItem">
+                	<a class="comm-stock-hots" th:href="@{/stock/} + ${stock.code}" target="_blank">
+	                    <h3 th:text="${stock.ranks} + ' ' + ${stock.st_name}"></h3>
+	                </a>
+	                <p th:text="${#numbers.formatInteger(stock.price, 0, 'COMMA')} + '원'"></p>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <section class="order-section">
+        <div th:replace="~{layout/stocksOrder.html}"></div>
+    </section>
+</div>
+<input th:id="mb_id" type="hidden" th:value="${not #strings.isEmpty(userInfo) ? userInfo : ''}">
+<script th:inline="javascript">
+const st_code = /*[[${stock.st_code}]]*/ '';
+const mb_id = /*[[${member.mb_id}]]*/ '';
+
+function follower(button) {
+	
+    const mb_id = $(button).data("mbid");
+    var thisBtn = button;
+    
+    let url = "/stock/" + st_code + "/community/followorNot";
+    var button = $(this);
+    $.ajax({
+        url: url, 
+        type: "POST",
+        async: false,
+        data: { fo_mb_id: mb_id },
+        success: function(response) {
+	       	alert(response.msg);
+	       	
+	       	var color = '';
+	    	if(response.text == '팔로우 중'){
+	    		color = 'grey';
+	    	}
+			$(thisBtn).text(response.text).css('background-color', color);
+        },
+        error: function(xhr, status, error) {
+            alert("오류가 발생했습니다. 다시 시도해주세요.");
+        }
+    });
+}
+function board_action(form, type) {
+    let url = "/stock/" + /*[[${stock.st_code}]]*/ '';
+    var param;
+    if (type == "insert") {
+        url += "/community/insert";
+        param = $(form).serialize();
+    } else if (type == "delete") {
+        url += "/community/delete";
+        var no = $(form).data('wr-no');
+        param = { wr_no: no };
+    } else if (type == "update") {
+        url += "/community/update";
+        var no = $(form).find('.btn-save').data('wr-no');
+        const updatedContent = $(form).find('.edit-input').val();
+        param = { wr_no: no, wr_content: updatedContent };
+    }
+    $.ajax({
+        url: url,
+        type: "post",
+        data: param,
+        async: false, // false : 비동기 / true : 동기
+        success: function(data) {
+            if (data.res === "true") {
+                location.href = location.href; 
+            } else {
+                alert(data.msg);
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.error("AJAX 오류:", textStatus, errorThrown);
+            alert("댓글 등록 중 오류가 발생했습니다. 나중에 다시 시도해 주세요.");
+        }
+    });
+    return false;
+}
+
+function enableEditMode(id, type, button) {
+    let target, content;
+    if (type === "post") {
+        target = $(`.board-body[data-id="${id}"]`);
+        content = target.find(".board-text");
+    } else if (type === "comment") {
+        target = $(`.comment-body[data-coid="${id}"]`);
+        content = target.find(".comment-text");
+    }
+    if (content) {
+        const currentText = content.text();
+        content.html(`<textarea class="edit-input" rows="4">${currentText}</textarea>`);
+        $(button).hide();
+        target.find(".btn-save").show(); 
+    }
+}
+
+function comment_action(button, type) {
+    let url = "/stock/" + /*[[${stock.st_code}]]*/ '';
+    var param;
+    
+    if (type == "insertComment") {
+        url += "/community/insertComment";
+        var content = $(button).closest('.input-group').find('.comment-input').val();
+        var no = $(button).data('wr-no');
+        param = { co_content: content, wr_no: no };
+        if (content.trim() === '') {
+            alert('댓글을 입력하세요.');
+            return;
+        }
+    } else if (type == "deleteComment") {
+        url += "/community/deleteComment";
+        var no = $(button).data('wr-no');
+        var coId = $(button).data('co-id');
+        param = { wr_no: no, co_id: coId };
+    } else if (type == "updateComment") {
+        url += "/community/updateComment";
+        var no = $(button).data('wr-no');
+        var coId = $(button).data('co-id');
+        const updatedContent = $(button).closest('.comment-body').find('.edit-input').val();
+        param = { wr_no: no, co_id: coId, co_content: updatedContent };
+    }
+    
+    $.ajax({
+        url: url,
+        type: "post",
+        data: param,
+        async: false, // false : 비동기 / true : 동기
+        success: function(data) {
+            if (data.res === "true") {
+                // 댓글 입력 필드 초기화
+                if (type == "insertComment") {
+                    $(button).closest('.input-group').find('.comment-input').val('');
+                    let addText = parseInt($('#commentCount' + $(button).data('wr-no')).text());
+                    $('#commentCount' + $(button).data('wr-no')).text(addText + 1);
+                } else if (type == "deleteComment") {
+                    $(button).closest('.comment-header').parent().remove(); // 삭제 후 댓글 요소 제거
+                    let addText = parseInt($('#commentCount' + $(button).data('wr-no')).text());
+                    $('#commentCount' + $(button).data('wr-no')).text(addText - 1);
+                }
+                replace_comment(no); 
+            } else {
+                alert(data.msg);
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.error("AJAX 오류:", textStatus, errorThrown);
+            alert("댓글 등록 중 오류가 발생했습니다. 나중에 다시 시도해 주세요.");
+        }
+    });
+    return false;    
+}
+
+function replace_comment(wr_no) {
+    let url = "/stock/" + /*[[${stock.st_code}]]*/ '';
+    url += "/community/replaceComment";
+
+    const commentData = { wr_no: wr_no }; // 댓글 ID로 section을 사용
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: commentData,
+        success: function(data) {
+            $('#replace_comment' + wr_no).html(data);
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.error("댓글 목록 갱신 오류:", textStatus, errorThrown);
+            alert("댓글 목록을 갱신하는 중 오류가 발생했습니다. 나중에 다시 시도해 주세요.");
+        }
+    });
+}
+
+function action(button) {
+	
+    let no = button.getAttribute('data-no');
+    const action = button.getAttribute('data-action');
+    const type = button.getAttribute('data-type');
+    
+    let url = "/stock/" + /*[[${stock.st_code}]]*/ ''; // 주식 코드 추가
+    url += "/community/action";
+    var feel = {
+       	 cg_num: no,
+         action: action,
+         cg_type : type
+    };
+    $.ajax({
+        type: "POST",
+        url: url,
+        contentType: "application/json",
+        data: JSON.stringify(feel),
+        dataType : "json", 
+        success: function(data) {
+        	if(data.res == '401' ){
+                alert(data.msg);
+                return;
+            } else if (data.res == '200') {
+            	var regex = /[^0-9]/g; //숫자만 정규식 변수
+            	//현재 클릭한 요소의 count값을 받아와 int로 형변환
+            	var org_cnt = parseInt($(button).find(".action-count").text().replace(regex, ""));
+            	
+            	//active가 있으면 지우고 없으면 생성하고 그거에 따른 계산을 시도
+                if(type === "comment" && action === "like"){
+                    if($('#comment-like' + no).hasClass("active")){
+                        $('#comment-like' + no).removeClass("active")
+                        $('#comment-like' + no).parent().find("span").text(addCommas(org_cnt - 1))
+                    } else {
+                        $('#comment-like' + no).addClass("active")
+                        $('#comment-like' + no).parent().find("span").text(addCommas(org_cnt + 1))
+                    }
+                }
+
+                if(type === "comment" && action === "report"){
+                    if($('#comment-report' + no).hasClass("active")){
+                        $('#comment-report' + no).removeClass("active")
+                        $('#comment-report' + no).parent().find("span").text(addCommas(org_cnt - 1))
+                    } else {
+                        $('#comment-report' + no).addClass("active")
+                        $('#comment-report' + no).parent().find("span").text(addCommas(org_cnt + 1))
+                    }
+                }
+
+
+                if(type === "board"){
+
+                    if($(button).find("i").hasClass("active")){
+                        org_cnt -= 1;
+                        $(button).find(".action-count").text(addCommas(org_cnt));
+                        $(button).find("i").removeClass("active");
+                    } else {	    
+                        org_cnt += 1;
+                        $(button).find(".action-count").text(addCommas(org_cnt));
+                        $(button).find("i").addClass("active");
+                    } 
+
+                }
+
+
+            	alert("정상적으로 처리되었습니다.");
+            } else if (data.res === '204') {
+                alert("처리 완료, 변화 없음."); // 빈 알림 대신 명확한 메시지로 수정
+            } else {
+                alert("예상치 못한 응답이 발생했습니다.");
+            }
+        }	
+    });
+}
+
+</script>
+</main>
+</body>
+</html>

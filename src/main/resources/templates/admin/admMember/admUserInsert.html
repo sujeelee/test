@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/admlayout.html}" layout:fragment="content">
+<head>
+<link href="/css/admhome.css" rel='stylesheet'>
+<meta charset="UTF-8">
+<title>관리자 페이지</title>
+</head>
+<body>
+	<div id="wrapper">
+		<div id="container">
+			<h1 id="container_title">회원 정보 등록</h1>
+			<div id="container_main" class="content">
+				<section>
+					<h2 id="main_h2">회원 정보 상세 페이지</h2>
+					<div class="tbl_main">
+						<form action="/admin/admMember/admUserInsert/AdminUserInsert"
+							method="post" id='form' onsubmit="return validateForm()">
+							<table>
+								<colgroup>
+									<col class="grid_4">
+									<col>
+									<col class="grid_4">
+									<col>
+								</colgroup>
+								<tbody>
+									<tr>
+										<th><label for="id">회원 아이디</label></th>
+										<td><input type="text" name="mb_id" id="mb_id" required
+											placeholder="아이디는 영문, 숫자 6~13자" class="menu_input" size="40">
+											<button type="button" id="idCheckBtn"
+												style="height: 30px; width: 130px;"
+												class="btn_submit btn btn_pw">아이디 중복 확인</button> <span
+											id="idCheckBtnY"
+											style="color: red; display: none; margin-top: 4px;">중복된
+												아이디입니다.</span> <span id="idCheckBtnN"
+											style="color: green; display: none; margin-top: 4px;">사용
+												가능한 아이디입니다.</span></td>
+									</tr>
+									<tr>
+										<th><label for="pw">비밀번호</label></th>
+										<td><input type="password" name="mb_password" id="pw"
+											required placeholder="영문, 숫자, 특수문자(!@#$) 6~15자"
+											class="menu_input" size="40"></td>
+									</tr>
+									<tr>
+										<th><label for="pw2">비밀번호 확인</label></th>
+										<td><input type="password" name="mb_password2" id="pw2"
+											required placeholder="영문, 숫자, 특수문자(!@#$) 6~15자"
+											class="menu_input" size="40"></td>
+									</tr>
+									<tr>
+										<th><label for="name">회원 이름</label></th>
+										<td><input type="text" name="mb_name" id="name" required
+											class="menu_input" size="40"></td>
+									</tr>
+									<tr>
+										<th><label for="nick">회원 닉네임</label></th>
+										<td><input type="text" name="mb_nick" id="nick" required
+											placeholder="닉네임은 한글, 영문, 숫자 6~13자" class="menu_input"
+											size="40"></td>
+									</tr>
+									<tr>
+										<th><label for="ph">회원 전화번호</label></th>
+										<td><input type="text" name="mb_ph" id="ph" required
+											placeholder="010-XXXX-XXXX 형식" class="menu_input" size="40"></td>
+									</tr>
+									<tr>
+										<th><label for="email">회원 이메일</label></th>
+										<td><input type="text" name="mb_email" id="email"
+											required class="menu_input" size="40"></td>
+									</tr>
+									<tr>
+										<th><label>주소</label></th>
+										<!-- 우편번호와 기본주소 사이 간격 조정 가능한지~~? -->
+
+										<td><input type="text" name="mb_zip"
+											onclick="sample3_execDaumPostcode()" id="sample3_postcode"
+											required class="menu_input" size="40"
+											style="margin-bottom: 4px" placeholder="우편번호"> <input
+											type="text" id="sample3_address" name="mb_addr2"
+											placeholder="주소" required class="menu_input" size="40"
+											style="margin-bottom: 4px"> <input type="text"
+											id="sample3_detailAddress" name="mb_addr" class="menu_input"
+											size="87" placeholder="상세주소" required> <input
+											type="hidden" id="sample3_extraAddress" name="addr2"
+											placeholder="참고항목" readonly>
+											<button type="button" class="zip_btn"
+												onclick="sample3_execDaumPostcode()">우편번호 찾기</button>
+											<div id="wrap"
+												style="display: none; border: 1px solid; width: 100%; height: 100%; margin: 5px 0; position: relative">
+												<img
+													src="//t1.daumcdn.net/postcode/resource/images/close.png"
+													id="btnFoldWrap"
+													style="cursor: pointer; position: absolute; right: 0px; top: -1px; z-index: 1"
+													onclick="foldDaumPostcode()" alt="접기 버튼">
+											</div></td>
+									</tr>
+									<tr>
+										<th><label for="birth">생년월일</label></th>
+										<td><input type="text" name="mb_birth" id="birth"
+											required placeholder="YYYY-MM-DD 형식" class="menu_input"
+											size="40"></td>
+									</tr>
+									<tr>
+										<th><label for="lvl">회원 레벨</label></th>
+										<td><select name="mb_level" class="menu_input">
+												<option th:if="${level == null}" disabled selected>레벨
+													설정</option>
+												<option th:each="i : ${#numbers.sequence(1, 10)}"
+													th:value="${i}" th:text="${i}"></option>
+										</select></td>
+									</tr>
+									<tr>
+										<th><label>이메일수집동의여부</label></th>
+										<td><input type="checkbox" name="mb_emailing_test"
+											class="menu_input" size="1">사용 여부</td>
+									</tr>
+								</tbody>
+							</table>
+							<div class="btn_fixed_top btn_confirm">
+								<input type="submit" value="확인" class="btn_submit btn">
+							</div>
+						</form>
+					</div>
+				</section>
+			</div>
+			<footer id="ft">
+				<p>Copyright © demo.sir.kr. All rights reserved.</p>
+				<br>
+			</footer>
+		</div>
+
+		<script
+			src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+		<script>
+			// 우편번호 찾기 찾기 화면을 넣을 element
+			var element_wrap = document.getElementById('wrap');
+
+			function foldDaumPostcode() {
+				// iframe을 넣은 element를 안보이게 한다.
+				element_wrap.style.display = 'none';
+			}
+
+			function sample3_execDaumPostcode() {
+				// 현재 scroll 위치를 저장해놓는다.
+				var currentScroll = Math.max(document.body.scrollTop,
+						document.documentElement.scrollTop);
+				new daum.Postcode(
+						{
+							oncomplete : function(data) {
+								// 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+
+								// 각 주소의 노출 규칙에 따라 주소를 조합한다.
+								// 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+								var addr = ''; // 주소 변수
+								var extraAddr = ''; // 참고항목 변수
+
+								//사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
+								if (data.userSelectedType === 'R') { // 사용자가 도로명 주소를 선택했을 경우
+									addr = data.roadAddress;
+								} else { // 사용자가 지번 주소를 선택했을 경우(J)
+									addr = data.jibunAddress;
+								}
+
+								// 사용자가 선택한 주소가 도로명 타입일때 참고항목을 조합한다.
+								if (data.userSelectedType === 'R') {
+									// 법정동명이 있을 경우 추가한다. (법정리는 제외)
+									// 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
+									if (data.bname !== ''
+											&& /[동|로|가]$/g.test(data.bname)) {
+										extraAddr += data.bname;
+									}
+									// 건물명이 있고, 공동주택일 경우 추가한다.
+									if (data.buildingName !== ''
+											&& data.apartment === 'Y') {
+										extraAddr += (extraAddr !== '' ? ', '
+												+ data.buildingName
+												: data.buildingName);
+									}
+									// 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
+									if (extraAddr !== '') {
+										extraAddr = ' (' + extraAddr + ')';
+									}
+									// 조합된 참고항목을 해당 필드에 넣는다.
+									document
+											.getElementById("sample3_extraAddress").value = extraAddr;
+
+								} else {
+									document
+											.getElementById("sample3_extraAddress").value = '';
+								}
+
+								// 우편번호와 주소 정보를 해당 필드에 넣는다.
+								document.getElementById('sample3_postcode').value = data.zonecode;
+								document.getElementById("sample3_address").value = addr;
+								// 커서를 상세주소 필드로 이동한다.
+								document
+										.getElementById("sample3_detailAddress")
+										.focus();
+
+								// iframe을 넣은 element를 안보이게 한다.
+								// (autoClose:false 기능을 이용한다면, 아래 코드를 제거해야 화면에서 사라지지 않는다.)
+								element_wrap.style.display = 'none';
+
+								// 우편번호 찾기 화면이 보이기 이전으로 scroll 위치를 되돌린다.
+								document.body.scrollTop = currentScroll;
+							},
+							// 우편번호 찾기 화면 크기가 조정되었을때 실행할 코드를 작성하는 부분. iframe을 넣은 element의 높이값을 조정한다.
+							onresize : function(size) {
+								element_wrap.style.height = size.height + 'px';
+							},
+							width : '100%',
+							height : '100%'
+						}).embed(element_wrap);
+
+				// iframe을 넣은 element를 보이게 한다.
+				element_wrap.style.display = 'block';
+			}
+		</script>
+		<script>
+			let isIdChecked = false; // 아이디 중복 확인 여부를 저장하는 전역 변수
+
+			function validateForm() {
+				// 정규식 패턴 설정
+				const idPattern = /^[a-zA-Z0-9]{4,20}$/; // 아이디: 영문 또는 숫자 4~20자
+				const passwordPattern = /^(?=.*[!@#$])(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$]{8,}$/; // 비밀번호: 최소 8자, 문자 및 숫자 포함
+				const phonePattern = /^01[016789]-\d{3,4}-\d{4}$/; // 전화번호: 한국 전화번호 형식 (예: 010-1234-5678)
+				const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // 이메일: 일반 이메일 형식
+				const datePattern = /^\d{4}-\d{2}-\d{2}$/; // 생년월일: YYYY-MM-DD 형식
+
+				// 입력 필드 값 가져오기
+				const id = document.getElementById("mb_id").value;
+				const password = document.getElementById("pw").value;
+				const passwordConfirm = document.getElementById("pw2").value;
+				const phone = document.getElementById("ph").value;
+				const email = document.getElementById("email").value;
+				const birth = document.getElementById("birth").value;
+
+				// 아이디 검증
+				if (!idPattern.test(id)) {
+					alert("아이디는 영문 또는 숫자로 4~20자 입력 가능합니다.");
+					return false;
+				}
+
+				// 아이디 중복 확인 여부 검증
+				if (!isIdChecked) {
+					alert("아이디 중복 확인을 해주세요.");
+					return false;
+				}
+
+				// 비밀번호 검증
+				if (!passwordPattern.test(password)) {
+					alert("비밀번호는 최소 8자, 문자 및 숫자를 포함해야 합니다.");
+					return false;
+				}
+
+				// 비밀번호 확인 검증
+				if (password !== passwordConfirm) {
+					alert("비밀번호가 일치하지 않습니다. 다시 확인해주세요.");
+					return false;
+				}
+
+				// 전화번호 검증
+				if (!phonePattern.test(phone)) {
+					alert("전화번호는 형식에 맞게 입력하세요 (예: 010-1234-5678).");
+					return false;
+				}
+
+				// 이메일 검증
+				if (!emailPattern.test(email)) {
+					alert("올바른 이메일 형식이 아닙니다.");
+					return false;
+				}
+
+				// 생년월일 검증
+				if (!datePattern.test(birth)) {
+					alert("생년월일은 YYYY-MM-DD 형식으로 입력하세요.");
+					return false;
+				}
+
+				return true; // 모든 검증 통과 시 폼 제출 허용
+			}
+		</script>
+
+		<script
+			src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+		<script>
+			$(document).ready(function() {
+				$("#idCheckBtn").click(function() {
+					const mb_id = $("#mb_id").val();
+
+					$.ajax({
+						type : "POST",
+						url : "/admin/admMember/admUserSelect/searchid",
+						contentType : "application/json",
+						data : JSON.stringify({
+							mb_id : mb_id
+						}),
+						dataType : "json",
+						success : function(data) {
+							if (data === 0) {
+								$("#idCheckBtnN").show();
+								$("#idCheckBtnY").hide();
+								isIdChecked = true; // 중복 확인 통과 시 true로 설정
+							} else {
+								$("#idCheckBtnY").show();
+								$("#idCheckBtnN").hide();
+								isIdChecked = false; // 중복일 경우 false로 설정
+								alert("이미 사용 중인 아이디입니다.");
+							}
+						}
+					});
+				});
+			});
+		</script>
+
+	</div>
+
+</body>
+</html>

@@ -1,0 +1,38 @@
+@charset "UTF-8";
+
+.center{text-align: center; margin-bottom: 3%; margin-top: 2%;}
+.div-deposit-send {display: flex;flex-direction: column;align-items: center;width: 100%;}
+.account-input{display: flex;align-items: center;margin-top: 2%;position: relative;}
+.account-title{margin-bottom: 5px;}
+.start-acc{font-size: 20px;color:#17a2b8;}
+.account-control{display: block;height: calc(1.5em + .75rem + 2px);padding: .375rem  .75rem;font-size: 1.1rem;border: none;border-bottom: 1px solid #17a2b8;}
+.account-control:focus-visible{outline: none;}
+.btn:focus{box-shadow: none !important;}
+button.start-acc{position: absolute; top: 5px;bottom: 5px;right: 0;}
+.msg-error{color: red;}
+.msg-success{color: #17a2b8;}
+input:disabled {color: #17a2b8;background-color: #fff;}
+.resv-name{font-size: 18px;}
+.resv_acc:not(.non-color), .last-left-resv{color: #96a2a3;}
+.account-tiny{cursor:pointer; text-align: center;white-space: nowrap;width: 75%;background-color: #e9f5f7;border-radius: 20px;padding: 2%;}
+.last-account-row{text-align: center;width: 350px;margin-bottom: 7%;}
+.last-account-row > div > .resv-name{color: #17a2b8;}
+.last-member-views{display: flex;justify-content: space-between;margin-top: 20%;margin-bottom: 2%}
+.last-right{text-align: right;}
+.last-left{text-align: left;}
+.last-account-member{font-size: 20px !important;}
+.form-footer > button{width: 100%;}
+.center > .btn-outline-info:not(.form-footer > button){width: 80%;}
+.last-fake-click{cursor: pointer;}
+.xmark{right: 40px !important;}
+.last-change-input{margin-top: 0 !important; margin-bottom: 1%;}
+.last-send-name{margin-right: 2%;}
+.tooltip-inner{background-color: #17a2b8 !important;}
+.tooltip > .arrow:before {border-top-color: #17a2b8 !important;}
+.btn > i{color: #17a2b8 !important;}
+.account-row  > div:not(.last-member-views) {margin-top: 3%;}
+.account-row {margin-top: 3%;}
+.prev-arrow{font-size: 30px; color: #17a2b8; margin-top: 5%; margin-left: 1%;cursor: pointer;}
+.account-chk, .resv-chk{margin-top: 5%;}
+.send-end{margin-top: 15%}
+.now-deposit{margin-bottom: 2%;margin-top: 5%;}

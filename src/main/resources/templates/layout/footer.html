@@ -1,0 +1,95 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <footer th:fragment="footer">
+    <style>	
+		  main{min-height: calc(100vh - 10rem) !important; /* footer 높이를 빼준다. */}
+		  footer {
+            height: 10rem;
+            left: 0;
+            width: 100%;
+            background-color: white; /* 배경색 설정 */
+            color: #888888;; /* 텍스트 색상 */
+            text-align: center;
+            display: flex; /* Flexbox를 사용하여 정렬 */
+            flex-direction: column; /* 세로 방향으로 정렬 */
+            align-items: center; /* 가로 중앙 정렬 */
+            justify-content: center; /* 세로 중앙 정렬 */
+            padding: 10px; /* 패딩 추가 */
+            font-size: 14px; /* 글자 크기 조정 */
+            z-index: 5;
+            margin-bottom: 2%;
+		  }
+		  
+	        .footer-info {
+	            margin: 10px 0; /* 위 아래 여백 */
+	        }
+	
+	        .footer-links {
+	            margin: 20px 0; /* 링크 간격 */
+	        }
+	
+			/* 기본 글씨 색상 회색 */
+			.footer-links a {
+			  font-size: 12px;
+			  color: #888888; /* 회색 */
+			  text-decoration: none;
+			  padding: 10px;
+			}
+			
+			/* 마우스 호버 시 검은색으로 변경 */
+			.footer-links a:hover {
+			  color: #000000; /* 검은색 */
+			  padding: 10px;
+			}
+			.footer-links a:hover:not(.footer-logo-a){
+				border-bottom: 2px solid #096c8a; /* 밑줄 */
+			}
+			.company-info {
+            display: flex; /* Flexbox를 사용하여 가로 방향으로 정렬 */
+            justify-content: center; /* 중앙 정렬 */
+            margin-top: 10px; /* 위쪽 여백 */
+            flex-wrap: wrap; /* 줄 바꿈 허용 */
+	        }
+	
+	        .company-info p {
+	            margin: 0 10px; /* 좌우 여백 */
+	        }
+	        .footerdivider {
+			    border-top: 2px solid #ccc; /* 줄 두께와 색상 */
+			    margin: 20px 0; /* 위 아래 여백 */
+			    width: 50%; /* 선의 길이를 50%로 설정 */
+			    margin-left: auto; /* 왼쪽 여백을 자동으로 설정 */
+			    margin-right: auto; /* 오른쪽 여백을 자동으로 설정하여 중앙 정렬 */
+		    }
+	</style>
+	<div class="container">
+	<div class="footerdivider"></div> <!-- 줄 추가 -->
+	<div class="footer-links" style="display: flex; align-items: center; margin-left: 24%;">
+	        <a th:href="@{/terms/privacy}" target="_blank">개인정보 처리방침</a>
+	        <span>|</span>
+	        <a th:href="@{/terms/stock}" target="_blank">투자 유의사항</a>
+	        <span>|</span>
+	        <a th:href="@{/terms/info}" target="_blank">이용약관</a>
+	        <span>|</span>
+	        <a th:href="@{/terms/noemail}" target="_blank">이메일 무단수집거부</a>
+	        <span>|</span>
+	        <a th:href="@{/terms}" target="_blank">처리방침 리스트</a>
+	        <span>|</span>
+	        <a th:href="@{/}" class="footer-logo-a">
+		        <span th:text="${config.cf_title}"></span>
+		        <img alt="로고" th:src="@{/img/long_logo.png}" height="50px;" style="margin-left: 8px;">
+	        </a>
+	</div>
+	    <div class="footer-company-info">
+	        <span th:text="'대표 이메일 : ' + ${config.cf_email}"></span>
+	        <span th:text="'대표 : ' + ${config.cf_owner_name}"></span>
+	        <span th:text="'주소 : ' + ${config.cf_zip} + ' ) ' + ${config.cf_addr} + ' ' + ${config.cf_addr2}"></span>
+	        <span th:text="'고객센터 : ' + ${config.cf_tel}"></span>
+	    </div>
+	<div class="footer-disclaimer">
+	    <span th:text="${config.cf_title} + '증권에서 제공하는 투자 정보는 고객의 투자 판단을 위한 단순 참고용일 뿐, 투자 제안 및 권유, 종목 추천을 위해 작성된 것이 아닙니다.'"></span>
+    </div>
+    </div>
+    </footer>
+</body>
+</html>

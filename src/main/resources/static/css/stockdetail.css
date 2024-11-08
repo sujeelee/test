@@ -1,0 +1,88 @@
+@charset "UTF-8";
+
+main{margin: 1%; margin-left: 100px;}
+
+.cmcontainer {
+	display: flex;
+	justify-content: space-between; /* 왼쪽과 오른쪽 섹션을 나눔 */
+	align-items: flex-start; /* 상단 정렬 */
+}
+
+.stock-info {
+  flex-basis: 50%; /* 왼쪽 섹션이 차지할 비율 */
+}
+
+.details-right {
+	display: flex;
+	flex-direction: row; /* 세로 방향으로 배치 */
+	gap: 10px; /* 세부 항목과 버튼 사이의 간격 */
+	color: gray; /* 텍스트 색상을 회색으로 설정 */
+}
+.details {
+	display: flex;
+	flex-direction: row; /* 세부 항목을 세로로 나열 */
+	color: gray; /* 텍스트 색상을 회색으로 설정 */
+}
+
+.detail {
+	display: flex;
+	flex-direction: column; /* 라벨과 값을 가로로 배치 */
+	justify-content: space-between; /* 라벨과 값을 양쪽 끝으로 배치 */
+	padding: 5px; /* 패딩으로 요소 간격 조정 */
+	border-left: 1px solid #e0e0e0; 
+	align-items: center; /* 수직 정렬 */
+	width: 100px; /* 원하는 너비로 설정 (예: 200px) */
+	color: gray; /* 텍스트 색상을 회색으로 설정 */
+}
+
+.label {
+	font-weight: 400; /* 라벨 굵게 설정 */
+	color: #555; /* 라벨 색상 설정 */
+	font-size: 12px; /* 텍스트 크기 조정 (예: 12px) */
+	color: gray; /* 텍스트 색상을 회색으로 설정 */
+}
+
+.value {
+	font-weight: bold; /* 값 굵게 설정 */
+	color: #333; /* 값 색상 설정 */
+	font-size: 14px; /* 텍스트 크기 조정 (예: 14px) */
+	color: gray; /* 텍스트 색상을 회색으로 설정 */
+}
+
+.buttons {
+	display: flex;
+	gap: 5px; /* 버튼 간의 간격 */
+	margin-right: 20px;
+}
+
+.button-icon {
+	padding: 10px 10px; /* 상하 5px, 좌우 10px로 줄이기 */
+	font-size: 20px; /* 버튼 텍스트 크기 조정 (예: 12px) */
+	border: none; /* 필요에 따라 테두리 제거 */
+	border-radius: 3px; /* 모서리 둥글게 */
+	cursor: pointer; /* 포인터 커서로 변경 */
+	background-color: #fff;
+}
+
+.icon-watch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+}
+
+li{cursor:pointer; color:#0c5460 !important;}
+.list-group-item{border:none !important;padding: .3rem 0.25rem !important;}
+.dropdown-item > .on{color:#0c5460 !important;}
+.dropdown-item > .on:after {content: " ν";}
+.dropdown-menu{min-width: 1em !important;}
+.dropdown-item{padding: 1px !important;}
+li > a > .btn:not(.heart){width: 100% !important; text-align: left; border-radius: 20px;}
+.stock-name{font-size: 1.2em; font-weight: bold;}
+.stock-before, .red:before {content: '+';}
+.stock-price{font-size: 1.8em !important; font-weight: bold;}
+.stock-info-price{font-size: 0.8em;}
+.grey{color: #d4d4d4;}
+.pink{color: #f54747;}
+.blue{color: blue;}
+.red{color: red;}
+.hold{color: #888;}

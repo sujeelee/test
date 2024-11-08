@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/admlayout.html}" layout:fragment="content">
+<head>
+<link href="/css/admmember.css" rel='stylesheet'>
+<meta charset="UTF-8">
+<title>관리자 페이지</title>
+</head>
+<body>
+	<div id="wrapper">
+		<div id="container" class="ulul">
+			<h1 id="container_title">회원 관리 페이지</h1>
+			<div id="container_main" class="content">
+				<!-- 검색기능 form -->
+				<div id="select_left">
+					<form action="/admin/admMember/adminUser/userSearch" method="get"
+						class="local_sch" onsubmit="return unableform()">
+						<select name="use_sh" style="height: 25px">
+							<option value="mb_id">회원아이디</option>
+							<option value="mb_name">회원이름</option>
+							<option value="mb_nick">회원닉네임</option>
+						</select> <input type="text" name="search" required class="in_sch" id="use_sh"
+							style="height: 25px" th:placeholder="${search}">
+						<button type="submit" class="btn_submit btn in_sch">검색</button>
+						<a type="submit" th:href="@{/admin/admMember/admUserInsert}"
+							class="btn_submit btn btn_ateg">추가</a>
+					<a type="submit" href="/admin/admMember/adminUser" class="btn_submit btn btn_a" style="padding-top: 5px;">초기화</a>
+					</form>
+				</div>
+				<table>
+					<thead>
+						<tr>
+							<th class="use_th">아이디</th>
+							<th class="use_th">이름</th>
+							<th class="use_th">닉네임</th>
+							<th class="use_th">전화번호</th>
+							<th class="use_th">레벨</th>
+							<th class="use_th">가입일</th>
+							<th class="use_th">수정일</th>
+							<th class="use_th">정지일</th>
+							<th class="use_th">관리</th>
+						</tr>
+					</thead>
+					<tbody>
+						<!-- 값 불러오기 -->
+						<tr th:each="user : ${user}">
+							<td th:text="${user.mb_id}" class="use_td"></td>
+							<td th:text="${user.mb_name}" class="use_td"></td>
+							<td th:text="${user.mb_nick}" class="use_td"></td>
+							<td th:text="${user.mb_ph}" class="use_td"></td>
+							<td th:text="${user.mb_level}" class="use_td"></td>
+							<td th:text="${#dates.format(user.mb_datetime, 'yyyy-MM-dd')}"
+								class="use_td"></td>
+							<td th:text="${#dates.format(user.mb_edit_date, 'yyyy-MM-dd')}"
+								class="use_td"></td>
+							<td th:text="${#dates.format(user.mb_stop_date, 'yyyy-MM-dd')}"
+								class="use_td"></td>
+							<td class="use_td_set">
+								<form action="/admin/admMember/admUserSelect" method="post"
+									class="use_form">
+									<input type="hidden" name="mb_no" th:value="${user.mb_no}" />
+									<input type="submit" value="수정" class="btn_submit btn "
+										onclick="location.href='/admin/admMember/admUserSelect'">
+								</form>
+								<form action="/admin/admMember/adminUser/delete" method="post"
+									class="use_form">
+									<input type="hidden" name="mb_no" th:value="${user.mb_no}" />
+									<input type="submit" value="삭제" class="btn_submit btn">
+								</form>
+							</td>
+						</tr>
+						<tr th:if="${#lists.isEmpty(user)}">
+								<td colspan="9" class="no-data not_search">검색 결과가 없습니다.</td>
+							</tr>
+					</tbody>
+				</table>
+				<div id="display_box">
+					<ul class="pagination" th:object="${pm_use}"
+						th:if="${pm_use != null && pm_use.endPage != 0 && use_sh != null}">
+						<li th:if="${pm_use.prev}"><a
+							th:href="@{/admin/admMember/adminUser/userSearch(use_sh=${use_sh}, search=${search}, page=${pm_use.startPage - 1})}">◀</a>
+						</li>
+						<li
+							th:each="i : ${#numbers.sequence(pm_use.startPage, pm_use.endPage)}"
+							th:classappend="${pm_use.cri.page} == ${i} ? 'active' : ''">
+							<a
+							th:href="@{/admin/admMember/adminUser/userSearch(use_sh=${use_sh}, search=${search}, page=${i})}"
+							th:text="${i}"></a>
+						</li>
+						<li th:if="${pm_use.next}"><a
+							th:href="@{/admin/admMember/adminUser/userSearch(use_sh=${use_sh}, search=${search}, page=${pm_use.endPage + 1})}">▶</a>
+						</li>
+					</ul>
+					<ul class="pagination" th:object="${pm_use}"
+						th:if="${pm_use != null && pm_use.endPage != 0 && use_sh == null}">
+						<li th:if="${pm_use.prev}"><a
+							th:href="@{/admin/admMember/adminUser(page=${pm_use.startPage - 1})}">◀</a>
+						</li>
+						<li
+							th:each="i : ${#numbers.sequence(pm_use.startPage, pm_use.endPage)}"
+							th:classappend="${pm_use.cri.page} == ${i} ? 'active' : ''">
+							<a
+							th:href="@{/admin/admMember/adminUser(page=${i})}"
+							th:text="${i}"></a>
+						</li>
+						<li th:if="${pm_use.next}"><a
+							th:href="@{/admin/admMember/adminUser(page=${pm_use.endPage + 1})}">▶</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<footer id="ft">
+				<p>Copyright © demo.sir.kr. All rights reserved.</p>
+			</footer>
+		</div>
+		<script>
+			function unableform() {
+				const use_sh_select = document.getElementById("use_sh");
+				const userValue = use_sh_select.value;
+				const user = userValue.replace(/\s/g, '')
+
+				document.getElementById('use_sh').value = user;
+			}
+		</script> 
+		
+	</div>
+
+</body>
+</html>

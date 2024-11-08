@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kh.st.boot.dao.NewspaperDAO">
+
+	<select id="selectAllNewspapers" resultType="NewspaperVO">
+		SELECT * FROM
+		newspaper limit #{pageStart}, #{perPageNum}
+	</select>
+
+	<select id="selectCountList" resultType="int"> select count(*) from
+		newspaper
+	</select>
+
+	<insert id="insertNewspaper">
+		INSERT INTO newspaper (np_name, np_use)
+		VALUES
+		(#{np_name}, #{np_use})
+	</insert>
+
+	<update id="updateNewspaper">
+		UPDATE newspaper
+		SET np_name = #{np_name}, np_use =
+		#{np_use}
+		WHERE np_no = #{np_no}
+	</update>
+
+	<delete id="deleteNewspaper">
+		DELETE FROM newspaper WHERE np_no = #{np_no}
+
+	</delete>
+
+	<select id="selectNewspapersByStatus" resultType="NewspaperVO">
+		SELECT * FROM
+		newspaper WHERE np_use = #{np_use}
+	</select>
+	<!-- 왜 이런 쿼리를 썻는지 주석달기 -->
+	<select id="getNewsOne" resultType="NewspaperVO">
+		SELECT * FROM newspaper WHERE
+		np_name = #{name} limit 1
+	</select>
+	<!-- 이게 중복방지 기능인것같은데 먼저 중복체크하고 vo 로 보냄 -->
+
+
+	<select id="searchNews" resultType="NewspaperVO">
+		SELECT * FROM newspaper
+		WHERE np_name LIKE CONCAT('%',#{np_name},'%')
+		LIMIT #{pageStart}, #{perPageNum}
+	</select>
+
+	<select id="selectTotalCount" resultType="int">
+		select count(*) from
+		newspaper WHERE np_name LIKE CONCAT('%',#{np_name},'%')
+	</select>
+
+
+	<update id="UseChange">
+		UPDATE newspaper
+		SET np_use = #{useByte}
+		WHERE np_no = #{np_no}
+	</update>
+
+
+</mapper>

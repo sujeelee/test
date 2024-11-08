@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kh.st.boot.dao.PointDAO">
+
+    <update id="spandPoint">
+        update member
+        set mb_point = mb_point - #{point}
+        where mb_id = #{userName}
+    </update>
+
+    <insert id="usePoint">
+        insert into point(po_num, po_content, po_datetime, mb_id)
+        value(#{point}, #{reason}, now(), #{userName})
+    </insert>
+    
+</mapper>

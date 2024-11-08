@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/admlayout.html}" layout:fragment="content">
+<head>
+<script src="https://kit.fontawesome.com/3f892a70ad.js"
+	crossorigin="anonymous"></script>
+<script
+	src="https://demo.sir.kr/gnuboard5/js/jquery.menu.js?ver=2304171"></script>
+<link href="/css/admpoint.css" rel='stylesheet'>
+<meta charset="UTF-8">
+<title>관리자 페이지</title>
+</head>
+<body>
+	<div id="wrapper">
+		<div id="container">
+			<h1 id="container_title">포인트 관리</h1>
+			<div id="container_main" class="content">
+				<!-- 검색기능 form -->
+				<form action="/admin/admPoint/admPointPage/pointSearch" method="get" onsubmit="return findId()"
+					class="local_sch">
+					<input type="text" name="mb_id" placeholder="사용자 ID" required id="point_user"
+						class="in_sch" th:placeholder="${mb_id != null ? mb_id : '아이디를 입력하세요'}" style="margin-top: 2px;">
+					<button type="submit" class="btn_submit btn in_sch" style="width: 50px;">검색</button>
+					<a type="submit" href="/admin/admPoint/admPointPage"
+						class="btn_submit btn btn_a" style="padding-top: 7px;">초기화</a>
+				</form>
+				<div class="tbl_col">
+
+					<table>
+						<thead>
+							<tr>
+								<th>회원ID</th>
+								<th>포인트</th>
+								<th>지급사유</th>
+								<th>지급일</th>
+								<th>관리</th>
+							</tr>
+						</thead>
+						<tbody>
+							<!-- 값 불러오기 -->
+							<tr th:each="list : ${list}">
+								<td th:text="${list.mb_id}"></td>
+								<td th:text="${list.po_num}"></td>
+								<td th:text="${list.po_content}"></td>
+								<td th:text="${list.po_datetime}"></td>
+								<td class="point_set">
+									<form action="/admin/admPoint/admPointPage/delete"
+										method="post">
+										<input type="hidden" name="po_no" th:value="${list.po_no}" /><input
+											type="submit" value="삭제" class="btn_submit btn" accesskey="5">
+									</form>
+								</td>
+							</tr>
+							<tr th:if="${#lists.isEmpty(list)}">
+								<td colspan="6" class="no-data not_search">검색 결과가 없습니다.</td>
+							</tr>
+						</tbody>
+					</table>
+					<div id="display_box">
+						<ul class="pagination" th:object="${pm_point}"
+							th:if="${pm_point != null && pm_point.endPage != 0 && mb_id != null}">
+							<li th:if="${pm_point.prev}"><a
+								th:href="@{/admin/admPoint/admPointPage/pointSearch(mb_id=${mb_id}, page=${pm_point.startPage - 1})}">◀</a>
+							</li>
+							<li
+								th:each="i : ${#numbers.sequence(pm_point.startPage, pm_point.endPage)}"
+								th:classappend="${pm_point.cri.page} == ${i} ? 'active' : ''">
+								<a
+								th:href="@{/admin/admPoint/admPointPage/pointSearch(mb_id=${mb_id}, page=${i})}"
+								th:text="${i}"></a>
+							</li>
+							<li th:if="${pm_point.next}"><a
+								th:href="@{/admin/admPoint/admPointPage/pointSearch(mb_id=${mb_id}, page=${pm_point.endPage + 1})}">▶</a>
+							</li>
+						</ul>
+						<ul class="pagination" th:object="${pm_point}"
+							th:if="${pm_point != null && pm_point.endPage != 0 && mb_id == null}">
+							<li th:if="${pm_point.prev}"><a
+								th:href="@{/admin/admPoint/admPointPage(page=${pm_point.startPage - 1})}">◀</a>
+							</li>
+							<li
+								th:each="i : ${#numbers.sequence(pm_point.startPage, pm_point.endPage)}"
+								th:classappend="${pm_point.cri.page} == ${i} ? 'active' : ''">
+								<a th:href="@{/admin/admPoint/admPointPage(page=${i})}"
+								th:text="${i}"></a>
+							</li>
+							<li th:if="${pm_point.next}"><a
+								th:href="@{/admin/admPoint/admPointPage(page=${pm_point.endPage + 1})}">▶</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<section id="sec_ing">
+					<h2 id="point_ins_txt">개별회원 포인트 증/감가</h2>
+					<form action="/admin/admPoint/admPointPage/point" method="post"
+						onsubmit="return pointSubmit()">
+						<table>
+							<colgroup>
+								<col id="grid_4">
+								<col>
+							</colgroup>
+							<tbody>
+								<tr>
+									<th><label>회원아이디</label></th>
+									<td><input type="text" name="mb_id" id="mb_id"
+										class="point_ins" placeholder="회원 ID" required></td>
+								</tr>
+								<tr>
+									<th><label>포인트 지급 사유</label></th>
+									<td><input type="text" name="po_content" id="po_content"
+										placeholder="지급사유" required></td>
+								</tr>
+								<tr>
+									<th><label>포인트</label></th>
+									<td><label> <input type="radio" name="pointType"
+											value="plus" checked> +
+									</label> <label> <input type="radio" name="pointType"
+											value="minus"> -
+									</label> <input type="text" name="po_num" class="point_ins"
+										placeholder="포인트" required style="margin-left: 10px;"
+										id="point"><span id="pointMsg"
+										style="color: red; display: none; font-size: 11px;">+,-와
+											숫자만 입력 가능합니다.</span></td>
+								</tr>
+							</tbody>
+						</table>
+						<input type="submit" value="저장" class="btn_submit btn"
+							accesskey="5" style="margin-top: 10px;">
+					</form>
+
+				</section>
+			</div>
+			<footer id="ft">
+				<p>Copyright © demo.sir.kr. All rights reserved.</p>
+			</footer>
+		</div>
+		<script>
+			function pointSubmit() {
+				const pattern = /^[0-9]/g; // 숫자 앞에 + 또는 - 기호 가능
+				const pointInput = document.getElementById("point");
+				const pointMsg = document.getElementById("pointMsg");
+				const pointValue = pointInput.value;
+
+				if (!pattern.test(pointValue)) {
+					pointMsg.style.display = "inline";
+					return false; // 폼 제출 막기
+				} else {
+					return true; // 폼 제출 허용
+				}
+			}
+		</script>
+		<script>
+			function findId() {
+				const point_user = document.getElementById("point_user").value.replace(/\s/g, '');
+				document.getElementById('point_user').value = point_user;
+			}
+		</script>
+	</div>
+
+</body>
+</html>

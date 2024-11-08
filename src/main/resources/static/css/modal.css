@@ -1,0 +1,29 @@
+.search-modal{padding: 1%; position: fixed;z-index: 9999; background-color: #fff;width: 600px;height:400px; transform: translateX(var(--translate-x)) translateY(11px);border-radius: 15px;}
+.search-modal-input{background-color: rgba(2, 32, 71, 0.05); border-radius: 20px;padding: 1%;}
+.mstx{width: 90% !important;padding: .375rem .75rem;height: calc(1.5em + .75rem + 2px);line-height: 1.5; border:none;background: 0;}
+.mstx:focus-visible{outline: none !important;}
+.search-modal-input > i{margin-left: 12px; color: #888;}
+.search-modal-table{display: flex;flex-direction: column;justify-content: normal;align-items: normal;}
+.modal-right{text-align: right;}
+.search-modal-row{padding: 2%;cursor:pointer; display: flex; justify-content: space-between;align-items: center; margin-bottom: 5px;}
+.search-modal-row:hover, .result-modal-row:hover{background-color: rgba(2, 32, 71, 0.05);border-radius: 20px;}
+.search-modal-table-div{margin-top: 2%;}
+.search-modal-rank, .nav-link.active{color: #17a2b8 !important;}
+.search-modal-sub-title{padding: 1%;}
+.nav-item{cursor: pointer;font-size: 13px;}
+.nav-link{transition: color 0.3s ease, background-color 0.3s ease;}
+.search-result{height: 460px;box-sizing: border-box; overflow: auto; overflow-x: hidden;white-space: nowrap;}
+::-webkit-scrollbar-track {background-color: #f8f9fa;}
+::-webkit-scrollbar-thumb {background-color: #17a2b8;}
+.search-result::-webkit-scrollbar{display: block !important;}
+.search-result{scrollbar-width: thin;scrollbar-color: #17a2b8 #f8f9fa;}
+.search-result-line{display: flex;align-items: center;justify-content: space-evenly;}
+.search-result-stock{padding: 1%;}
+.result-mini-title{padding: 1%;color: #888;font-size: 13px;}
+.result-modal-row{padding: 1%;cursor:pointer;margin-bottom: 5px;}
+.search-modal-result-div:not(.result-modal-bottom){font-size: 14px;}
+.result-modal-bottom{color: #888;font-size: 12px;}
+.result-modal-left{overflow: hidden;white-space: nowrap;text-overflow: ellipsis;word-break: break-all;}
+.search-result-none{padding: 2%;}
+.result-none-text{margin-bottom: 3%;box-sizing: border-box;white-space: pre-wrap;}
+.result-none-text > span{color: #17a2b8;}

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kh.st.boot.dao.SearchDAO"> 
+	<select id="stockSearch" resultType="kh.st.boot.model.dto.DashListDTO">
+		SELECT 
+		    a.st_code AS code, 
+		    a.st_name AS stockName, 
+		    b.si_price AS price, 
+		    b.si_fltRt AS flt
+		FROM 
+		    stock a
+		JOIN (
+		    SELECT 
+		        si1.st_code, 
+		        si1.si_price, 
+		        si1.si_vs, 
+		        si1.si_fltRt
+		    FROM 
+		        stock_info si1
+		    JOIN (
+		        SELECT 
+		            st_code, 
+		            MAX(si_date) AS max_date
+		        FROM 
+		            stock_info
+		        GROUP BY 
+		            st_code
+		    ) si2 ON si1.st_code = si2.st_code AND si1.si_date = si2.max_date
+		) b ON a.st_code = b.st_code
+		WHERE 
+		    a.st_name LIKE CONCAT('%', #{stx}, '%')
+		ORDER BY 
+		    a.st_name ASC;
+	</select>
+	<select id="newsSearch" resultType="NewsVO">
+		select b.ne_no, b.ne_title, b.ne_datetime, c.np_name 
+		from news b 
+		join newspaper c 
+		ON b.np_no = c.np_no 
+		where b.ne_title LIKE CONCAT('%', #{stx}, '%')
+	</select>
+	
+	<select id="getCommunityRank" resultType="kh.st.boot.model.dto.ComRankDTO">
+		SELECT RANK() OVER (ORDER BY total DESC) AS ranks, st_name as title, wr_category as code
+		FROM (
+		    SELECT 
+		        a.wr_category, (COUNT(*) + SUM(a.wr_comment)) AS total, b.st_name 
+		    FROM board a 
+			Join stock b on a.wr_category = b.st_code
+			where a.wr_blind != 'Y'
+		    GROUP BY a.wr_category
+		) AS board
+		ORDER BY total DESC
+		limit 5;
+	</select>
+	<select id="getFlt" resultType="String">
+		SELECT si1.si_fltRt
+	    FROM stock_info si1
+	    JOIN (
+	        SELECT st_code, MAX(si_date) AS max_date
+	        FROM stock_info
+	        where st_code = #{code}
+	        GROUP BY st_code
+	    ) si2 ON si1.st_code = si2.st_code AND si1.si_date = si2.max_date
+	</select>
+	<select id="getCommunityList" resultType="BoardVO">
+		select a.wr_content, a.wr_datetime, b.mb_level, b.mb_nick as mb_id 
+		from board a
+		join member b on a.mb_id = b.mb_id
+		where wr_category = #{code} and wr_blind != 'Y'
+		order by wr_no DESC
+		limit 10
+	</select>
+	<select id="getCount" resultType="int">
+		<if test="type == 'list'">
+			select count(*) from follow
+		</if>
+		<if test="type == 'view'">
+			select count(*) from board where mb_id = #{mb_id} and wr_blind = 'N'
+		</if>
+	</select>
+	<select id="getFollowList" resultType="kh.st.boot.model.dto.MyFollowDTO">
+		SELECT a.*, b.mb_nick AS fo_mb_nick, b.cnt
+		FROM follow a
+		JOIN (
+		    SELECT mb.mb_nick, mb.mb_id, COUNT(bo.wr_no) AS cnt
+		    FROM member mb
+		    LEFT JOIN board bo ON mb.mb_id = bo.mb_id
+		    GROUP BY mb.mb_nick, mb.mb_id
+		) AS b ON a.fo_mb_id = b.mb_id 
+		where a.mb_id = #{mb_id}
+		order by fo_no ASC
+		<if test="cri != null">
+			limit #{cri.pageStart}, #{cri.perPageNum}
+		</if>
+	</select>
+	<delete id="unfollow">
+		delete from follow where fo_no = #{fo_no} and mb_id = #{mb_id}
+	</delete>
+	<select id="getFollowViews" resultType="kh.st.boot.model.dto.FollowViewDTO">
+		select  a.wr_no, a.wr_content, a.wr_category as st_code, a.wr_datetime, a.wr_blind, b.st_name 
+		from board a 
+		join stock b on a.wr_category = b.st_code
+	    where a.mb_id = #{fo_id}
+		order by a.wr_no DESC
+		<if test="cri != null">
+			limit #{cri.pageStart}, #{cri.perPageNum} 
+		</if>
+	</select>
+	<select id="getFollowInfo" resultType="kh.st.boot.model.dto.FollowInfoDTO">
+		SELECT 
+		    (SELECT COUNT(*) FROM follow WHERE mb_id = #{fo_id}) AS following,
+		    (SELECT COUNT(*) FROM follow WHERE fo_mb_id = #{fo_id}) AS follower,
+		    b.mb_nick
+		FROM member b
+		WHERE b.mb_id = #{fo_id};
+	</select>
+	<select id="getFollowNo" resultType="int">
+		SELECT COALESCE((SELECT fo_no FROM follow WHERE mb_id = #{mb_id} AND fo_mb_id = #{fo_id}), 0)
+	</select>
+	<insert id="follow">
+		insert into follow
+		set	mb_id = #{mb_id},
+			fo_mb_id = #{fo_no}
+	</insert>
+	<update id="memberFollow">
+		update member
+		set mb_follow = mb_follow + #{cnt}
+		where mb_id = #{id}
+	</update>
+</mapper>

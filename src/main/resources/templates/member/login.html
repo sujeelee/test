@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html 
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+	layout:decorate="~{layout/layout.html}">
+<head>
+	<title>시드키 : 로그인</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/login.css}">
+</head>
+<body>
+<main layout:fragment="content">
+	<div class="login-wrapper123">		
+		<h2>Login</h2>
+
+
+		<div class="divider"></div> <!-- 줄 추가 -->
+		<form method="post" th:action="@{/member/login}" id="login-form">
+
+			<input type="text" id="username" name="username"  placeholder="Username" required="" 
+			th:class="${param.id != null} ? 'error-border' : '' "
+			th:value="${param.username != null} ? ${param.username} : ''"
+			>
+
+			<input type="password" id="password" name="password" placeholder="Password" required=""
+			th:class="${param.pw != null} ? 'error-border' : '' " >
+
+			<div class="error-message" 
+			th:if="${param.error}"
+			th:text="${param.msg != null ? param.msg : '로그인에 실패했습니다. 다시 시도해 주세요.'}">
+			</div>
+
+
+			<label for="remember-check">
+				<input type="checkbox" id="remember-check" name="re">아이디 기억하기
+			</label>
+			<div class="pw">
+			<a th:href="@{/member/findPwView}">비밀번호를 잊으셨나요?</a>			        		
+			<a th:href="@{/member/join}">아직 회원가입을 안하셨나요?</a>
+							
+			</div>	            
+			<div class="divider"></div> <!-- 줄 추가 -->
+			<input type="submit" value="Login">
+
+
+
+		</form>
+		
+		<div style="text-align: center; margin-top: 20px;">
+			<a th:href="${kakao_location}" style="text-align: center;">
+				<img th:src="@{/img/button/kakao_login_medium.png}">
+			</a>
+
+			<a th:href="${naver_location}" style="text-align: center;">
+				<img th:src="@{/img/button/naver_login_medium.png}" style="height: 45px; width: 90px;">
+			</a>
+		</div>
+	</div>
+</main>
+</body>
+</html>

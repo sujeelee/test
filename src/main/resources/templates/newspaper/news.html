@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html 
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+	layout:decorate="~{layout/layout.html}">
+<head>
+<meta charset="UTF-8">
+<title>시드키 : 뉴스 리스트</title>
+<link rel="stylesheet" type="text/css" th:href="@{/css/stockuser.css}">
+<link rel="stylesheet" type="text/css" th:href="@{/css/stockorder.css}">
+<link rel="stylesheet" type="text/css" th:href="@{/css/communityNews.css}">
+</head>
+<body>
+	<main layout:fragment="content">
+		<div th:replace="~{layout/stocksHeader.html}"></div>
+		<div class="form-content">
+			<section class="news-section">
+				<h4 class="mt-4 ml-3" th:text="${stock.st_name} + ' 뉴스'"></h4>
+				<div class="news-container">
+					<ul class="news-list">
+						<li class="news-item" th:each="item : ${list}">
+							<div class="news-box">
+								<div class="news-content-box">
+			                    	<div class="news-text-box">
+				                    	<div class="news-title mb-2">
+				                    		<a th:href="@{/stock/detail/{ne_no}(ne_no=${item.ne_no})}" 
+       											th:onclick="'window.open(this.href, \'_blank\', \'width=860,height=2150,left=500\'); return false;'" 
+       											th:text="${item.ne_title}">헤드라인 제목</a>
+				                    	</div>
+				                    	<div class="news-content">
+					                        <a th:href="@{/stock/detail/{ne_no}(ne_no=${item.ne_no})}" 
+       											th:onclick="'window.open(this.href, \'_blank\', \'width=860,height=2150,left=500\'); return false;'" 
+       											th:text="${item.ne_content}">헤드라인 내용</a>                   		
+				                    	</div>
+				                    	<div class="news-footer">
+				                    		<span th:text="${#dates.format(item.ne_datetime, 'MM월 dd일')} + ' · '">xxxx.xx.xx</span>
+				                    		<span th:text="${item.np_name}">신문사</span>
+				                    	</div>
+			                    	</div>
+			                    	<div class="news-image-box" th:if="${item.fi_path != null}">
+			                    		<img th:src="@{'/uploads' + ${item.fi_path}}" alt="썸네일">
+			                    	</div>
+			                    </div>
+							</div>
+						</li>
+						<li class="none-list" th:if="${list == null or #lists.isEmpty(list)}">
+							<div class="none-content">
+								<i class="fa-solid fa-note-sticky fa-5x fa-color"></i>
+						 		<p class="no-title">발행된 종이 신문이 없거나<br>신문게재 정보가 입력되지 않았습니다.</p>
+						 	</div>
+						</li>
+					</ul>
+				</div>
+			</section>
+			<section class="order-section">
+				<div th:replace="~{layout/stocksOrder.html}"></div>
+			</section>
+		</div>
+	</main>
+</body>
+</html>

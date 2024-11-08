@@ -1,0 +1,8 @@
+#calenders{z-index: -50; width: 0;}
+.ui-datepicker{border: 1px solid #17a2b8; border-radius: 15px; background-color: #fff;margin-top: 3px;}
+.ui-datepicker-header > select {padding: 3%; border: 0;cursor: pointer;}
+.ui-datepicker-header > select:focus-visible {outline: 0;}
+table.mtz-monthpicker{width: 100%;}
+tr.mtz-monthpicker{display: flex;justify-content: space-around;}
+td.mtz-monthpicker-month{margin-right: 10px;cursor: pointer !important;}
+.ui-state-disabled{color: #888;}

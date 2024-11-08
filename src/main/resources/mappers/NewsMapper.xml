@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kh.st.boot.dao.NewsDAO">
+
+	<select id="selectNewsPaperList" resultType="NewsPaperVO">
+		SELECT * FROM NEWSPAPER
+	</select>
+
+	<select id="selectNewsListByDate" resultType="NewsVO">
+		SELECT *, FI_PATH
+		FROM
+			NEWSPAPER
+		JOIN
+			NEWS ON NEWSPAPER.NP_NO = NEWS.NP_NO
+		LEFT JOIN(
+			SELECT * FROM
+			file 
+			WHERE fi_type = 'news'
+		) as FILE ON NE_NO = FI_REG_NO
+		WHERE
+			NE_DATETIME LIKE CONCAT(#{formatDate}, '%')
+		GROUP BY
+			NEWSPAPER.NP_NO
+		ORDER BY NE_DATETIME DESC
+	</select>
+	
+	<select id="selectNewsPaper" resultType="NewsPaperVO">
+		SELECT *
+		FROM
+			NEWSPAPER
+		WHERE
+			NEWSPAPER.NP_NO = #{np_no}
+	</select>
+	
+	<select id="selectNewsListByPaper" resultType="NewsVO">
+		SELECT *
+		FROM
+			NEWS
+		LEFT JOIN(
+			SELECT * FROM
+			file 
+			WHERE fi_type = 'news'
+		) as FILE ON NE_NO = FI_REG_NO
+		WHERE
+			NP_NO = #{np_no}
+			AND NE_DATETIME LIKE CONCAT(SUBSTRING(#{ne_datetime},1,7), '%')
+		ORDER BY NE_DATETIME DESC
+	</select>
+	
+	<select id="selectNews" resultType="NewsVO">
+		SELECT *
+		FROM
+			NEWS
+		WHERE NE_NO = #{ne_no}
+	</select>
+	
+	<select id="selectNewsEmoji" resultType="NewsEmojiVO">
+		SELECT *
+		FROM
+			NEWS_EMOJI
+		WHERE
+			NE_NO = #{ne_no} AND
+			MB_ID = #{mb_id}
+	</select>
+	
+	<insert id="insertNewsEmoji">
+		INSERT INTO NEWS_EMOJI(NE_NO, EM_ACT, MB_ID, EM_DATETIME) VALUES
+		(#{ne_no}, #{em_act}, #{mb_id}, NOW())
+	</insert>
+	
+	<update id="updateNewsEmojiCount">
+		UPDATE NEWS
+		<choose>
+			<when test="em.em_act == 1">
+				SET NE_HAPPY = NE_HAPPY + #{count}
+			</when>
+			<when test="em.em_act == 2">
+				SET NE_ANGRY = NE_ANGRY + #{count}
+			</when>
+			<when test="em.em_act == 3">
+				SET NE_ABSURD = NE_ABSURD + #{count}
+			</when>
+			<when test="em.em_act == 4">
+				SET NE_SAD = NE_SAD + #{count}
+			</when>
+		</choose>
+		WHERE NE_NO = #{em.ne_no}
+	</update>
+	
+	<update id="updateNewsEmoji">
+		UPDATE 
+			NEWS_EMOJI 
+		SET 
+			EM_ACT = #{em_act}, EM_DATETIME = NOW() 
+		WHERE
+			NE_NO = #{ne_no} AND MB_ID = #{mb_id}
+	</update>
+	
+	<delete id="deleteNewsEmoji">
+		DELETE FROM NEWS_EMOJI WHERE NE_NO = #{ne_no} AND MB_ID = #{mb_id}
+	</delete>
+	
+	<insert id="insertNews">
+		INSERT INTO NEWS (NE_TITLE, NE_CONTENT, MB_ID, NP_NO, NE_DATETIME, NE_NAME)
+		SELECT #{ne_title}, #{ne_content}, #{mb_id}, #{np_no}, NOW(), MB_NAME
+		FROM
+			MEMBER
+		WHERE
+			MB_ID = #{mb_id}
+	</insert>
+
+	<update id="updateNews">
+		UPDATE NEWS
+		SET
+			NE_TITLE = #{ne_title},
+			NE_CONTENT = #{ne_content},
+			NE_EDIT_DATE = NOW()
+		WHERE
+			NE_NO = #{ne_no}
+	</update>
+	
+	<delete id="deleteNews">
+		DELETE FROM NEWS WHERE NE_NO = #{ne_no}
+	</delete>
+	
+	<select id="selectNewsLimitOne" resultType="NewsVO">
+		SELECT * FROM NEWS ORDER BY NE_NO DESC LIMIT 1
+	</select>
+	
+	<insert id="insertFile">
+		INSERT INTO FILE(FI_ORG_NAME, FI_PATH, FI_REG_NO, FI_TYPE) VALUES
+		(#{fi_org_name}, #{fi_path}, #{fi_reg_no}, #{fi_type})
+	</insert>
+	
+	<select id="selectFileByFiNo" resultType="FileVO">
+		SELECT *
+		FROM
+			FILE
+		WHERE
+			FI_NO = #{fi_no} AND
+			FI_TYPE = 'news'
+	</select>
+	
+	<select id="selectFileByNeNo" resultType="FileVO">
+		SELECT *
+		FROM
+			FILE
+		WHERE
+			FI_REG_NO = #{ne_no} AND
+			FI_TYPE = 'news'
+	</select>
+	
+	<delete id="deleteFileByFiNo">
+		DELETE FROM FILE WHERE FI_NO = #{fi_no} AND FI_TYPE = 'news'
+	</delete>
+	
+	<delete id="deleteFileByNeNo">
+		DELETE FROM FILE WHERE FI_REG_NO = #{ne_no} AND FI_TYPE = 'news'
+	</delete>
+	
+	<select id="selectNewsList" resultType="NewsVO">
+		SELECT *, NP_NAME, FI_PATH
+		FROM
+			NEWS
+		JOIN
+			NEWSPAPER ON NEWSPAPER.NP_NO = NEWS.NP_NO
+		LEFT JOIN(
+			SELECT * FROM
+			file 
+			WHERE fi_type = 'news'
+		) as FILE ON NE_NO = FI_REG_NO
+		WHERE
+			NE_TITLE LIKE CONCAT('%', #{st_name}, '%')
+			OR NE_CONTENT LIKE CONCAT('%', #{st_name}, '%')
+		ORDER BY NE_DATETIME DESC
+	</select>
+	
+	<select id="selectNewsListByImg" resultType="NewsVO">
+		SELECT *, NP_NAME, FI_PATH
+		FROM
+			NEWS
+		JOIN
+			NEWSPAPER ON NEWSPAPER.NP_NO = NEWS.NP_NO
+		JOIN(
+			SELECT * FROM
+			file 
+			WHERE fi_type = 'news'
+		) as FILE ON NE_NO = FI_REG_NO
+		ORDER BY NE_DATETIME DESC
+		LIMIT 0,4
+	</select>
+	
+	<select id="selectNewsListByNoImg" resultType="NewsVO">
+		SELECT NEWS.*, NEWSPAPER.NP_NAME
+		FROM 
+			NEWS
+		JOIN 
+			NEWSPAPER ON NEWSPAPER.NP_NO = NEWS.NP_NO
+		WHERE 
+			NOT EXISTS (SELECT 1 FROM FILE WHERE FILE.FI_REG_NO = NEWS.NE_NO and FILE.fi_type = 'news')
+		ORDER BY NEWS.NE_DATETIME DESC
+		LIMIT 0, 4
+	</select>
+	
+	<select id="selectNewsMember" resultType="NewsMemberVO">
+		SELECT *
+		FROM
+			NEWS_MEMBER
+		WHERE
+			MB_NO = #{mb_no}
+	</select>
+</mapper>

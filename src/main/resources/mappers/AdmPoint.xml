@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kh.st.boot.dao.AdmPointDAO">
+
+
+
+	<select id="selectAll" resultType="AdmPointVO">
+		SELECT * FROM point limit
+		#{pageStart}, #{perPageNum}
+	</select>
+
+	<select id="selectCountList" resultType="int"> select count(*) from
+		point</select>
+
+
+	<select id="selectId" resultType="AdmPointVO">
+		SELECT * FROM point
+		WHERE mb_id
+		= #{mb_id}
+	</select>
+
+	<insert id="upPoint">
+		INSERT INTO point
+		(mb_id,po_num,po_content,po_datetime )
+		VALUES
+		(#{mb_id},#{po_num},#{po_content},now())
+	</insert>
+
+	<insert id="downPoint">
+		INSERT INTO point
+		(mb_id,po_num,po_content,po_datetime )
+		VALUES
+		(#{mb_id},#{po_num},#{po_content},now())
+	</insert>
+	
+	<update id="updateUserPoint">
+		UPDATE MEMBER SET MB_POINT = MB_POINT + #{po_num} WHERE MB_ID = #{mb_id}
+	</update>
+
+	<delete id="deletPoint">
+		DELETE FROM point WHERE po_no = #{po_no};
+	</delete>
+
+	<select id="pointUserSearch" resultType="AdmPointVO">
+		SELECT * FROM point
+        WHERE mb_id LIKE CONCAT('%', #{mb_id}, '%')
+        LIMIT #{pageStart}, #{perPageNum}
+	</select>
+
+	<select id="selectTotalCount" resultType="int">
+		select count(*) from point WHERE mb_id LIKE CONCAT('%', #{mb_id}, '%')
+	</select>
+
+
+</mapper>

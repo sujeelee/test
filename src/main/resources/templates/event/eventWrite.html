@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html 
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout.html}">
+<head>
+<meta charset="UTF-8">
+<title>시드키 : 이벤트 작성</title>
+	<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
+</head>
+<body>
+	<main layout:fragment="content">
+
+
+
+		<h1 class="text-center mt-4 mb-4">이벤트 등록 페이지</h1>
+
+		<div class="container mt-5">
+			<form th:action="@{/event/write}" method="post" enctype="multipart/form-data">
+				<div class="form-group">
+					<label for="ev_title">이벤트 제목:</label>
+					<input type="text" class="form-control" id="ev_title" name="ev_title" placeholder="이벤트 제목">
+				</div>
+
+
+				<label>이벤트 상태:</label>
+				<select name="ev_status" class="custom-select mb-3">
+					<option selected>이벤트 상태 선택 (반드시 선택해 주세요.)</option>
+					<option value="Opening">Opening</option>
+					<option value="Ending">Ending</option>
+					<option value="resUser">resUser</option>
+					<option value="Hidden">Hidden</option>
+				</select>
+
+				<label>이벤트 폼 종류:</label>
+				<select name="ev_form" class="custom-select mb-3">
+					<option value="Post" checked>Post (기본값)</option>
+					<option value="Participatory">Participatory event(참여형 이벤트)</option>
+					<option value="none">새로 추가해 주세요</option>
+				</select>
+
+				<div class="mt-3">
+					<label>이벤트 시작일, 종료일(종료일은 이벤트 상태가 resUser일 경우 작성일자로 표기됩니다):</label>
+					<div class="form-row ">
+						<div class="col">
+							<input type="date" id="ev_start" name="ev_start" class="form-control" placeholder="시작일">
+						</div>	
+						<div class="col">
+							<input type="date" id="ev_end" name="ev_end" class="form-control" placeholder="종료일">
+						</div>
+					</div>
+				</div>
+
+				<div class="form-group mt-3">
+					<label>이벤트 썸네일 이미지:</label>
+					<input type="file" class="form-control-file border"  name="file">
+				</div>
+
+				<div class="form-group mt-3">
+					<label>이벤트 배너 이미지:</label>
+					<input type="file" class="form-control-file border"  name="file_banner">
+				</div>
+
+				
+				<div class="form-group">
+					<label for="ev_content"></label>
+					<textarea class="form-control" id="ev_content" name="ev_content" style="min-height: 400px; height: auto;"></textarea>
+				</div>
+				<button type="submit" class="btn btn-outline-dark col-12 mb-2">등록</button>
+			</form>
+		</div>
+
+
+		<script type="text/javascript">
+		 	$('#ev_content').summernote({
+				placeholder: '내용을 작성하세요',
+				tabsize: 2,
+				height: 400
+			})
+
+
+			
+		</script>
+
+	</main>
+</body>
+</html>

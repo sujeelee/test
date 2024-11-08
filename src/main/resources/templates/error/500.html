@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Page Not Found</title>
+    <style>
+		html, body {
+		    padding: 0;
+		    margin: 0;
+		    overflow: hidden;
+		}
+		.page-content {
+    		background-color: #d6e2ee;
+		}
+		.page-content .container_fix {
+		    width: 1330px;
+		    padding: 0 15px;
+		    max-width: 100%;
+		    margin: 0 auto;
+		    display: flex;
+		    height: 100vh;
+		}
+		.hidden-sm, .hidden-xs {
+		    display: block !important;
+		    margin-left: 200px;
+		    width: 50%;
+   		 	margin-top: 30%;		    
+		}
+		.hidden-lg, .hidden-md {
+		    display: none !important;
+		}
+		.page-content .text_box {
+		    padding-top: 253px;
+		}
+		.page-content h1 {
+		    color: #235bf5;
+		    font-size: 200px;
+		    font-weight: 800;
+		    font-family: 'Montserrat', sans-serif;
+		    margin: 0;
+		    line-height: 147px;
+		}
+		.page-content h2 {
+		    color: #222222;
+		    font-size: 60px;
+		    font-weight: 700;
+		    font-family: 'Montserrat', sans-serif;
+		    margin: 74px 0 28px;
+		}
+		.page-content h3 {
+		    color: #666666;
+		    font-size: 25px;
+		    font-weight: 500;
+		    margin: 28px 0 70px;
+		}
+		.page-content .go_box a {
+		    color: #fff;
+		    font-size: 18px;
+		    font-weight: 500;
+		    background: #17a2b8;
+		    border-radius: 30px;
+		    line-height: 60px;
+		    padding: 0 31px;
+		    display: inline-block;
+		    text-decoration: none;
+		}
+    </style>
+</head>
+<body>
+<div class="page-content">
+        <div class="404_box container_fix">
+            <div class="img_box">
+                <img th:src="@{/img/S2DKEY_logo.png}" alt="404" class="hidden-sm hidden-xs">
+                <img th:src="@{/img/S2DKEY_logo.png}"  alt="404" class="hidden-lg hidden-md">
+            </div>
+            <div class="text_box">
+                <h1>500</h1>
+                <h2>Server Error</h2>
+                <h3>서버에 문제가 생겼습니다.관리자에게 문의해주세요.</h3>
+                <div class="go_box">
+                    <a th:href="@{/}" class="go_btn">S2DKEY 바로가기</a>
+                </div>
+            </div>
+        </div>
+	</div>
+</body>
+</html>

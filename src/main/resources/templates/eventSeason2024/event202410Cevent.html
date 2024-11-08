@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html 
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>시드키 : 이벤트 : 10월 출석 체크 이벤트</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/eventC.css}">
+    
+</head>
+<body th:inline="javascript">
+    <main layout:fragment="content">
+    <div class="container-of-cal">
+        <h1>출석체크 이벤트</h1>
+        <div class="month-header" id="monthHeader"></div>
+        <div class="calendar" id="calendar"></div>
+        <button id="checkInButton" sec:authorize="isAuthenticated()">오늘 출석 체크</button>
+        <div id="message" class="success-message"></div>
+    </div>
+
+    <script th:inline="javascript">
+        const mb_id = /*[[${#authentication.Principal.member.mb_id}]]*/ '';
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = today.getMonth(); // 0부터 시작 (0: 1월)
+        const date = today.getDate(); 
+        //const daysInMonth = 31; // 10월의 일수
+        const firstDayOfNextMonth = new Date(year, month + 1, 1); // 다음 달의 첫 번째 날짜
+		const lastDayOfCurrentMonth = new Date(firstDayOfNextMonth - 1); // 현재 월의 마지막 날짜
+		const daysInMonth = lastDayOfCurrentMonth.getDate(); // 현재 월의 일수
+
+        const calendar = document.getElementById("calendar");
+        const checkInButton = document.getElementById("checkInButton");
+        const message = document.getElementById("message");
+
+        // 타임리프에서 전달된 checkList 배열을 JSON 형식으로 사용
+        const checkList = JSON.parse(/*[[${checkList}]]*/ '[]');
+
+        // 이번 달 표시
+        const monthNames = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
+        document.getElementById("monthHeader").textContent = `${year}년 ${monthNames[month]}`;
+
+        // 요일 추가
+        const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
+        weekdays.forEach(function(weekday) {
+            const weekdayDiv = document.createElement('div');
+            weekdayDiv.classList.add('weekday');
+            weekdayDiv.textContent = weekday;
+            calendar.appendChild(weekdayDiv);
+        });
+
+        // 2024년 10월 1일은 화요일이므로 해당 날짜의 요일을 찾음
+        const firstDayOfMonth = new Date(year, month, 1).getDay(); // 0: 일요일, 1: 월요일 ...
+
+        // 첫 번째 요일 전에 빈 칸 추가
+        for (let i = 0; i < firstDayOfMonth; i++) {
+            const emptyDiv = document.createElement('div');
+            emptyDiv.classList.add('day');
+            calendar.appendChild(emptyDiv);
+        }
+
+        // 달력 생성
+        for (let i = 1; i <= daysInMonth; i++) {
+            const dayDiv = document.createElement('div');
+            dayDiv.classList.add('day');
+            dayDiv.textContent = i;
+
+            if (i === date) {
+                dayDiv.classList.add('today');
+            }
+
+            // 출석 체크 상태에 따라 표시 (checkList[i-1] 값에 따라 설정)
+            if (checkList[i - 1] === 1) {
+                dayDiv.classList.add('checked');
+            }
+
+            calendar.appendChild(dayDiv);
+        }
+
+        // 오늘 날짜가 출석 체크된 경우 버튼 비활성화
+        if (checkList[date - 1] === 1) {
+            checkInButton.disabled = true;
+        }
+
+        // 출석 체크 처리
+        checkInButton.addEventListener("click", function() {
+            const todayDiv = document.querySelector(".day.today");
+            
+            // 출석 체크가 되어 있지 않을 때만 처리
+            if (todayDiv && checkList[date - 1] === 0) {
+                todayDiv.classList.add('checked');
+                checkList[date - 1] = 1; // 출석 체크 배열 업데이트
+                message.textContent = `${year}년 ${month + 1}월 ${date}일 출석체크 완료!`;
+                checkInButton.disabled = true; // 버튼 비활성화
+
+                // jQuery AJAX 요청 보내기
+                $.ajax({
+                    url: '/event/ajax/calendar_event',
+                    type: 'POST',
+                    dataType: 'text',
+                    data: {
+                        mb_id: mb_id,
+                        checkList: checkList
+                    },
+                    success: function(data) {
+                        if(date){
+                            alert("Point +50")
+                        } else {
+                            alert("이미 출석을 하셨어요!")
+                        }
+                        
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error:', error);
+                    }
+                });
+            }
+        });
+
+    </script>    
+    </main>
+</body>
+</html>

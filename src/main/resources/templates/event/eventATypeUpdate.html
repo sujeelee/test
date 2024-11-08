@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html 
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout.html}">
+<head>
+<meta charset="UTF-8">
+<title>시드키 : 어드민 : 이벤트 작성 : Atype</title>
+	<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
+</head>
+<body>
+	<main layout:fragment="content">
+
+		<h1 class="text-center mt-4 mb-4">참여형 이벤트 작성</h1>
+
+		<div class="container mt-5">
+
+			<form th:action="@{/event/eventATypeUpdate}" method="post" enctype="multipart/form-data">
+
+                <p>정보 : 이벤트 번호에 맞추어서 /event/Aevent/(event.ev_no) 로 주소가 만들어집니다.
+                    상품을 여러번 등록하시면 여러게 표기됩니다.</p>
+				<div class="form-group">
+					<label for="pr_name">상품명:</label>
+					<input type="text" class="form-control" id="pr_name" name="pr_name" placeholder="상품명" th:value="${prize.pr_name}">
+				</div>
+
+				<div class="form-group">
+					<label for="pr_point">소모될 포인트:</label>
+					<input type="text" class="form-control" id="pr_point" name="pr_point" placeholder="포인트" th:value="${prize.pr_point}">
+				</div>
+
+				<div class="form-group">
+					<label for="pr_link">(이벤트 포스트 작성시 가게될 주소)저장될 이벤트 주소:</label>
+					<input type="text" class="form-control" id="pr_link" name="pr_link" placeholder="이벤트 주소" th:value="${prize.pr_link}">
+				</div>
+
+
+                
+                <div class="form-group">
+                    <label for="ev_no">연동될 Event Post 주소</label>
+                    <select class="form-control" id="ev_no" name="ev_no" disabled>
+                        <option th:each="event : ${eventList}" th:value="${event.ev_no}"
+                        th:selected="${event.ev_no == prize.ev_no}" th:text="${event.ev_title}" ></option> 
+                    </select>
+
+                    
+                </div>
+
+
+                <div class="form-group">
+                    <label for="pr_startLevel">레벨(start Line)(Default level 1)</label>
+                    <select class="form-control" id="pr_startLevel" name="pr_startLevel">
+                        <option th:selected="${prize.pr_startLevel == '1'}">1</option>
+                        <option th:selected="${prize.pr_startLevel == '2'}">2</option>
+                        <option th:selected="${prize.pr_startLevel == '3'}">3</option>
+                        <option th:selected="${prize.pr_startLevel == '4'}">4</option>
+                        <option th:selected="${prize.pr_startLevel == '5'}">5</option>
+                        <option th:selected="${prize.pr_startLevel == '6'}">6</option>
+                        <option th:selected="${prize.pr_startLevel == '7'}">7</option>
+                        <option th:selected="${prize.pr_startLevel == '8'}">8</option>
+                        <option th:selected="${prize.pr_startLevel == '9'}">9</option>
+                    </select>
+                </div>
+
+                
+
+                <div class="form-group">
+                    <label for="pr_endLevel">레벨(end Line)(Default level 9)(resUser일 경우 작성일자로 표기됩니다)</label>
+                    <select class="form-control" id="pr_endLevel" name="pr_endLevel">
+                      <option th:selected="${prize.pr_endLevel == '1'}">1</option>
+                      <option th:selected="${prize.pr_endLevel == '2'}">2</option>
+                      <option th:selected="${prize.pr_endLevel == '3'}">3</option>
+                      <option th:selected="${prize.pr_endLevel == '4'}">4</option>
+                      <option th:selected="${prize.pr_endLevel == '5'}">5</option>
+                      <option th:selected="${prize.pr_endLevel == '6'}">6</option>
+                      <option th:selected="${prize.pr_endLevel == '7'}">7</option>
+                      <option th:selected="${prize.pr_endLevel == '8'}">8</option>
+                      <option th:selected="${prize.pr_endLevel == '9'}">9</option>
+                    </select>
+                </div>
+
+				<div class="form-group">
+					<p>기존 이미지:</p>
+					<img th:src="@{'/uploads' + ${prize.fi_path}}" alt="Event Image" style="height: 200px;">
+				</div>
+
+                <div class="form-group">
+					<label>새로 변경 할 이미지:</label>
+					<input type="file" class="form-control-file border"  name="file">
+				</div>
+				
+
+                <input type="hidden" th:value="${prize.ev_no}" name="ev_no">
+
+                <input type="hidden" th:value="${prize.pr_no}" name="pr_no">
+
+				<button type="submit" class="btn btn-outline-dark col-12 mb-2">상품 수정</button>
+			</form>
+		</div>
+
+
+
+
+        <script>    
+            
+
+
+        </script>
+
+
+
+	</main>
+</body>
+</html>

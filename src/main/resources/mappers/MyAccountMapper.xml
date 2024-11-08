@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kh.st.boot.dao.MyAccountDAO"> 
+	
+	<select id="selectAccountById" resultType="AccountVO">
+		SELECT *
+		FROM
+			ACCOUNT
+		JOIN
+			MEMBER ON MEMBER.MB_NO = ACCOUNT.MB_NO
+		WHERE
+			MB_ID = #{mb_id}
+	</select>
+	
+	<select id="selectDepositListByDate" resultType="DepositVO">
+		SELECT *
+		FROM
+			DEPOSIT
+		WHERE
+			MB_ID = #{mb_id} AND
+			DE_DATETIME >= #{date}
+	</select>
+
+	<select id="selectPointList" resultType="PointVO">
+		SELECT *
+		FROM
+			POINT
+		WHERE
+			MB_ID = #{mb_id}
+			<if test="cri.type == 'use'">
+				AND 0 > PO_NUM
+			</if>
+			<if test="cri.type == 'get'">
+				AND PO_NUM > 0
+			</if>
+		ORDER BY PO_NO DESC
+		LIMIT #{cri.pageStart}, #{cri.perPageNum}
+	</select>
+	
+	<update id="updatePw">
+		UPDATE MEMBER SET MB_PASSWORD = #{mb_password} WHERE MB_ID = #{mb_id}
+	</update>
+	
+	<delete id="deleteAccount">
+		DELETE FROM ACCOUNT WHERE MB_NO = #{mb_no}
+	</delete>
+	
+	<update id="deleteUser">
+		UPDATE 
+			MEMBER 
+		SET
+			MB_PASSWORD = NULL,
+			MB_NAME = NULL,
+			MB_NICK = NULL,
+			MB_PH = NULL,
+			MB_EMAIL = NULL,
+			MB_BIRTH = NULL,
+			MB_ZIP = NULL,
+			MB_ADDR = NULL,
+			MB_ADDR2 = NULL,
+			MB_OUT_DATE = NOW()
+		WHERE
+			MB_ID = #{mb_id} 
+	</update>
+	
+	<select id="selectStockList" resultType="StockVO">
+		SELECT * FROM STOCK
+	</select>
+	
+	<select id="selectMemberApprove" resultType="MemberApproveVO">
+		SELECT * FROM MEMBER_APPROVE WHERE MB_NO = #{mb_no}
+	</select>
+	
+	<insert id="insertMemberApprove">
+		INSERT INTO MEMBER_APPROVE (MP_TYPE, MP_COMPANY, MP_DATETIME, MB_NO) VALUES
+		(#{mp_type}, #{mp_company}, NOW(), #{mb_no})
+	</insert>
+	
+	<delete id="deleteMemberApprove">
+		DELETE FROM MEMBER_APPROVE WHERE MB_NO = #{mb_no}
+	</delete>
+	
+	<select id="getStockName" resultType="String">
+		SELECT ST_NAME
+		FROM
+			STOCK
+		WHERE
+			ST_CODE = #{mp_company}
+	</select>
+	<select id="selectNewsMember" resultType="NewsMemberVO">
+		SELECT *
+		FROM
+			NEWS_MEMBER
+		WHERE
+			MB_NO = #{mb_no}
+	</select>
+	<select id="selectStockMember" resultType="StockMemberVO">
+		SELECT *
+		FROM
+			STOCK_MEMBER
+		WHERE
+			MB_NO = #{mb_no}
+	</select>
+	<delete id="deleteNewsMember">
+		DELETE FROM NEWS_MEMBER WHERE MB_NO = #{mb_no}
+	</delete>
+	<delete id="deleteStockMember">
+		DELETE FROM STOCK_MEMBER WHERE MB_NO = #{mb_no}
+	</delete>
+	<select id="selectMyStockList" resultType="kh.st.boot.model.dto.MyAccountStocksDTO">
+		SELECT 
+		    a.st_code AS stockCode, 
+		    a.st_name AS stockName, 
+		    c.total_qty AS stocksQty, 
+		    c.total_price AS stockOrignPrice
+		FROM 
+		    stock a
+		JOIN (
+		    SELECT 
+		        od_st_code, 
+		        COALESCE(SUM(CASE WHEN od_status LIKE '매수%' THEN od_qty ELSE 0 END), 0) - 
+		        COALESCE(SUM(CASE WHEN od_status LIKE '매도%' THEN od_qty ELSE 0 END), 0) AS total_qty, 
+		        COALESCE(SUM(CASE WHEN od_status LIKE '매수%' THEN od_st_price * od_qty + od_percent_price ELSE 0 END), 0) - 
+		        COALESCE(SUM(CASE WHEN od_status LIKE '매도%' THEN od_st_price * od_qty + od_percent_price  ELSE 0 END), 0) AS total_price  
+		    FROM 
+		        `order`
+		    WHERE 
+		        mb_id = #{mb_id}
+		    GROUP BY 
+		        od_st_code
+		    HAVING 
+		        total_qty > 0
+		) c ON a.st_code = c.od_st_code
+		ORDER BY 
+		    a.st_name ASC;
+	</select>
+	<select id="selectMemberStatus" resultType="String">
+	    SELECT 
+	        CASE 
+	            WHEN EXISTS (SELECT 1 FROM news_member WHERE mb_no = #{mb_no}) THEN 'news'
+	            WHEN EXISTS (SELECT 1 FROM stock_member WHERE mb_no = #{mb_no}) THEN 'stock'
+	            ELSE 'none'
+	        END AS member_status
+	    FROM
+	        MEMBER
+	    WHERE
+	    	MB_ID = #{mb_id}
+	</select>
+	<delete id="deleteMemberStatus">
+		<choose>
+	        <when test="status == 'news'">
+	            DELETE FROM news_member WHERE mb_no = #{mb_no}
+	        </when>
+	        <when test="status == 'stock'">
+	            DELETE FROM stock_member WHERE mb_no = #{mb_no}
+	        </when>
+	    </choose>
+	</delete>
+	<insert id="insertStockAdd">
+		INSERT INTO STOCK_ADD (SA_QTY, MB_ID, SA_DATETIME, SA_CONTENT) VALUES
+		(#{sa_qty}, #{mb_id}, NOW(), #{sa_content})
+	</insert>
+	<select id="selectStockAddList" resultType="StockAddVO">
+		SELECT *
+		FROM
+			STOCK_ADD
+		WHERE
+			MB_ID = #{mb_id}
+		ORDER BY SA_DATETIME DESC
+		LIMIT #{cri.pageStart}, #{cri.perPageNum}
+	</select>
+	<select id="getCountByStockAdd" resultType="int">
+		SELECT COUNT(*)
+		FROM
+			STOCK_ADD
+		WHERE
+			MB_ID = #{mb_id}
+	</select>
+</mapper>

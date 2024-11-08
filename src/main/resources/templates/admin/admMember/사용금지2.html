@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/admlayout.html}" layout:fragment="content">
+<head>
+<script src="https://kit.fontawesome.com/3f892a70ad.js"
+	crossorigin="anonymous">
+	
+</script>
+<script
+	src="https://demo.sir.kr/gnuboard5/js/jquery.menu.js?ver=2304171"></script>
+<meta charset="UTF-8">
+<title>관리자 페이지</title>
+
+</head>
+<body>
+
+	<div id="wrapper">
+		<div id="container">
+			<h1 id="container_title">회원 관리</h1>
+			<div id="container_main">
+				<!-- 검색기능 form -->
+				<form action="" class="local_sch">
+					<select>
+						<option>회원아이디</option>
+						<option>회원이름</option>
+						<option>회원닉네임</option>
+						<option>회원전화번호</option>
+						<option>회원레벨</option>
+					</select> <input type="text" name="search" required class="in_sch">
+				</form>
+
+				<form action="">
+					<table>
+						<thead>
+							<tr>
+								<th style="width: 420px">아이디</th>
+								<th>이름</th>
+								<th>닉네임</th>
+								<th>전화번호</th>
+								<th>레벨</th>
+								<th>가입일</th>
+								<th>수정일</th>
+								<th>정지일</th>								
+								<th>관리</th>
+							</tr>
+						</thead>
+						<tbody>
+							<!-- 값 불러오기 -->
+							<th:block th:each="userlist : ${userlist}">
+							<tr>
+								<td th:text="${userlist.mb_id}"></td>
+								<td th:text="${userlist.mb_name}"></td>
+								<td th:text="${userlist.mb_nick}"></td>
+								<td th:text="${userlist.mb_ph}"></td>
+								<td th:text="${userlist.mb_level}"></td>
+								<td th:text="${#dates.format(userlist.mb_datetime, 'yyyy-MM-dd')}"></td>
+								<td th:text="${#dates.format(userlist.mb_edit_date, 'yyyy-MM-dd')}"></td>	
+								<td th:text="${#dates.format(userlist.mb_stop_date, 'yyyy-MM-dd')}"></td>
+								<td>
+									<!-- 수정 버튼 -->
+									<form th:action="@{/admin/admMember/admUser/update}" method="post" style="display:inline;">
+										<input type="hidden" name="mb_id" th:value="${userlist.mb_id}"/>
+										<button type="submit">수정</button>
+									</form>
+									
+								</td>	
+							</tr>
+							</th:block>
+						</tbody>
+					</table>
+					
+					
+				</form>
+
+			</div>
+			<footer id="ft">
+				<p>Copyright © demo.sir.kr. All rights reserved.</p>
+			</footer>
+		</div>
+	</div>
+
+</body>
+</html>

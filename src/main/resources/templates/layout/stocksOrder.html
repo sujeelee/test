@@ -1,0 +1,358 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet" type="text/css" th:href="@{/css/stockdetail.css}">
+<div class="order-header">
+	<span class="mini-title">주문하기</span>
+</div>
+<div class="order-div" th:if="${member.mb_id == null}">
+	<div class="not-member">
+		<div class="none-list">
+	    	<div class="none-content">
+				<i class="fa-solid fa-note-sticky fa-5x fa-color"></i>
+	    		<p class="no-title">회원만 이용가능합니다.</p>
+		    	<a th:href="@{/member/login}">
+		    		<button class="btn btn-outline-danger">로그인 하러 가기</button>
+		    	</a>
+	    	</div>
+	    </div>
+	</div>
+</div>
+<div class="order-div" th:if="${member.mb_id != null}">
+	<div class="btn-list order-btn-list">
+		<button type="button" class="btn btn-outline-danger order-type on" value="buy" onclick="order_status(this);">구매</button>
+<button type="button" class="btn btn-outline-primary order-type" value="sell" onclick="order_status(this);">판매</button>
+<button type="button" class="btn btn-outline-success order-type" value="wait" onclick="order_status(this);">대기</button>
+</div>
+<div class="form-order">
+	<div class="select-type form-group">
+		<label for="type">주문유형</label>
+		<select class="form-control" name="type" id="type" onchange="control_type(this.value);">
+			<option value="now">일반 주문</option>
+			<option value="wait">조건 주문</option>
+		</select>
+	</div>
+	<form name="forderform" th:action="@{/stock/orderupdate}" class="form-tab" onsubmit="return forderform_update(this);" method="POST">
+ <input type="hidden" name="stock_total_qty" th:value="${stock.st_qty}">
+ <input type="hidden" name="percent" th:value="${config.cf_percent}">
+ <input type="hidden" name="po_percent" th:value="${config.cf_od_point}">
+ <input type="hidden" name="od_st_code" th:value="${st_code}">
+ <input type="hidden" name="od_price" value="0">
+ <input type="hidden" name="status" value="now">
+ <input type="hidden" name="od_type" value="buy">
+ <input type="hidden" name="od_st_name" th:value="${stock.st_name}">
+ <input type="hidden" name="mb_id" th:value="${member.mb_id}">
+ <input type="hidden" name="od_name" th:value="${member.mb_name}">
+ <input type="hidden" name="od_st_price" th:value="${today.si_price}">
+ <div class="form-content">
+<div class="form-group price-button rigth">
+  		<div class="st-label">구매가격</div>
+  		<div>수량</div>
+  </div>
+  <div class="form-group price-button left">
+  	<div>
+  		<input type="text" readonly name="st_price" id="od_st_price" th:data-orgin="${today.si_price}" th:value="${today.si_price}" data-tag="od_st_price" onkeyup="calculator_qty(this)">
+<div class="btn-group-qty price-hidden" style="display:none;">
+<button type="button" class="btn" data-tag="od_st_price" value="plus" onclick="calculator_qty(this);">+</button>
+<button type="button" class="btn" data-tag="od_st_price" value="minus" onclick="calculator_qty(this);">-</button>
+</div>
+	</div>
+	<div>
+<input type="text" name="od_qty" id="od_qty" value="0" data-tag="od_qty" onkeyup="calculator_qty(this)">
+<div class="btn-group-qty">
+	<button type="button" class="btn" data-tag="od_qty" value="plus" onclick="calculator_qty(this);">+</button>
+<button type="button" class="btn" data-tag="od_qty" value="minus" onclick="calculator_qty(this);">-</button>
+					</div>
+			  	</div>
+			  </div>
+		  </div>
+		  <div class="divider"></div>
+		  <div class="total-info-section form-content">
+		  	<div class="total-info rigth">
+			  	<div class="total-label">구매가능 금액</div>
+			  	<div>총 금액</div>
+		  	</div>
+		  	<div class="total-info left">
+		  		<div class="deposit" th:data-deposit="${deposit}" th:data-stocks="${myStocks.stocksQty}" th:text="${#numbers.formatInteger(deposit, 0, 'COMMA')} + '원'"></div>
+			  	<div class="tot-price">0원</div>
+		  	</div>
+		  </div>
+		  <button type="submit" class="footer-sticky btn btn-outline-danger on width-full">구매하기</button>
+	</form>
+</div>
+<div class="wait-list" style="display:none;">
+<div class="wait-table">
+	<div class="wait-row" th:each="reserve : ${reservation}" th:data-num="${reserve.re_no}">
+		<div class="wait-top">
+			<i class="fa-solid fa-square-plus" th:if="${reserve.re_state.contains('매수')}" style="color:#dc3545;"></i>
+<i class="fa-solid fa-square-minus blue" th:if="${reserve.re_state.contains('매도')}" style="color:#007bff;"></i>
+					<span class="wait-date" th:text=" ${#strings.substring(reserve.re_datetime, 5, 10)}"></span>
+					<span class="wait-state" th:text="${reserve.re_state}"></span>&nbsp;
+				</div> 
+				<div class="wait-bottom">
+					<span class="wait-price" th:text="': ' + ${#numbers.formatInteger(reserve.re_want_price,0,'COMMA')} + '원'"></span>
+					<span class="wait-qty" th:text="${#numbers.formatInteger(reserve.re_qty,0,'COMMA')} + '주'"></span>
+					<span class="waite-delete">
+						<button type="button" class="btn" th:onclick="delete_wait([[${reserve.re_no}]]);">X</button>
+					</span>
+				</div>
+			</div>
+			<div class="none-list" th:if="${reservation == null or #lists.isEmpty(reservation)}">
+		    	<div class="none-content">
+					<i class="fa-solid fa-note-sticky fa-5x fa-color"></i>
+		    		<p class="no-title">내역이 없어요</p>
+		    	</div>
+		    </div>
+		</div>
+	</div>
+</div>
+<div class="mystock-div" th:if="${member.mb_id != null}">
+	<div class="order-header">
+		<span class="mini-title">내 주식</span>
+	</div>
+	<div class="mystock-info" th:if="${myStocks.stocksQty > 0}">
+		<div class="mystock-list form-content">
+			<div class="mystock-row rigth">
+				<div class="my-price">1주 평균금액</div>
+				<div class="my-qty">보유 수량</div>
+				<div class="my-total">총 금액</div>
+				<div class="my-orign">투자원금</div>
+		    </div>
+		    <div class="mystock-row left">
+				<div class="my-price" th:text="${#numbers.formatInteger(myStocks.stockAverage, 0,'COMMA')} + '원'"></div>
+				<div class="my-qty" th:text="${#numbers.formatInteger(myStocks.stocksQty,0,'COMMA')} + '주'"></div>
+				<div class="my-total" th:text="${#numbers.formatInteger(myStocks.stockNowPrice,0,'COMMA')} + '원'"></div>
+				<div class="my-orign" th:text="${#numbers.formatInteger(myStocks.stockOrignPrice,0,'COMMA')} + '원'"></div>
+		   </div>
+		</div>
+		<div class="divider"></div>
+		<div class="mystock-list form-content bottom">
+			<div class="mystock-row rigth">
+				<div class="my-price">거래 수수료</div>
+		    </div>
+		    <div class="mystock-row left">
+				<div class="my-price" th:text="${#numbers.formatInteger(myStocks.stockPercent,0,'COMMA')} + '원 예상'"></div>
+		   </div>
+		</div>
+	</div>
+    <div class="none-list" th:if="${myStocks.stocksQty == 0}">
+    	<div class="none-content">
+			<i class="fa-solid fa-note-sticky fa-5x fa-color"></i>
+    		<p class="no-title">내역이 없어요</p>
+    	</div>
+    </div>
+</div>
+<script th:inline="javascript">
+	function forderform_update(f){
+		
+		if(parseInt(f.od_price.value) == 0){
+			alert("가격이나 수량은 1이상이어야 합니다.");
+			return false;
+		}
+		
+		return true;
+	}
+	function order_status(type){
+		$(".order-type").removeClass("on");
+		$(type).addClass("on");
+		var footer_class = $(".footer-sticky").attr("class");
+		if(type.value != 'wait'){
+			$("input[name=od_type]").val(type.value);
+			calculator_price($("input[name=od_type]").val());
+		} //대기 리스트에서는 필요가 없어요
+		
+		if(type.value == 'sell'){
+			var update_class = footer_class.replace(/\bbtn-outline-\S+/g, "btn-outline-primary");
+		    $(".footer-sticky").attr("class", update_class);
+		    $(".footer-sticky").text("판매하기");
+		    $(".st-label").text("판매가격");
+		    $(".total-label").text("판매가능 수량");
+		    $(".deposit").text(addCommas(parseInt($(".deposit").data("stocks"))) + "주");
+		    $(".form-order").show();
+		    $(".wait-list").hide();
+		} else if(type.value == 'wait'){
+			$(".form-order").hide();
+			$(".wait-list").show();
+		} else {
+			var update_class = footer_class.replace(/\bbtn-outline-\S+/g, "btn-outline-danger");
+		    $(".footer-sticky").attr("class", update_class);
+		    $(".footer-sticky").text("구매하기");
+		    $(".st-label").text("구매가격");
+		    $(".total-label").text("구매가능 금액");
+		    $(".deposit").text(addCommas(parseInt($(".deposit").data("deposit"))) + "원");
+		    $(".form-order").show();
+		    $(".wait-list").hide();
+		}
+	}
+	
+	function data_filter(type){
+		$(".graph-date-btn").removeClass("btn-info");
+		$(type).addClass("btn-info");
+		var url = "/stock/graph/";
+		url += [[${st_code}]];
+		$.ajax({
+            url: url,
+            type: 'post',
+            data: {type: type.value},
+            dataType : 'json',
+            async: false, 
+            success: function (data) {
+            	var tableBody = $(".stock-day-table tbody"); // 테이블 tbody 선택자
+                tableBody.empty(); // 기존 데이터 삭제
+                
+            	if(data.list.length < 1){
+            		var str = '<div class="none-list">';
+            			str += '	<div class="none-content">';
+            			str += '		<i class="fa-solid fa-note-sticky fa-5x fa-color"></i>';
+            			str += '		<p class="no-title">내역이 없어요</p>';
+            			str += '	</div>';
+            			str += '</div>';
+            			
+            		$("#graph").html(str);
+            		tableBody.append("<tr class='none-stock-order none-list'><td colspan='7'>" + str + "</td></tr>");
+            	} else {
+	                var list = data.list;
+	                drawGraph(list);
+	                for (var i = list.length - 1; i >= 0; i--) {
+	                    var row = "<tr>" +
+	                        "<td>" + list[i].si_date.substring(4, 6) + "." + list[i].si_date.substring(6, 8) + "</td>" +
+	                        "<td>" + new Intl.NumberFormat().format(list[i].si_price) + "원</td>" +
+	                        "<td><span class='" + (list[i].si_fltRt == '0' ? 'hold' : (list[i].si_fltRt.includes('-') ? 'blue' : 'red')) + "'>" + parseFloat(list[i].si_fltRt).toFixed(2) + "%</span></td>" +
+	                        "<td>" + new Intl.NumberFormat().format(list[i].yesterPrice) + "원</td>" +
+	                        "<td>" + new Intl.NumberFormat().format(list[i].si_hipr) + "원</td>" +
+	                        "<td>" + new Intl.NumberFormat().format(list[i].si_lopr) + "원</td>" +
+	                        "<td>" + new Intl.NumberFormat().format(list[i].si_trqu) + "</td>" +
+	                        "</tr>";
+	                    
+	                    tableBody.append(row); // 새롭게 만든 행을 테이블에 추가
+	                }
+	            }
+            }
+		});
+	}
+	
+	function calculator_qty(btn){
+		
+		var org_qty = parseInt($("#" + $(btn).data("tag")).val().replace(/[^0-9]/g, ''));
+
+		if(isNaN(org_qty)){
+			org_qty = 0;
+		}
+		
+		if(btn.value == "plus"){
+			org_qty += 1;
+		} else if (btn.value == "minus") {
+			org_qty -= 1;
+		}
+		
+		if(org_qty < 0) {
+			org_qty = 0;
+		}
+		
+		if($(btn).data("tag") == "od_qty" && $("input[name=od_type]").val() == 'sell'){
+			if(org_qty > parseInt($(".deposit").data("stocks")) ){
+				alert("최대 판매 가능 주식 보유 수는 " + parseInt($(".deposit").data("stocks")) + "주 입니다.");
+				org_qty = parseInt($(".deposit").data("stocks"));
+			}
+		}
+		
+		if($("input[name=od_type]").val() == 'buy'){
+			
+			var percent = parseInt($("input[name=percent]").val());
+			
+			var deposit = parseInt($(".deposit").data("deposit"));
+			
+			if($(btn).data("tag") == "od_qty"){
+				//var total_price = parseInt($("#od_st_price").val()) * parseInt($("#od_qty").val());
+				var total = org_qty * parseInt($("#od_st_price").val());
+				total += Math.floor(total * percent / 100);
+				if(total > deposit){
+					if(confirm("최대 구매 가능 금액은 " + addCommas(deposit) + "원 입니다.\n예치금을 충전하시겠습니까?")){
+						open_window('deposit', 1250, 800);
+					}
+					org_qty = deposit / (parseInt($("#od_st_price").val()) + Math.floor(parseInt($("#od_st_price").val()) * percent / 100));
+					org_qty = Math.floor(org_qty);
+				}
+				var stock_total = parseInt($("input[name=stock_total_qty]").val());
+				if(org_qty > stock_total){
+					alert("최대 구매 가능한 주식은 " + addCommas(stock_total) + "주 입니다.");
+					org_qty = stock_total;
+				}
+			} else {
+				var total = org_qty * parseInt($("#od_qty").val());
+				total += Math.floor(total * percent / 100);
+				if(total > deposit){
+					alert("최대 구매 가능 금액은 " + addCommas(deposit) + "원 입니다.");
+					org_qty = $("#od_st_price").data("orgin");
+				}
+			}
+			if(org_qty > parseInt($(".deposit").data("deposit")) ){
+				alert("최대 구매 가능 금액은 " + addCommas(deposit) + "원 입니다.");
+				org_qty = $("#od_st_price").data("orgin");
+			}
+		}
+		
+		$("#" + $(btn).data("tag")).val(org_qty);
+		
+		calculator_price($("input[name=od_type]").val());
+	}
+	
+	function calculator_price(type){
+		var percent = parseInt($("input[name=percent]").val());
+		var total_price = parseInt($("#od_st_price").val()) * parseInt($("#od_qty").val());
+		if(type == "sell"){
+			total_price -= Math.floor(total_price * percent / 100);
+		} else {
+			total_price += Math.floor(total_price * percent / 100);
+		}
+		
+		$("input[name=od_price]").val(total_price);
+		$(".tot-price").text(addCommas(total_price) + "원");
+	}
+	
+	function control_type(val){
+		$("input[name=status]").val(val);
+		if(val == "wait"){
+			$(".price-hidden").show();
+			$("#od_st_price").removeAttr("readonly");
+		} else {
+			$(".price-hidden").hide();
+			$("#od_st_price").val($("#od_st_price").data("orgin"));
+			$("#od_st_price").attr("readonly", true);
+		}
+		
+		calculator_price();
+	}
+	
+	function delete_wait(num){
+		if(confirm("대기를 리스트에서 삭제하시겠습니까?")){
+			var url = "/stock/delete/";
+			url += [[${st_code}]];
+			$.ajax({
+	            url: url,
+	            type: 'post',
+	            data: {re_no: num},
+	            dataType : 'json',
+	            async: false, 
+	            success: function (data) {
+	            	$(".wait-row").each(function() {
+				        // 현재 요소의 data("num") 값이 전달된 num과 같은지 확인
+				        if (num == $(this).data("num")) {
+				            // 일치하는 요소의 내용을 비움
+				            $(this).remove();
+				            //마지막 요소이면?
+				            if ($(".wait-table").children().length === 0) {
+				            	var str = '<div class="none-list">';
+					    			str += '<div class="none-content">';
+					    			str += '<i class="fa-solid fa-note-sticky fa-5x fa-color"></i>';
+				    				str += '<p class="no-title">내역이 없어요</p>';
+		    						str += '</div>';
+		    						str += '</div>';
+				               $(".wait-table").append(str);
+				            }
+				            return false;
+				        }
+				    });
+	            }
+			});
+		}
+	}
+</script>

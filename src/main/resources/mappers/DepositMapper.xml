@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kh.st.boot.dao.DepositDAO"> 
+	<select id="findMaxOrderId" resultType="String">
+		<if test="type == null">
+			select do_od_id from deposit_order where do_od_id LIKE CONCAT(#{date}, '%') order by do_od_id DESC limit 1
+		</if>
+		<if test="type != null">
+			select od_id from `order` where od_id LIKE CONCAT(#{date}, '%') order by od_id DESC limit 1
+		</if>
+	</select>
+	<select id="getOrderCheck" resultType="DepositOrderVO">
+		select * from deposit_order where do_od_id = #{od_id}
+	</select>
+	<insert id="insertOrderData">
+		insert into deposit_order
+		set	do_od_id = #{do.do_od_id},
+			do_name = #{do.do_name},
+			do_tel = #{do.do_tel},
+			do_email = #{do.do_email},
+			do_price = #{do.do_price},
+			do_date = NOW(),
+			do_status = #{do.do_status},
+			mb_id = #{do.mb_id}
+	</insert>
+	<update id="updateOrder">
+		update deposit_order
+		set do_auth = #{do.do_auth},
+			do_tno = #{do.do_tno},
+			do_status = #{do.do_status},
+			do_date = NOW()
+		where do_od_id = #{do.do_od_id}
+	</update>
+	<select id="getAccount" resultType="AccountVO">
+		select * from account where mb_no = #{mb_no}
+	</select>
+	<insert id="insertAccountDeposit">
+		insert into account
+		set mb_no = #{ac.mb_no},
+			ac_deposit = #{ac.ac_deposit}
+	</insert>
+	<update id="updateAccountDeposit">
+		update account
+		set ac_deposit =  ac_deposit + #{totalPrice}
+		where mb_no = #{ac.mb_no}
+	</update>
+	<insert id="insertDepositLog">
+		insert into deposit
+		set de_content = #{de.de_content},
+			mb_id = #{de.mb_id},
+			de_num = #{de.de_num},
+			de_before_num = #{de.de_before_num},
+			de_datetime = NOW()
+			<if test="de.de_stock_code">
+				,de_stock_code = #{de.de_stock_code}
+			</if>
+	</insert>
+	<delete id="deleteStatusStay">
+		delete from deposit_order where do_status = '대기' and mb_id = #{mb_id}
+	</delete>
+	<select id="getCount" resultType="int">
+		select count(*) from deposit 
+		where mb_id = #{mb_id}
+		<if test="cri.type == 'stock'">
+			and de_stock_code != ''
+		</if>
+		<if test="cri.detail == 'sell'">
+			and de_content REGEXP('매수|매도')
+		</if>
+		<if test="cri.detail == 'account'">
+			and de_content REGEXP('예치금|송금|출금')
+		</if>
+		<if test="cri.detail == 'stocks'">
+			and de_content REGEXP('입고|출고')
+		</if>
+	</select>
+	<select id="getDepositMember" resultType="DepositVO">
+		select * from deposit 
+		where mb_id = #{mb_id}
+		<if test="cri.type == 'stock'">
+			and de_stock_code != ''
+		</if>
+		<if test="cri.detail == 'sell'">
+			and de_content REGEXP('매수|매도')
+		</if>
+		<if test="cri.detail == 'account'">
+			and de_content REGEXP('예치금|송금|출금')
+		</if>
+		<if test="cri.detail == 'stocks'">
+			and de_content REGEXP('입고|출고')
+		</if>
+		order by de_no DESC
+		<if test="cri != null">
+			limit #{cri.pageStart}, #{cri.perPageNum}
+		</if>
+	</select>
+	<select id="getOrderMemberBySell" resultType="OrderVO">
+		SELECT *
+		FROM
+			`ORDER`
+		WHERE
+			MB_ID = #{mb_id}
+			AND OD_STATUS LIKE '%매도%'
+		ORDER BY
+			OD_DATE DESC
+	</select>
+	<select id="getOrderMemberByBuy" resultType="OrderVO">
+		SELECT *
+		FROM
+			`ORDER`
+		WHERE
+			MB_ID = #{mb_id}
+			AND OD_STATUS LIKE '%매수%'
+		ORDER BY
+			OD_DATE DESC
+	</select>
+	<select id="getOrderMember" resultType="OrderVO">
+		SELECT *
+		FROM
+			`ORDER`
+		WHERE
+			MB_ID = #{mb_id}
+			AND (OD_STATUS LIKE '%매도%' OR OD_STATUS LIKE '%매수%') 
+		ORDER BY
+			OD_DATE DESC
+	</select>
+	<select id="getOrderMemberBySellDate" resultType="OrderVO">
+		SELECT *
+		FROM
+			`ORDER`
+		WHERE
+			MB_ID = #{mb_id}
+			AND OD_STATUS LIKE '%매도%'
+			<if test="now.length() > 0">
+				AND OD_DATE LIKE CONCAT(#{now}, '%')
+			</if>
+		ORDER BY
+			OD_DATE DESC
+	</select>
+	<select id="getOrderMemberByBuyDate" resultType="OrderVO">
+		SELECT *
+		FROM
+			`ORDER`
+		WHERE
+			MB_ID = #{mb_id}
+			AND OD_STATUS LIKE '%매수%'
+			<if test="now.length() > 0">
+				AND OD_DATE LIKE CONCAT(#{now}, '%')
+			</if>
+		ORDER BY
+			OD_DATE DESC
+	</select>
+	<select id="getOrderMemberByDate" resultType="OrderVO">
+		SELECT *
+		FROM
+			`ORDER`
+		WHERE
+			MB_ID = #{mb_id}
+			AND (OD_STATUS LIKE '%매도%' OR OD_STATUS LIKE '%매수%')
+			<if test="now.length() > 0">
+				AND OD_DATE LIKE CONCAT(#{now}, '%')
+			</if>
+		ORDER BY
+			OD_DATE DESC
+	</select>
+	<select id="getCountByPoint" resultType="int">
+		SELECT COUNT(*)
+		FROM
+			POINT
+		WHERE MB_ID = #{mb_id}
+			<if test="cri.type == 'use'">
+				AND 0 > PO_NUM
+			</if>
+			<if test="cri.detail == 'get'">
+				AND PO_NUM > 0 
+			</if>
+	</select>
+	<select id="chkAccount" resultType="kh.st.boot.model.dto.AccountChkDTO">
+		select mb_account as account, mb_id, mb_name 
+		from member
+		where mb_account = #{account}
+	</select>
+	<insert id="insertSend" useGeneratedKeys="true" keyColumn="ds_no" keyProperty="se.ds_no">
+		insert into deposit_send
+		set ds_send_name = #{se.ds_send_name},
+			ds_receive_name = #{se.ds_receive_name},
+			ds_receive_account = #{se.ds_receive_account},
+			mb_id = #{se.mb_id},
+			ds_re_mb_id = #{se.ds_re_mb_id},
+			ds_send_price = #{se.ds_send_price},
+			ds_datetime = NOW()
+	</insert>
+	<select id="getSendInfo" resultType="SendVO">
+		select * from deposit_send 
+		where ds_no = #{no}
+	</select>
+</mapper>

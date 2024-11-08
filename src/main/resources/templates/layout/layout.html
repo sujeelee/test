@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <title layout:fragment="title">부트</title>
+    <!-- Latest compiled and minified CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+    />
+
+    <!-- jQuery library -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+
+    <!-- Popper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+	
+    <!--추가-->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <script type="text/javascript" th:src="@{/js/sidebar.js}"></script>
+    <script
+      src="https://kit.fontawesome.com/aa7d727d3c.js"
+      crossorigin="anonymous"
+    ></script>
+    <!-- 구글 차트 스크립트 추가 -->
+    <script
+      type="text/javascript"
+      src="https://www.gstatic.com/charts/loader.js"
+    ></script>
+    
+	<!-- <link rel="stylesheet" type="text/css" th:href="@{/css/jquery-ui.min.css}"> -->
+	<script type="text/javascript" th:src="@{/js/jquery-ui.min.js}"></script>
+	<link rel="stylesheet" type="text/css" th:href="@{/css/layoutCommon.css}">
+  </head>
+  <body scroll="no">
+    <!--/* 고정 헤더 */-->
+    <div th:replace="~{layout/header.html :: header}"></div>
+    <!-- 헤더 불러오기 -->
+    <!-- 사이드바 불러오기 -->
+    <div th:replace="~{layout/sidebar.html :: sidebar}"></div>
+
+    <!--/* 고정 푸터 */-->
+
+    <div class="home-section container">
+      <main layout:fragment="content"></main>
+      <div th:replace="~{layout/modal.html}"></div>
+      <div class="go-top" style="display: none;">
+      	<span class="go-cursor">
+      		<i class="fa fa-chevron-up"></i>
+      	</span>
+      </div>
+    </div>
+    
+    <div th:replace="~{layout/footer.html :: footer}"></div>
+    <!-- 푸터 불러오기 -->
+    <!-- 컨텐츠 영역 (각 페이지에서 변경될 부분) -->
+
+	<script th:inline="javascript">
+	<!-- URL에 따라 container 클래스 제거하는 스크립트 -->
+	$(document).ready(function () {
+	  // 현재 URL 가져오기
+	  let currentUrl = window.location.href;
+	  // container 없애고 싶은 url 아래에 추가 하시면 됩니다.
+	  let urlNames = ["myaccount"];
+	  // URL에 'myaccount'가 포함되어 있는지 확인
+	  for (item of urlNames) {
+	    if (currentUrl.includes(item)) {
+	      // 'container' 클래스를 가진 div 요소에서 클래스 제거
+	      $(".home-section").removeClass("container");
+	    }
+	  }
+	}); // 특정 url에 container를 삭제하는 함수
+	
+	function isEmptyCheck(data) {
+		if (data == "" ||data == null ||data == undefined || (data != null &&typeof data == "object" &&!Object.keys(data).length)) {
+			return true;
+		}
+		return false;
+	}
+	
+	function addCommas(num) {
+		return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+	}
+	
+	function open_window(type, width, height) {
+		var url = "/deposit";
+		if(type == "send"){
+			url += "/send";
+		}
+		const left = (window.screen.width / 2) - (width / 2);
+		const top = (window.screen.height / 2) - (height / 2);
+	
+		window.open(url, '_blank', `width=${width},height=${height},scrollbars=no,left=${left},top=${top}`);
+	}
+	$(document).on("keydown", function(event) {
+	    if (event.key === "/") {
+	    	action_search("show");
+	    }
+	});
+	
+	function action_search(type){
+		if(type == "show"){
+			if($(".search-modal").hasClass("active") === false){
+				$(".search-modal").fadeIn(300, function() {
+					$(".mstx").focus();
+					$('body').append('<div class="modal-backdrop" onclick="action_search(\'hide\')"></div>'); // 새로운 backdrop 추가
+					$(".search-modal").addClass("active");
+				});
+			}
+		} else {
+			if($(".search-modal").hasClass("active")){
+				$(".search-modal").fadeOut(300, function() {
+					$(".mstx").val("");
+					search_mstx("");
+					$('.modal-backdrop').remove(); // 백드롭 제거
+					$(".search-modal").removeClass("active");
+				});
+			} else {
+				$(".search-modal").fadeIn(300, function() {
+					$(".mstx").focus();
+					$('body').append('<div class="modal-backdrop" onclick="action_search(\'hide\')"></div>'); // 새로운 backdrop 추가
+					$(".search-modal").addClass("active");
+				});
+			}
+		}
+	}
+	function updateTranslateValue() {
+		var windowWidth = $(window).width() / 2; // 현재 창의 너비
+		var translateXValue = `calc(-50% + ${windowWidth}px)`;
+		$(':root').css('--translate-x', translateXValue);
+	}
+	updateTranslateValue();
+    $(window).resize(updateTranslateValue);
+    
+    function close_window(){
+		window.close();
+	}
+    
+	$(window).scroll(function(){
+		if ($(this).scrollTop() > 250) {
+			$('.go-top').fadeIn();
+		} else {
+			$('.go-top').fadeOut();
+		}
+	});
+
+	$('.go-top').on('click', function () {
+		$('html, body').animate({ scrollTop: '0px' }, 500);
+		return false;
+	});
+	</script>
+  </body>
+</html>

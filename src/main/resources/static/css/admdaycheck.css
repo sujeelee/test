@@ -1,0 +1,75 @@
+/* 꾸미기~~~~~~ */
+.local_sch {
+	margin: 10px 0;
+}
+
+.local_sch select {
+	height: 30px;
+	margin-right: 3px;
+	border: 1px solid #dcdcdc;
+}
+
+.in_sch {
+	height: 35px;
+	border: 1px solid #dcdcdc;
+	padding: 0 5px;
+}
+
+.tbl_col thead th {
+	background: #6f809a;
+	color: #fff;
+	border: 1px solid #60718b;
+	font-weight: normal;
+	text-align: center;
+	padding: 9px 5px;
+	font-size: 0.92em;
+	text-decoration: underline;
+	text-underline-position: under;
+}
+
+tbody {
+	background: white;
+}
+
+tbody td {
+	border: 1px solid #d6dce7;
+	padding: 5px;
+	text-align: left;
+}
+
+tr {
+	display: table-row;
+}
+
+.td_upd {
+	height: 26px;
+	line-height: 26px;
+	border: 0;
+	border-radius: 3px;
+	padding: 0 8px;
+	margin: 1px;
+	font-weight: normal;
+	background: #3f51b5;
+	color: #fff;
+}
+
+.day_search {
+	text-align: left;
+}
+
+.in_sch {
+	height: 30px;
+    border: 1px solid #dcdcdc;
+    padding: 0 5px;
+    margin-bottom: 7px;
+}
+
+.btn_a{
+	text-align: center;
+    width: 63px;
+    padding-top: 7px;
+    display: inline-flex;
+    height: 29px;
+    align-content: center;
+    flex-direction: column;
+}

@@ -1,0 +1,217 @@
+@charset "UTF-8";
+/* Container */
+.my-container {
+    display: grid;
+    grid-template-columns: 184px minmax(10px, 1fr);
+    grid-column-gap: 40px;
+    column-gap: 40px;
+    padding: 0 40px 40px 24px;
+    min-width: 940px;
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+/* Sidebar */
+.my-sidebar {
+    position: sticky;
+    top: 60px;
+    padding-top: 30px;
+    border-radius: 50px;
+    background-color: #fff;
+}
+
+.my-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.my-list li {
+    margin-bottom: 10px;
+}
+
+.my-item {
+	list-style: none;
+}
+
+.my-btn {
+    background-color: transparent;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    padding: 10px 15px;
+    border-radius: 50px;
+    transition: background-color 0.2s;
+    width: 100%;
+}
+     
+/* li 태그에 호버 효과 추가 */
+.my-list li:hover {
+	border-radius: 20px;
+	background-color: #f9fafb;
+}
+.my-text {
+    font-size: 17px;
+    color: #888;
+    transition: color 0.2s; /* 글자 색상 변화에 애니메이션 추가 */
+}
+
+/* Header */
+.mypage-header {
+    margin-bottom: 20px;
+}
+
+.header-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333d4b;
+}
+
+/* Balance Section */
+.balance-text {
+   	color: #888;
+    font-size: 17px;
+}
+
+
+/* Transactions Section */
+.transactions {
+    flex-direction: column;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: #fff;
+    min-height: 700px;
+}
+
+.transaction-item {
+    justify-content: space-between;
+    padding: 16px;
+    
+}
+
+.transaction-info {
+    flex-direction: column;
+}
+
+.transaction-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333d4b;
+}
+
+.transaction-date {
+    font-size: 14px;
+    color: #888;
+}
+
+.transaction-amount {
+    font-size: 16px;
+    font-weight: bold;
+}
+ /* 컨테이너 */
+.transaction-box {
+	min-height: 50%;
+}
+
+.transaction-container {
+    display: flex;
+    padding: 16px;
+    margin: 8px;
+    background-color: white;
+    border-radius: 12px;
+}
+
+/* 날짜 및 시간 정보 */
+.date-info {
+    font-size: 14px;
+    font-weight: 500;
+    color: #4a4a4a;
+    margin-right: 16px;
+}
+
+/* 거래 내역 */
+.transaction-details {
+    flex-grow: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* 사용자 정보 */
+.user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name {
+    font-weight: bold;
+    color: #333;
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+.transaction-type {
+    color: #6c6c6c;
+    font-size: 14px;
+}
+
+/* 금액 정보 */
+.amount-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.amount {
+    font-weight: bold;
+    color: #096c8a;
+    font-size: 16px;
+}
+
+.balance {
+    font-weight: 500;
+    color: #6c6c6c;
+    font-size: 14px;
+}
+
+li{cursor:pointer; color:#0c5460 !important;}
+.list-group-item{border:none !important;padding: .3rem 0.25rem !important;}
+.dropdown-item:hover{background-color:  rgba(9, 108, 138, 0.2) !important;}
+.dropdown-item > .on{color:#0c5460 !important;}
+.dropdown-item > .on:after {content: " ν";}
+.dropdown-menu{min-width: 1em !important; width:120px;}
+.dropdown-item{padding: 1px !important;}
+.btn{width: 100% !important; text-align: left; border-radius: 20px;}
+.page_div{margin-top: 5%;}
+.none-list{margin-top: 18%;}
+.none-content{text-align: center;}
+.fa-color{color: rgba(9, 108, 138, 0.3);}
+.no-title{margin-top: 2%; font-weight: bold; color: #888; font-size: 0.9em;}
+
+.profit-section {
+	display: flex; 
+	flex-direction: row; 
+	gap: 0px; 
+	justify-content: normal; 
+	align-items: center;
+}
+.profit-box {
+    padding: 4px 8px;
+}
+.profit-text {
+	color: #6b7684;
+	line-height: 1.6;
+	font-size: 22px;
+}
+.btn-list {
+	display: flex;
+	flex-direction: row;
+	gap: 15px;
+}
+.date-box{
+	padding-top: 15px;
+}
+.date-btn{
+	border: 0;
+			background-color: transparent;
+}

@@ -1,0 +1,107 @@
+<html xmlns:th="http://www.thymeleaf.org">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/modal.css}">
+	<div class="search-modal modal" tabindex="-1" role="dialog" style="display: none;">
+		<div class="search-modal-box">
+			<div class="search-modal-input">
+				<i class="fa-solid fa-magnifying-glass"></i>
+				<input type="hidden" name="search_type" value="all">
+				<input type="text" name="mstx" class="mstx" onkeyup="search_mstx(this.value);" autocomplete="off">
+			</div>
+			<div class="search-modal-table-div">
+				<div class="search-modal-table-title">
+					<div class="search-modal-sub-title">인기 주식 TOP 5</div>
+				</div>
+				<div class="search-modal-table">
+					<div class="search-modal-row" th:each="tops : ${top5list}" th:onclick="modal_link([[${tops.code}]], 'stock');">
+						<div class="modal-left">
+							<span class="search-modal-rank" th:text="${tops.ranks}"></span>
+							<span th:text="${tops.st_name}"></span>
+						</div>
+						<div class="modal-right">
+							<span th:class="${tops.flt == '0' ? 'dash-grey' : tops.flt.contains('-') ? 'dash-blue' :'dash-red' }" th:text="${#numbers.formatDecimal(tops.flt, 1, 2)}+'%'"></span>
+						</div>
+					</div> <!-- end search-modal-row -->
+				</div>
+			</div>
+			<div class="search-modal-result-div" style="display: none;">
+				<div class="search-modal-table-title">
+					<div class="search-modal-sub-title">
+						<ul class="nav nav-tabs">
+							<li class="nav-item modal-li-tabs-all" onclick="search_result('all');">
+								<span class="nav-link active">전체</span>
+							</li>
+							<li class="nav-item modal-li-tabs-stock" onclick="search_result('stock');">
+								<span class="nav-link">종목</span>
+							</li>
+							<li class="nav-item modal-li-tabs-news" onclick="search_result('news');">
+								<span class="nav-link">뉴스</span>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div class="search-modal-table search-result" id="search-result"></div>
+			</div>
+		</div>
+	</div>
+	<script th:inline="javascript">
+		function modal_link(code, type){
+			var url = "";
+			
+			if(type == "stock"){
+				url = "/stock/" + code;
+			} else if(type == "news"){
+				url = "/newspaper/newsDetail/" + code;
+			} else if(type == "url"){
+				url = code;
+			}
+			
+			location.href = url;
+		}
+		function search_mstx(stx){
+			
+			var type = $("input[name=search_type]").val();
+			
+			if(stx != ""){
+				get_result(type, stx);
+				if ($(".search-modal-table-div").css("display") != "none") {
+					$(".search-modal-table-div").fadeOut(300, function() {
+						$(".search-modal").animate({ height:"600px"}, 50); 
+						$(".search-modal-result-div").fadeIn(300);
+					});
+				}
+			} else {
+				type = "all";
+				search_result(type);
+				$("input[name=search_type]").val(type);
+				if ($(".search-modal-result-div").css("display") != "none") {
+					$(".search-modal-result-div").fadeOut(300, function() {
+						$(".search-modal").animate({ height:"400px"}, 50); 
+						$(".search-modal-table-div").fadeIn(300);
+					});
+				}
+			}
+			
+		}
+		function search_result(type){
+			$(".nav-link").removeClass("active");
+			$(".modal-li-tabs-" + type).find("span").addClass("active");
+			$("input[name=search_type]").val(type);
+			var stx = $(".mstx").val();
+			get_result(type, stx);
+		}
+		
+		function get_result(type, stx){
+			$.ajax({
+				url : '/totalSearch',
+				method : "post", //원하는 방식 선택
+				data : { //보낸 데이터를 객체로
+					stx : stx,
+					type : type
+				},
+				success : function(data){
+					$("#search-result").replaceWith(data);
+				}
+			});
+		}
+	</script>
+</html>

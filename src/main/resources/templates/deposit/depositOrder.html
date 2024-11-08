@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html 
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" >
+<head th:replace="~{layout/windows.html}"></head>
+<link rel="stylesheet" type="text/css" th:href="@{/css/deposit.css}">
+<script src="https://pay.nicepay.co.kr/v1/js/"></script> <!--nicepay payment-window client-auth-->
+<body>
+	<h2 class="center">예치금결제</h2>
+	<div class="center">
+		<form name="fdepositorder" class="center" action="" method="post" onsubmit="return fdepositorder_submit(this);">
+			<input type="hidden" name="do_price" value="0">
+			<input type="hidden" name="do_od_id" value="">
+			<div class="form-content">
+				<div class="left_side">
+					<div class="title">
+						<p>충전금액</p>
+					</div>
+					<div class="de_price">
+						<input type="radio" name="chk" id="do_pr_1" value="1000" onclick="get_show(this.value);">
+						<label for="do_pr_1" class="mr-sm-2">1,000원</label>
+					</div>
+					<div class="de_price">
+						<input type="radio" name="chk" id="do_pr_2" value="5000" onclick="get_show(this.value);">
+						<label for="do_pr_2" class="mr-sm-2">5,000원</label>
+					</div>
+					<div class="de_price">
+						<input type="radio" name="chk" id="do_pr_3" value="10000" onclick="get_show(this.value);">
+						<label for="do_pr_3" class="mr-sm-2">10,000원</label>
+					</div>
+					<div class="de_price">
+						<input type="radio" name="chk" id="do_pr_4" value="50000" onclick="get_show(this.value);">
+						<label for="do_pr_4" class="mr-sm-2">50,000원</label>
+					</div>
+					<div class="de_price">
+						<input type="radio" name="chk" id="do_pr_5" value="ect" onclick="get_show(this.value);">
+						<label for="do_pr_5" class="mr-sm-2">직접입력(최대 1,000,000원까지 충전 가능)</label>
+					</div>
+					<div class="enter_price form-group" style="display:none;">
+						<div class="row">
+							<div class="col-sm-9 input-money">
+								<input type="text" id="ect_price" class="form-control" value="0" size="10" onkeyup="get_price(this.value);">
+							</div>
+							<div class="col-sm-2 won">
+							원
+							</div>
+						</div>
+						<div class="row money_btn_row">
+							<div class="money_btn btn-list col-sm-8">
+								<button type="button" class="btn btn-info" value="5000" onclick="add_price(this.value);">+5,000</button>
+								<button type="button" class="btn btn-info" value="10000" onclick="add_price(this.value);">+10,000</button>
+								<button type="button" class="btn btn-info" value="100000" onclick="add_price(this.value);">+100,000</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="divider"></div> <!-- 중간 선 -->
+				<div class="rigth_side">
+					<div class="title">
+						<p>구매자정보</p>
+					</div>
+					<div class="order_info form-group row">
+						<label for="do_name" class="col-sm-4 text-sm-right">구매자 성함</label>
+						<div class="col-sm-8">
+							<input type="text" class="form-control" name="do_name" id="do_name" th:value="${#authentication.Principal.member.mb_name}">
+						</div>
+					</div>
+					<div class="order_info form-group row">
+						<label for="do_tel" class="col-sm-4 text-sm-right">구매자 연락처</label>
+						<div class="col-sm-8">
+							<input type="text" class="form-control" name="do_tel" id="do_tel" th:value="${#authentication.Principal.member.mb_ph}">
+						</div>
+					</div>
+					<div class="order_info form-group row">
+						<label for="do_email" class="col-sm-4 text-sm-right">구매자 이메일</label>
+						<div class="col-sm-8">
+							<input type="text" class="form-control" name="do_email" id="do_email" th:value="${#authentication.Principal.member.mb_email}">
+						</div>
+					</div>
+				</div>
+			</div>
+			 <div class="form-footer">
+	            <button type="submit" class="btn btn-outline-info">결제하기</button>
+	        </div>
+		</form>
+	</div>
+	<script th:inline="javascript">
+		function get_show(price){
+			
+			$("input[name=do_price]").val(0);
+			
+			if(price == "ect"){
+				$(".enter_price").slideDown(350, function() {
+					$("#ect_price").val(0);
+				    $(".enter_price").show();
+				});
+			} else {
+				get_price(price);
+				$(".enter_price").slideUp(350, function() {
+					$("#ect_price").val(0);
+				    $(".enter_price").hide();
+				});
+			}
+		}
+		
+		function add_price(price){
+			var new_price = parseInt($("#ect_price").val()) + parseInt(price);
+			$("#ect_price").val(new_price);
+			$("input[name=do_price]").val(new_price);
+			get_price(new_price);
+		}
+		
+		function get_price(price){
+			if (/[^0-9]/g.test(price)) {				 
+				price = price.replace(/[^0-9]/g, '');
+				$("#ect_price").val(price);
+			}
+			// price가 1,000,000을 넘는지 확인
+		    if (parseInt(price) > 1000000) {
+		        alert("직접입력으로 충전시 1,000,000원을 초과할 수 없습니다.");
+		        price = 1000000;
+		        $("#ect_price").val(price);
+		    }
+			
+			$("input[name=do_price]").val(price);
+		}
+		function clientAuth(f) {
+			AUTHNICE.requestPay({
+				clientId: [[${clientId}]],
+				method: 'card',
+				orderId: f.do_od_id.value,
+				buyerName: f.do_name.value,
+				buyerTel: f.do_tel.value,
+				buyerEmail: f.do_email.value,
+				amount: parseInt(f.do_price.value),
+				goodsName: '예치금 결제',
+				returnUrl: '/deposit/clientAuth',
+				fnError: function (result) {
+					alert('error : ' + result.errorMsg + '');
+				}
+			});
+		}
+		function fdepositorder_submit(f){
+			
+			if(f.do_price.value <= 0){
+				alert("충전하실 금액을 선택해주세요.");
+				return false;
+			}
+			
+			if(f.chk.value == 'ect' && $("#ect_price").val() < 999 ){
+				alert("직접입력으로 충전시\n1000원 이상의 금액을 입력해주세요.");
+				$("#ect_price").focus();
+				return false;
+			}
+			
+			if(!f.do_name.value){
+				alert("성함을 작성해주세요.");
+				f.do_name.focus();
+				return false;
+			}
+			if(!f.do_tel.value){
+				alert("연락처를 작성해주세요.");
+				f.do_tel.focus();
+				return false;
+			}
+			if(!f.do_email.value){
+				alert("이메일을 작성해주세요.");
+				f.do_email.focus();
+				return false;
+			}
+			var url = "/deposit/insertOrder";
+			// 배열을 객체로 변환
+			var form_array = $(f).serializeArray();
+		    var order_data = {};
+		    form_array.forEach(function(item) {
+		    	order_data[item.name] = item.value;
+		    });
+			$.ajax({
+	            url: url,
+	            type: 'post',
+	            data: order_data,
+	            dataType : 'json',
+	            async: false, 
+	            success: function (data) {
+	                f.do_od_id.value = data;
+	            }
+	        });
+			
+			clientAuth(f);
+			return false;
+		}
+	</script>
+</body>
+</html>

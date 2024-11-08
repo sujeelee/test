@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<nav id="menu" class="menu_large" th:fragment="sidebar">
+	<ul id="menu_ul" onclick="toggleSubMenu('memberManagement')">
+		<li id="menu_li" class="side_hover"><a href="/admin/adminHome" class="sidefont">
+				<i class='bx bx-cog' id="nav_icon"> 기본환경설정 </i>
+		</a></li>
+		<li id="menu_li" class="side_hover"><a href="/admin/admMember/adminUser"
+			class="sidefont"> <i class="bx bx-user-check" id="nav_icon">
+					회원관리 </i>
+		</a></li>
+		<li id="menu_li" class="side_hover"><a href="/admin/admApproval/admApprovalPage"
+			class="sidefont"> <i class="bx bx-store-alt" id="nav_icon">
+					회원권한 </i>
+		</a></li>
+		<li id="menu_li" class="side_hover"><a href="/admin/admOrder/orderAdm"
+			class="sidefont"> <i class='bx bx-edit-alt' id="nav_icon">
+					주문내역 </i></a></li>
+		<li id="menu_li" class="side_hover"><a href="/admin/admPoint/admPointPage"
+			class="sidefont"> <i class='bx bx-credit-card' id="nav_icon">
+					포인트 </i></a></li>
+		<li id="menu_li" class="side_hover"><a href="/admin/admLevel/admLevelPage"
+			class="sidefont"> <i class='bx bx-chevrons-up' id="nav_icon">
+					레벨 </i></a></li>
+		<li id="menu_li" class="side_hover"><a href="/admin/admDaycheck/daycheckAdm"
+			class="sidefont"> <i class='bx bx-list-ul' id="nav_icon">
+					회원출석 </i></a></li>
+		<li id="menu_li" class="side_hover"><a href="/admin/admStock/admStock_add"
+			class="sidefont"> <i class='bx bxl-bitcoin' id="nav_icon">
+					주식발행 </i></a></li>
+		<li id="menu_li" class="side_hover"><a href="/admin/admNews/news" class="sidefont">
+				<i class='bx bx-news' id="nav_icon"> 신문사정보 </i>
+		</a></li>
+		<li id="menu_li" class="side_hover">
+			<div class="menu-item">
+				<a onclick="toggleSubMenu('eventManagement')" style="cursor: pointer;"> <i
+					class='bx bx-customize' id="nav_icon"> 주식</i></a>
+			</div>
+			<div id="eventManagement" class="sub-menu">
+				<div class="sub-menu-item">
+					<a th:href="@{/admin/stock/getListStock}"
+						style="font-size: 15px; color: black;">주식회사관리</a>
+				</div>
+				<div class="sub-menu-item">
+					<a th:href="@{/admin/stock}" style="font-size: 15px; color: black;">주식시세관리</a>
+				</div>
+			</div>
+		</li>
+	</ul>
+</nav>
+
+</html>
